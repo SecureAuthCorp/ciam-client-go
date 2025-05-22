@@ -37,6 +37,9 @@ import (
 	identityself "github.com/cloudentity/acp-client-go/clients/identityself/client"
 	identitysystem "github.com/cloudentity/acp-client-go/clients/identitysystem/client"
 
+	licensingadmin "github.com/cloudentity/acp-client-go/clients/licensingadmin/client"
+	licensingroot "github.com/cloudentity/acp-client-go/clients/licensingroot/client"
+
 	publicClient "github.com/cloudentity/acp-client-go/clients/public/client"
 	rootClient "github.com/cloudentity/acp-client-go/clients/root/client"
 	systemClient "github.com/cloudentity/acp-client-go/clients/system/client"
@@ -167,6 +170,14 @@ type IdentitySystem struct {
 	*identitysystem.Acp
 }
 
+type LicensingRoot struct {
+	*licensingroot.Acp
+}
+
+type LicensingAdmin struct {
+	*licensingadmin.Acp
+}
+
 type Hub struct {
 	*hub.Acp
 }
@@ -195,6 +206,9 @@ type Client struct {
 	IdentitySelf   *IdentitySelf
 	IdentityRoot   *IdentityRoot
 	IdentitySystem *IdentitySystem
+
+	LicensingRoot  *LicensingRoot
+	LicensingAdmin *LicensingAdmin
 
 	c                          *http.Client
 	requestObjectSigningKey    interface{}
@@ -769,6 +783,24 @@ func New(cfg Config) (c Client, err error) {
 		Acp: identitysystem.New(httptransport.NewWithClient(
 			cfg.IssuerURL.Host,
 			c.apiPathPrefix(cfg.VanityDomainType, "/api/identity/%s"),
+			[]string{cfg.IssuerURL.Scheme},
+			client,
+		).WithOpenTracing(), nil),
+	}
+
+	c.LicensingAdmin = &LicensingAdmin{
+		Acp: licensingadmin.New(httptransport.NewWithClient(
+			cfg.IssuerURL.Host,
+			c.apiPathPrefix(cfg.VanityDomainType, "/api/licensing/%s"),
+			[]string{cfg.IssuerURL.Scheme},
+			client,
+		).WithOpenTracing(), nil),
+	}
+
+	c.LicensingRoot = &LicensingRoot{
+		Acp: licensingroot.New(httptransport.NewWithClient(
+			cfg.IssuerURL.Host,
+			c.apiPathPrefix(cfg.VanityDomainType, "/api/licensing/%s"),
 			[]string{cfg.IssuerURL.Scheme},
 			client,
 		).WithOpenTracing(), nil),
