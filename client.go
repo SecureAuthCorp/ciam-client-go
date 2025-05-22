@@ -865,6 +865,14 @@ func (c *Client) apiPathPrefix(vanityDomainType string, format string) string {
 			return c.BasePath + fmt.Sprintf(format, c.TenantID)
 		}
 
+	case "/api/licensing/system/%s":
+		switch vanityDomainType {
+		case "tenant", "server":
+			return c.BasePath + "/api/licensing/system"
+		default:
+			return c.BasePath + fmt.Sprintf(format, c.TenantID)
+		}
+
 	case "/%s/%s":
 		switch vanityDomainType {
 		case "server":
