@@ -800,7 +800,7 @@ func New(cfg Config) (c Client, err error) {
 	c.LicensingRoot = &LicensingRoot{
 		Acp: licensingroot.New(httptransport.NewWithClient(
 			cfg.IssuerURL.Host,
-			c.apiPathPrefix(cfg.VanityDomainType, "/api/licensing/%s"),
+			c.BasePath+"/api/licensing",
 			[]string{cfg.IssuerURL.Scheme},
 			client,
 		).WithOpenTracing(), nil),
@@ -869,14 +869,6 @@ func (c *Client) apiPathPrefix(vanityDomainType string, format string) string {
 		switch vanityDomainType {
 		case "tenant", "server":
 			return c.BasePath + "/api/licensing"
-		default:
-			return c.BasePath + fmt.Sprintf(format, c.TenantID)
-		}
-
-	case "/api/licensing/system/%s":
-		switch vanityDomainType {
-		case "tenant", "server":
-			return c.BasePath + "/api/licensing/system"
 		default:
 			return c.BasePath + fmt.Sprintf(format, c.TenantID)
 		}
