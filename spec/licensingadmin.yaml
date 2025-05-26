@@ -1,0 +1,141 @@
+basePath: /api/licensing/default
+consumes:
+- application/json
+definitions:
+  Error:
+    description: HTTP error response
+    properties:
+      details:
+        type: object
+        x-nullable: false
+      error:
+        type: string
+        x-nullable: false
+      error_code:
+        type: string
+        x-nullable: false
+      status_code:
+        format: int64
+        type: integer
+        x-nullable: false
+    type: object
+  License:
+    properties:
+      end_date:
+        description: License end date
+        example: "2023-03-01T09:02:27.127932Z"
+        format: date-time
+        type: string
+        x-nullable: false
+      enforcement_enabled:
+        description: Is enforcement enabled
+        type: boolean
+        x-nullable: false
+      has_enterprise_idps_capability:
+        description: Is enterprise IDPs capability enabled
+        type: boolean
+        x-nullable: false
+      start_date:
+        description: License start date
+        example: "2023-03-01T09:02:27.127932Z"
+        format: date-time
+        type: string
+        x-nullable: false
+    type: object
+host: localhost:8443
+info:
+  description: |-
+    Cloudentity Licensing Admin API
+
+    The POST APIs support idempotency for safely retrying requests without accidentally performing the same operation twice.
+
+    To use idempotent requests:
+
+    1. Generate a unique idempotency key (32-255 characters long).
+    2. Include the key in the X-Idempotency-Key header of your POST request.
+    3. Retry failed requests with the same key within 1 minute.
+
+    Responses for replayed requests will include the X-Idempotent-Replayed: true header.
+  title: Cloudentity API
+  version: latest
+paths:
+  /admin/license:
+    get:
+      description: Get license.
+      operationId: getAdminLicense
+      responses:
+        "200":
+          $ref: '#/responses/LicenseResponse'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - admin: []
+      summary: Get license
+      tags:
+      - license
+produces:
+- application/json
+responses:
+  LicenseResponse:
+    description: License
+    schema:
+      $ref: '#/definitions/License'
+  badRequestHTTPError:
+    description: Bad request
+    schema:
+      $ref: '#/definitions/Error'
+  conflictHTTPError:
+    description: Conflict
+    schema:
+      $ref: '#/definitions/Error'
+  forbiddenHTTPError:
+    description: Forbidden
+    schema:
+      $ref: '#/definitions/Error'
+  internalServerErrorHTTPError:
+    description: Internal server error
+    schema:
+      $ref: '#/definitions/Error'
+  methodNotAllowedHTTPError:
+    description: Method not allowed
+    schema:
+      $ref: '#/definitions/Error'
+  notFoundHTTPError:
+    description: Not found
+    schema:
+      $ref: '#/definitions/Error'
+  payloadTooLargeHTTPError:
+    description: Payload too large
+    schema:
+      $ref: '#/definitions/Error'
+  preconditionFailedHTTPError:
+    description: Precondition failed
+    schema:
+      $ref: '#/definitions/Error'
+  tooManyRequestsHTTPError:
+    description: Too many requests
+    schema:
+      $ref: '#/definitions/Error'
+  unauthorizedHTTPError:
+    description: Unauthorized
+    schema:
+      $ref: '#/definitions/Error'
+  unprocessableEntityHTTPError:
+    description: Unprocessable entity
+    schema:
+      $ref: '#/definitions/Error'
+schemes:
+- https
+securityDefinitions:
+  admin:
+    authorizationUrl: /default/admin/oauth2/authorize
+    flow: accessCode
+    tokenUrl: /default/admin/oauth2/token
+    type: oauth2
+swagger: "2.0"

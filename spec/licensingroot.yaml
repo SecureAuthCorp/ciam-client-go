@@ -1,0 +1,534 @@
+basePath: /api/licensing
+consumes:
+- application/json
+definitions:
+  Capabilities:
+    additionalProperties:
+      $ref: '#/definitions/CapabilityData'
+    type: object
+  CapabilityData:
+    properties:
+      enabled:
+        type: boolean
+        x-nullable: false
+    type: object
+  Dump:
+    properties:
+      licenses:
+        items:
+          $ref: '#/definitions/TenantLicense'
+        type: array
+        x-nullable: false
+    type: object
+  Error:
+    description: HTTP error response
+    properties:
+      details:
+        type: object
+        x-nullable: false
+      error:
+        type: string
+        x-nullable: false
+      error_code:
+        type: string
+        x-nullable: false
+      status_code:
+        format: int64
+        type: integer
+        x-nullable: false
+    type: object
+  License:
+    properties:
+      capabilities:
+        $ref: '#/definitions/Capabilities'
+      end_date:
+        description: License end date
+        example: "2023-03-01T09:02:27.127932Z"
+        format: date-time
+        type: string
+        x-nullable: false
+      start_date:
+        description: License start date
+        example: "2023-03-01T09:02:27.127932Z"
+        format: date-time
+        type: string
+        x-nullable: false
+      type:
+        description: Type of license
+        enum:
+        - trial
+        - enterprise
+        example: trial
+        type: string
+        x-nullable: false
+    type: object
+  LicenseTypeWithDefaultCapabilities:
+    properties:
+      capabilities:
+        $ref: '#/definitions/Capabilities'
+      id:
+        description: LicenseType
+        enum:
+        - trial
+        - enterprise
+        type: string
+        x-nullable: false
+    type: object
+  Licenses:
+    properties:
+      default_license_duration:
+        description: DefaultLicenseDuration is the default license duration for new
+          tenants, 0 means unlimited
+        format: duration
+        type: string
+        x-nullable: false
+      default_license_type:
+        description: DefaultLicenseType is the default license type for new tenants
+        enum:
+        - trial
+        - enterprise
+        type: string
+        x-nullable: false
+      enabled:
+        description: Is licensing mechanism enabled
+        type: boolean
+        x-nullable: false
+      licenses:
+        description: All available licenses with default capabilities
+        items:
+          $ref: '#/definitions/LicenseTypeWithDefaultCapabilities'
+        type: array
+        x-nullable: false
+    type: object
+  Rfc6902PatchOperation:
+    properties:
+      op:
+        description: |-
+          Each operation must have at least one `op` member, which value indicates
+          the actual operation to be performed against the target (current) configuration.
+          For a detailed description of available operations,
+          see the [Operations #4 section of the RFC6902 specification](https://datatracker.ietf.org/doc/html/rfc6902#section-4).
+        enum:
+        - add
+        - remove
+        - replace
+        - move
+        - copy
+        - test
+        type: string
+        x-nullable: false
+      path:
+        description: |-
+          String containing a JSON-Pointer value ([RFC6901](https://datatracker.ietf.org/doc/html/rfc6901))
+          that references a location within the target configuration where the operation is performed.
+
+          For available paths, reference the exported configuration.
+        type: string
+        x-nullable: false
+      value:
+        description: New object value applied to the patched (target) configuration.
+        type: object
+        x-nullable: false
+    type: object
+  Rfc6902PatchOperations:
+    items:
+      $ref: '#/definitions/Rfc6902PatchOperation'
+    type: array
+  TenantLicense:
+    properties:
+      capabilities:
+        $ref: '#/definitions/Capabilities'
+      end_date:
+        description: License end date
+        example: "2023-03-01T09:02:27.127932Z"
+        format: date-time
+        type: string
+        x-nullable: false
+      start_date:
+        description: License start date
+        example: "2023-03-01T09:02:27.127932Z"
+        format: date-time
+        type: string
+        x-nullable: false
+      tenant_id:
+        format: tenantID
+        type: string
+        x-nullable: false
+      type:
+        description: Type of license
+        enum:
+        - trial
+        - enterprise
+        example: trial
+        type: string
+        x-nullable: false
+    type: object
+host: localhost:8443
+info:
+  description: |-
+    Cloudentity Root API
+
+    The POST APIs support idempotency for safely retrying requests without accidentally performing the same operation twice.
+
+    To use idempotent requests:
+
+    1. Generate a unique idempotency key (32-255 characters long).
+    2. Include the key in the X-Idempotency-Key header of your POST request.
+    3. Retry failed requests with the same key within 1 minute.
+
+    Responses for replayed requests will include the X-Idempotent-Replayed: true header.
+  title: Cloudentity API
+  version: latest
+paths:
+  /admin/tenants/{tenantID}/license:
+    get:
+      description: Get tenant license.
+      operationId: adminGetTenantLicense
+      parameters:
+      - default: default
+        description: Tenant id
+        in: path
+        name: tenantID
+        required: true
+        type: string
+      responses:
+        "200":
+          $ref: '#/responses/LicenseResponse'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - adminSystem: []
+      summary: Get tenant license
+      tags:
+      - licenses
+    put:
+      operationId: adminSetTenantLicense
+      parameters:
+      - default: default
+        description: Tenant id
+        in: path
+        name: tenantID
+        required: true
+        type: string
+      - in: body
+        name: License
+        schema:
+          $ref: '#/definitions/License'
+      responses:
+        "204":
+          description: ' license set'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "422":
+          $ref: '#/responses/unprocessableEntityHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - adminSystem: []
+      summary: Set tenant license
+      tags:
+      - licenses
+  /admin/tenants/{tenantID}/licenses:
+    get:
+      description: Get defined licenses.
+      operationId: getConfiguredLicenses
+      parameters:
+      - default: default
+        description: Tenant id
+        in: path
+        name: tenantID
+        required: true
+        type: string
+      responses:
+        "200":
+          $ref: '#/responses/LicensesResponse'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - adminSystem: []
+      summary: Get defined licenses
+      tags:
+      - licenses
+  /system/configuration:
+    get:
+      description: |-
+        Returns a JSON with licensing configuration.
+
+        By default, a system tenant is created for you automatically and a client application with the
+        client credentials grant flow enabled is also provided. The ID of this client is `system` and the
+        client secret can be found in your ACP configuration file.
+
+        When requesting an access token, you should provide the `manage_configuration` scope as the one you
+        would like to request.
+      operationId: exportConfiguration
+      parameters:
+      - default: default
+        description: Tenant id
+        in: query
+        name: tid
+        type: string
+      responses:
+        "200":
+          description: Dump
+          schema:
+            $ref: '#/definitions/Dump'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "422":
+          $ref: '#/responses/unprocessableEntityHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - setup: []
+      summary: Export global licensing configuration
+      tags:
+      - configuration
+    patch:
+      description: Patch tenant configuration using RFC 6902 JSON Patch.
+      operationId: patchConfiguration
+      parameters:
+      - default: default
+        description: Tenant id
+        in: query
+        name: tid
+        type: string
+      - in: body
+        name: patch
+        schema:
+          $ref: '#/definitions/Rfc6902PatchOperations'
+      - format: insertMode
+        in: query
+        name: mode
+        type: string
+      responses:
+        "204":
+          description: ' patch applied'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "422":
+          $ref: '#/responses/unprocessableEntityHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - setup: []
+      summary: Patch configuration
+      tags:
+      - configuration
+    put:
+      description: |-
+        Allows to import a JSON file that contains all the licensing configuration.
+
+        By default, a system tenant is created for you automatically and a client application with the
+        client credentials grant flow enabled is also provided. The ID of this client is `system` and the
+        client secret can be found in your ACP configuration file.
+
+        When requesting an access token, you should provide the `manage_configuration` scope as the one you
+        would like to request.
+      operationId: importConfiguration
+      parameters:
+      - in: body
+        name: Dump
+        schema:
+          $ref: '#/definitions/Dump'
+      - description: |-
+          Insert mode
+
+          Defines what happens in case of configuration import conflicts.
+
+          The `mode` parameter defines
+          what happens if there are any conflicts when importing your configuration. For example, if a
+          license already exists within ACP and you are trying to import a
+          configuration that also has a license for this tenant, there are the following ways
+          ACP can handle the request:
+
+          `mode` set to `ignore`, ACP ignores the changes that come from your configuration import.
+
+          `mode` set to `fail`, ACP stops processing the import and returns an error.
+
+          `mode` set to `update`, ACP updates the value from the previous configuration with the value
+          provided in the request.
+        format: insertMode
+        in: query
+        name: mode
+        type: string
+      responses:
+        "204":
+          description: ' configuration has been imported'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "409":
+          $ref: '#/responses/conflictHTTPError'
+        "422":
+          $ref: '#/responses/unprocessableEntityHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - setup: []
+      summary: Import global licensing configuration
+      tags:
+      - configuration
+  /system/tenants/{tenantID}/license:
+    get:
+      description: Get tenant license.
+      operationId: systemGetTenantLicense
+      parameters:
+      - default: default
+        description: Tenant id
+        in: path
+        name: tenantID
+        required: true
+        type: string
+      responses:
+        "200":
+          $ref: '#/responses/LicenseResponse'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - setup: []
+      summary: Get tenant license
+      tags:
+      - licenses
+    put:
+      operationId: systemSetTenantLicense
+      parameters:
+      - default: default
+        description: Tenant id
+        in: path
+        name: tenantID
+        required: true
+        type: string
+      - in: body
+        name: License
+        schema:
+          $ref: '#/definitions/License'
+      responses:
+        "204":
+          description: ' license set'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "422":
+          $ref: '#/responses/unprocessableEntityHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - setup: []
+      summary: Set tenant license
+      tags:
+      - licenses
+produces:
+- application/json
+responses:
+  LicenseResponse:
+    description: License
+    schema:
+      $ref: '#/definitions/License'
+  LicensesResponse:
+    description: Licenses
+    schema:
+      $ref: '#/definitions/Licenses'
+  badRequestHTTPError:
+    description: Bad request
+    schema:
+      $ref: '#/definitions/Error'
+  conflictHTTPError:
+    description: Conflict
+    schema:
+      $ref: '#/definitions/Error'
+  forbiddenHTTPError:
+    description: Forbidden
+    schema:
+      $ref: '#/definitions/Error'
+  internalServerErrorHTTPError:
+    description: Internal server error
+    schema:
+      $ref: '#/definitions/Error'
+  methodNotAllowedHTTPError:
+    description: Method not allowed
+    schema:
+      $ref: '#/definitions/Error'
+  notFoundHTTPError:
+    description: Not found
+    schema:
+      $ref: '#/definitions/Error'
+  payloadTooLargeHTTPError:
+    description: Payload too large
+    schema:
+      $ref: '#/definitions/Error'
+  preconditionFailedHTTPError:
+    description: Precondition failed
+    schema:
+      $ref: '#/definitions/Error'
+  tooManyRequestsHTTPError:
+    description: Too many requests
+    schema:
+      $ref: '#/definitions/Error'
+  unauthorizedHTTPError:
+    description: Unauthorized
+    schema:
+      $ref: '#/definitions/Error'
+  unprocessableEntityHTTPError:
+    description: Unprocessable entity
+    schema:
+      $ref: '#/definitions/Error'
+schemes:
+- https
+securityDefinitions:
+  adminSystem:
+    authorizationUrl: /system/admin/oauth2/authorize
+    flow: accessCode
+    tokenUrl: /system/admin/oauth2/token
+    type: oauth2
+  setup:
+    authorizationUrl: /system/system/oauth2/authorize
+    flow: accessCode
+    tokenUrl: /system/system/oauth2/token
+    type: oauth2
+swagger: "2.0"
