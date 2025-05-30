@@ -76,6 +76,10 @@ type ClientService interface {
 
 	ListServersBindings(params *ListServersBindingsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListServersBindingsOK, error)
 
+	RevokeRotatedServerSecrets(params *RevokeRotatedServerSecretsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RevokeRotatedServerSecretsNoContent, error)
+
+	RotateServerSecret(params *RotateServerSecretParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RotateServerSecretNoContent, error)
+
 	SetCIBAAuthenticationService(params *SetCIBAAuthenticationServiceParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*SetCIBAAuthenticationServiceOK, error)
 
 	SetServerConsent(params *SetServerConsentParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*SetServerConsentOK, error)
@@ -517,6 +521,88 @@ func (a *Client) ListServersBindings(params *ListServersBindingsParams, authInfo
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for listServersBindings: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+RevokeRotatedServerSecrets revokes rotated secrets
+
+Revoke all rotated server's secrets.
+*/
+func (a *Client) RevokeRotatedServerSecrets(params *RevokeRotatedServerSecretsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RevokeRotatedServerSecretsNoContent, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewRevokeRotatedServerSecretsParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "revokeRotatedServerSecrets",
+		Method:             "POST",
+		PathPattern:        "/servers/{wid}/revokeRotatedSecrets",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &RevokeRotatedServerSecretsReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*RevokeRotatedServerSecretsNoContent)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for revokeRotatedServerSecrets: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+RotateServerSecret rotates server s secret
+
+Generate a new server secret and move old secret to rotated secrets list.
+*/
+func (a *Client) RotateServerSecret(params *RotateServerSecretParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RotateServerSecretNoContent, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewRotateServerSecretParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "rotateServerSecret",
+		Method:             "POST",
+		PathPattern:        "/servers/{wid}/rotateSecret",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &RotateServerSecretReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*RotateServerSecretNoContent)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for rotateServerSecret: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

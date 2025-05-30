@@ -25,7 +25,6 @@ import (
 	"github.com/cloudentity/acp-client-go/clients/admin/client/idps"
 	"github.com/cloudentity/acp-client-go/clients/admin/client/images"
 	"github.com/cloudentity/acp-client-go/clients/admin/client/keys"
-	"github.com/cloudentity/acp-client-go/clients/admin/client/license"
 	"github.com/cloudentity/acp-client-go/clients/admin/client/mfa_methods"
 	"github.com/cloudentity/acp-client-go/clients/admin/client/openbanking"
 	"github.com/cloudentity/acp-client-go/clients/admin/client/organizations"
@@ -106,7 +105,6 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *Acp {
 	cli.Idps = idps.New(transport, formats)
 	cli.Images = images.New(transport, formats)
 	cli.Keys = keys.New(transport, formats)
-	cli.License = license.New(transport, formats)
 	cli.MfaMethods = mfa_methods.New(transport, formats)
 	cli.Openbanking = openbanking.New(transport, formats)
 	cli.Organizations = organizations.New(transport, formats)
@@ -202,8 +200,6 @@ type Acp struct {
 
 	Keys keys.ClientService
 
-	License license.ClientService
-
 	MfaMethods mfa_methods.ClientService
 
 	Openbanking openbanking.ClientService
@@ -267,7 +263,6 @@ func (c *Acp) SetTransport(transport runtime.ClientTransport) {
 	c.Idps.SetTransport(transport)
 	c.Images.SetTransport(transport)
 	c.Keys.SetTransport(transport)
-	c.License.SetTransport(transport)
 	c.MfaMethods.SetTransport(transport)
 	c.Openbanking.SetTransport(transport)
 	c.Organizations.SetTransport(transport)

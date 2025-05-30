@@ -19,6 +19,12 @@ type CapabilityData struct {
 
 	// enabled
 	Enabled bool `json:"enabled,omitempty" yaml:"enabled,omitempty"`
+
+	// monthly limit
+	MonthlyLimit int64 `json:"monthly_limit,omitempty" yaml:"monthly_limit,omitempty"`
+
+	// total limit
+	TotalLimit int64 `json:"total_limit,omitempty" yaml:"total_limit,omitempty"`
 }
 
 // Validate validates this capability data

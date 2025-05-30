@@ -490,6 +490,9 @@ definitions:
         format: verifiableAddress
         type: string
         x-nullable: false
+      allowed_for_2fa:
+        type: boolean
+        x-nullable: false
       created_at:
         format: date-time
         type: string
@@ -641,6 +644,10 @@ definitions:
         - sms_otp
         - webauthn
         example: password
+        type: string
+        x-nullable: false
+      totp_issuer:
+        description: totp issuer
         type: string
         x-nullable: false
       verifiable_addresses:

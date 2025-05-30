@@ -65,6 +65,24 @@ definitions:
         type: number
         x-nullable: false
     type: object
+  TopDataPoint:
+    properties:
+      frequency:
+        format: double
+        type: number
+        x-nullable: false
+      value:
+        type: string
+        x-nullable: false
+    type: object
+  TopDataPoints:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/TopDataPoint'
+        type: array
+        x-nullable: false
+    type: object
 host: localhost:8443
 info:
   description: |-
@@ -83,6 +101,14 @@ paths:
       description: Query access token data points.
       operationId: tenantSingleAccessTokenMetrics
       parameters:
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
+        type: string
       - default: auto
         description: Bucket
         enum:
@@ -109,14 +135,6 @@ paths:
         format: date-time
         in: query
         name: origin
-        type: string
-      - description: From
-        in: query
-        name: from
-        type: string
-      - description: To
-        in: query
-        name: to
         type: string
       - description: A server will only return requested resources if the resource
           matches one of the listed ETag value
@@ -150,12 +168,20 @@ paths:
       - admin: []
       summary: Query access tokens
       tags:
-      - Metrics
+      - TenantMetrics
   /access-tokens/{group}:
     get:
       description: Query access token data points by group.
       operationId: tenantAggregatedAccessTokenMetrics
       parameters:
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
+        type: string
       - default: auto
         description: Bucket
         enum:
@@ -182,14 +208,6 @@ paths:
         format: date-time
         in: query
         name: origin
-        type: string
-      - description: From
-        in: query
-        name: from
-        type: string
-      - description: To
-        in: query
-        name: to
         type: string
       - description: A server will only return requested resources if the resource
           matches one of the listed ETag value
@@ -231,12 +249,20 @@ paths:
       - admin: []
       summary: Query access tokens by group
       tags:
-      - Metrics
+      - TenantMetrics
   /authentications:
     get:
       description: Query authentication data points.
       operationId: tenantSingleAuthenticationMetrics
       parameters:
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
+        type: string
       - default: auto
         description: Bucket
         enum:
@@ -263,14 +289,6 @@ paths:
         format: date-time
         in: query
         name: origin
-        type: string
-      - description: From
-        in: query
-        name: from
-        type: string
-      - description: To
-        in: query
-        name: to
         type: string
       - description: A server will only return requested resources if the resource
           matches one of the listed ETag value
@@ -300,12 +318,20 @@ paths:
       - admin: []
       summary: Query authentications
       tags:
-      - Metrics
+      - TenantMetrics
   /authentications/{group}:
     get:
       description: Query authentication data points by group.
       operationId: tenantAggregatedAuthenticationMetrics
       parameters:
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
+        type: string
       - default: auto
         description: Bucket
         enum:
@@ -332,14 +358,6 @@ paths:
         format: date-time
         in: query
         name: origin
-        type: string
-      - description: From
-        in: query
-        name: from
-        type: string
-      - description: To
-        in: query
-        name: to
         type: string
       - description: Filter by result (works only for grouping by method)
         in: query
@@ -388,12 +406,20 @@ paths:
       - admin: []
       summary: Query authentications by group
       tags:
-      - Metrics
+      - TenantMetrics
   /faas:
     get:
       description: Query faas data points.
       operationId: tenantSingleFaasMetrics
       parameters:
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
+        type: string
       - default: auto
         description: Bucket
         enum:
@@ -420,14 +446,6 @@ paths:
         format: date-time
         in: query
         name: origin
-        type: string
-      - description: From
-        in: query
-        name: from
-        type: string
-      - description: To
-        in: query
-        name: to
         type: string
       - description: A server will only return requested resources if the resource
           matches one of the listed ETag value
@@ -469,12 +487,20 @@ paths:
       - admin: []
       summary: Query faas duration
       tags:
-      - Metrics
+      - TenantMetrics
   /faas/{group}:
     get:
       description: Query faas data points by group.
       operationId: tenantAggregatedFaasMetrics
       parameters:
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
+        type: string
       - default: auto
         description: Bucket
         enum:
@@ -501,14 +527,6 @@ paths:
         format: date-time
         in: query
         name: origin
-        type: string
-      - description: From
-        in: query
-        name: from
-        type: string
-      - description: To
-        in: query
-        name: to
         type: string
       - description: A server will only return requested resources if the resource
           matches one of the listed ETag value
@@ -558,12 +576,20 @@ paths:
       - admin: []
       summary: Query faas duration by group
       tags:
-      - Metrics
+      - TenantMetrics
   /gateway-requests:
     get:
       description: Query gateway request data points.
       operationId: tenantSingleGatewayRequestMetrics
       parameters:
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
+        type: string
       - default: auto
         description: Bucket
         enum:
@@ -590,14 +616,6 @@ paths:
         format: date-time
         in: query
         name: origin
-        type: string
-      - description: From
-        in: query
-        name: from
-        type: string
-      - description: To
-        in: query
-        name: to
         type: string
       - description: A server will only return requested resources if the resource
           matches one of the listed ETag value
@@ -632,12 +650,20 @@ paths:
       - admin: []
       summary: Query gateway requests
       tags:
-      - Metrics
+      - TenantMetrics
   /gateway-requests/{group}:
     get:
       description: Query gateway request data points by group.
       operationId: tenantAggregatedGatewayRequestMetrics
       parameters:
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
+        type: string
       - default: auto
         description: Bucket
         enum:
@@ -664,14 +690,6 @@ paths:
         format: date-time
         in: query
         name: origin
-        type: string
-      - description: From
-        in: query
-        name: from
-        type: string
-      - description: To
-        in: query
-        name: to
         type: string
       - description: A server will only return requested resources if the resource
           matches one of the listed ETag value
@@ -714,12 +732,20 @@ paths:
       - admin: []
       summary: Query gateway requests by group
       tags:
-      - Metrics
+      - TenantMetrics
   /http-requests:
     get:
       description: Query http request data points.
       operationId: tenantSingleHttpRequestMetrics
       parameters:
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
+        type: string
       - default: auto
         description: Bucket
         enum:
@@ -746,14 +772,6 @@ paths:
         format: date-time
         in: query
         name: origin
-        type: string
-      - description: From
-        in: query
-        name: from
-        type: string
-      - description: To
-        in: query
-        name: to
         type: string
       - description: A server will only return requested resources if the resource
           matches one of the listed ETag value
@@ -795,12 +813,20 @@ paths:
       - admin: []
       summary: Query http requests
       tags:
-      - Metrics
+      - TenantMetrics
   /http-requests/{group}:
     get:
       description: Query http request data points by group.
       operationId: tenantAggregatedHttpRequestMetrics
       parameters:
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
+        type: string
       - default: auto
         description: Bucket
         enum:
@@ -827,14 +853,6 @@ paths:
         format: date-time
         in: query
         name: origin
-        type: string
-      - description: From
-        in: query
-        name: from
-        type: string
-      - description: To
-        in: query
-        name: to
         type: string
       - description: A server will only return requested resources if the resource
           matches one of the listed ETag value
@@ -886,12 +904,20 @@ paths:
       - admin: []
       summary: Query http requests by group
       tags:
-      - Metrics
+      - TenantMetrics
   /otp-operations:
     get:
       description: Query otp operation data points.
       operationId: tenantSingleOTPOperationMetrics
       parameters:
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
+        type: string
       - default: auto
         description: Bucket
         enum:
@@ -918,14 +944,6 @@ paths:
         format: date-time
         in: query
         name: origin
-        type: string
-      - description: From
-        in: query
-        name: from
-        type: string
-      - description: To
-        in: query
-        name: to
         type: string
       - description: A server will only return requested resources if the resource
           matches one of the listed ETag value
@@ -955,12 +973,20 @@ paths:
       - admin: []
       summary: Query otp operations
       tags:
-      - Metrics
+      - TenantMetrics
   /otp-operations/{group}:
     get:
       description: Query otp operation data points by group.
       operationId: tenantAggregatedOTPOperationMetrics
       parameters:
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
+        type: string
       - default: auto
         description: Bucket
         enum:
@@ -987,14 +1013,6 @@ paths:
         format: date-time
         in: query
         name: origin
-        type: string
-      - description: From
-        in: query
-        name: from
-        type: string
-      - description: To
-        in: query
-        name: to
         type: string
       - description: A server will only return requested resources if the resource
           matches one of the listed ETag value
@@ -1032,12 +1050,20 @@ paths:
       - admin: []
       summary: Query otp operations by group
       tags:
-      - Metrics
+      - TenantMetrics
   /policy-validations:
     get:
       description: Query policy validation data points.
       operationId: tenantSinglePolicyValidationMetrics
       parameters:
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
+        type: string
       - default: auto
         description: Bucket
         enum:
@@ -1064,14 +1090,6 @@ paths:
         format: date-time
         in: query
         name: origin
-        type: string
-      - description: From
-        in: query
-        name: from
-        type: string
-      - description: To
-        in: query
-        name: to
         type: string
       - description: A server will only return requested resources if the resource
           matches one of the listed ETag value
@@ -1101,12 +1119,20 @@ paths:
       - admin: []
       summary: Query policy validations
       tags:
-      - Metrics
+      - TenantMetrics
   /policy-validations/{group}:
     get:
       description: Query policy validation data points by group.
       operationId: tenantAggregatedPolicyValidationMetrics
       parameters:
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
+        type: string
       - default: auto
         description: Bucket
         enum:
@@ -1133,14 +1159,6 @@ paths:
         format: date-time
         in: query
         name: origin
-        type: string
-      - description: From
-        in: query
-        name: from
-        type: string
-      - description: To
-        in: query
-        name: to
         type: string
       - description: A server will only return requested resources if the resource
           matches one of the listed ETag value
@@ -1178,12 +1196,20 @@ paths:
       - admin: []
       summary: Query policy validations by group
       tags:
-      - Metrics
+      - TenantMetrics
   /pools/{ipID}/users:
     get:
       description: Query pool users data points.
       operationId: poolSingleUsersMetrics
       parameters:
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
+        type: string
       - default: auto
         description: Bucket
         enum:
@@ -1210,14 +1236,6 @@ paths:
         format: date-time
         in: query
         name: origin
-        type: string
-      - description: From
-        in: query
-        name: from
-        type: string
-      - description: To
-        in: query
-        name: to
         type: string
       - description: A server will only return requested resources if the resource
           matches one of the listed ETag value
@@ -1254,17 +1272,27 @@ paths:
       - admin: []
       summary: Query pool users metrics
       tags:
-      - Metrics
-  /servers/{wid}/access-tokens:
+      - PoolMetrics
+  /pools/{ipID}/users/{userID}/access-tokens:
     get:
       description: Query access token data points.
-      operationId: workspaceSingleAccessTokenMetrics
+      operationId: userSingleAccessTokenMetrics
       parameters:
-      - default: default
-        description: Workspace ID
-        in: path
-        name: wid
+      - in: path
+        name: ipID
         required: true
+        type: string
+      - in: path
+        name: userID
+        required: true
+        type: string
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
         type: string
       - default: auto
         description: Bucket
@@ -1292,14 +1320,6 @@ paths:
         format: date-time
         in: query
         name: origin
-        type: string
-      - description: From
-        in: query
-        name: from
-        type: string
-      - description: To
-        in: query
-        name: to
         type: string
       - description: A server will only return requested resources if the resource
           matches one of the listed ETag value
@@ -1333,104 +1353,27 @@ paths:
       - admin: []
       summary: Query access tokens
       tags:
-      - Metrics
-  /servers/{wid}/access-tokens/{group}:
-    get:
-      description: Query access token data points by group.
-      operationId: workspaceAggregatedAccessTokenMetrics
-      parameters:
-      - default: default
-        description: Workspace ID
-        in: path
-        name: wid
-        required: true
-        type: string
-      - default: auto
-        description: Bucket
-        enum:
-        - auto
-        - all
-        - 1m
-        - 5m
-        - 15m
-        - 30m
-        - 1h
-        - 3h
-        - 6h
-        - 12h
-        - 1d
-        - 1w
-        - 1M
-        - 3M
-        - 6M
-        - 1Y
-        in: query
-        name: bucket
-        type: string
-      - description: Origin
-        format: date-time
-        in: query
-        name: origin
-        type: string
-      - description: From
-        in: query
-        name: from
-        type: string
-      - description: To
-        in: query
-        name: to
-        type: string
-      - description: A server will only return requested resources if the resource
-          matches one of the listed ETag value
-        format: etag
-        in: header
-        name: if-match
-        type: string
-      - default: count
-        description: Function
-        enum:
-        - count
-        - count_recovery
-        - recovery_friction
-        - unique
-        - unique_clients
-        in: query
-        name: function
-        type: string
-      - default: grant_type
-        description: Group by
-        enum:
-        - grant_type
-        in: path
-        name: group
-        required: true
-        type: string
-      responses:
-        "200":
-          $ref: '#/responses/AggregatedDataPoints'
-        "400":
-          $ref: '#/responses/badRequestHTTPError'
-        "401":
-          $ref: '#/responses/unauthorizedHTTPError'
-        "403":
-          $ref: '#/responses/forbiddenHTTPError'
-        "429":
-          $ref: '#/responses/tooManyRequestsHTTPError'
-      security:
-      - admin: []
-      summary: Query access tokens by group
-      tags:
-      - Metrics
-  /servers/{wid}/authentications:
+      - UserMetrics
+  /pools/{ipID}/users/{userID}/authentications:
     get:
       description: Query authentication data points.
-      operationId: workspaceSingleAuthenticationMetrics
+      operationId: userSingleAuthenticationMetrics
       parameters:
-      - default: default
-        description: Workspace ID
-        in: path
-        name: wid
+      - in: path
+        name: ipID
         required: true
+        type: string
+      - in: path
+        name: userID
+        required: true
+        type: string
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
         type: string
       - default: auto
         description: Bucket
@@ -1458,14 +1401,6 @@ paths:
         format: date-time
         in: query
         name: origin
-        type: string
-      - description: From
-        in: query
-        name: from
-        type: string
-      - description: To
-        in: query
-        name: to
         type: string
       - description: A server will only return requested resources if the resource
           matches one of the listed ETag value
@@ -1495,17 +1430,27 @@ paths:
       - admin: []
       summary: Query authentications
       tags:
-      - Metrics
-  /servers/{wid}/authentications/{group}:
+      - UserMetrics
+  /pools/{ipID}/users/{userID}/authentications/{group}:
     get:
       description: Query authentication data points by group.
-      operationId: workspaceAggregatedAuthenticationMetrics
+      operationId: userAggregatedAuthenticationMetrics
       parameters:
-      - default: default
-        description: Workspace ID
-        in: path
-        name: wid
+      - in: path
+        name: ipID
         required: true
+        type: string
+      - in: path
+        name: userID
+        required: true
+        type: string
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
         type: string
       - default: auto
         description: Bucket
@@ -1533,14 +1478,6 @@ paths:
         format: date-time
         in: query
         name: origin
-        type: string
-      - description: From
-        in: query
-        name: from
-        type: string
-      - description: To
-        in: query
-        name: to
         type: string
       - description: Filter by result (works only for grouping by method)
         in: query
@@ -1589,17 +1526,27 @@ paths:
       - admin: []
       summary: Query authentications by group
       tags:
-      - Metrics
-  /servers/{wid}/gateway-requests:
+      - UserMetrics
+  /pools/{ipID}/users/{userID}/loa:
     get:
-      description: Query gateway request data points.
-      operationId: workspaceSingleGatewayRequestMetrics
+      description: Query level of assurance.
+      operationId: userSingleLOAMetrics
       parameters:
-      - default: default
-        description: Workspace ID
-        in: path
-        name: wid
+      - in: path
+        name: ipID
         required: true
+        type: string
+      - in: path
+        name: userID
+        required: true
+        type: string
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
         type: string
       - default: auto
         description: Bucket
@@ -1628,6 +1575,46 @@ paths:
         in: query
         name: origin
         type: string
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - default: average
+        description: Function
+        enum:
+        - average
+        in: query
+        name: function
+        type: string
+      responses:
+        "200":
+          $ref: '#/responses/DataPoints'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - admin: []
+      summary: Query level of assurance
+      tags:
+      - UserMetrics
+  /servers/{wid}/access-tokens:
+    get:
+      description: Query access token data points.
+      operationId: workspaceSingleAccessTokenMetrics
+      parameters:
+      - default: default
+        description: Workspace ID
+        in: path
+        name: wid
+        required: true
+        type: string
       - description: From
         in: query
         name: from
@@ -1635,6 +1622,368 @@ paths:
       - description: To
         in: query
         name: to
+        type: string
+      - default: auto
+        description: Bucket
+        enum:
+        - auto
+        - all
+        - 1m
+        - 5m
+        - 15m
+        - 30m
+        - 1h
+        - 3h
+        - 6h
+        - 12h
+        - 1d
+        - 1w
+        - 1M
+        - 3M
+        - 6M
+        - 1Y
+        in: query
+        name: bucket
+        type: string
+      - description: Origin
+        format: date-time
+        in: query
+        name: origin
+        type: string
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - default: count
+        description: Function
+        enum:
+        - count
+        - count_recovery
+        - recovery_friction
+        - unique
+        - unique_clients
+        in: query
+        name: function
+        type: string
+      responses:
+        "200":
+          $ref: '#/responses/DataPoints'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - admin: []
+      summary: Query access tokens
+      tags:
+      - WorkspaceMetrics
+  /servers/{wid}/access-tokens/{group}:
+    get:
+      description: Query access token data points by group.
+      operationId: workspaceAggregatedAccessTokenMetrics
+      parameters:
+      - default: default
+        description: Workspace ID
+        in: path
+        name: wid
+        required: true
+        type: string
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
+        type: string
+      - default: auto
+        description: Bucket
+        enum:
+        - auto
+        - all
+        - 1m
+        - 5m
+        - 15m
+        - 30m
+        - 1h
+        - 3h
+        - 6h
+        - 12h
+        - 1d
+        - 1w
+        - 1M
+        - 3M
+        - 6M
+        - 1Y
+        in: query
+        name: bucket
+        type: string
+      - description: Origin
+        format: date-time
+        in: query
+        name: origin
+        type: string
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - default: count
+        description: Function
+        enum:
+        - count
+        - count_recovery
+        - recovery_friction
+        - unique
+        - unique_clients
+        in: query
+        name: function
+        type: string
+      - default: grant_type
+        description: Group by
+        enum:
+        - grant_type
+        in: path
+        name: group
+        required: true
+        type: string
+      responses:
+        "200":
+          $ref: '#/responses/AggregatedDataPoints'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - admin: []
+      summary: Query access tokens by group
+      tags:
+      - WorkspaceMetrics
+  /servers/{wid}/authentications:
+    get:
+      description: Query authentication data points.
+      operationId: workspaceSingleAuthenticationMetrics
+      parameters:
+      - default: default
+        description: Workspace ID
+        in: path
+        name: wid
+        required: true
+        type: string
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
+        type: string
+      - default: auto
+        description: Bucket
+        enum:
+        - auto
+        - all
+        - 1m
+        - 5m
+        - 15m
+        - 30m
+        - 1h
+        - 3h
+        - 6h
+        - 12h
+        - 1d
+        - 1w
+        - 1M
+        - 3M
+        - 6M
+        - 1Y
+        in: query
+        name: bucket
+        type: string
+      - description: Origin
+        format: date-time
+        in: query
+        name: origin
+        type: string
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - default: count
+        description: Function
+        enum:
+        - count
+        in: query
+        name: function
+        type: string
+      responses:
+        "200":
+          $ref: '#/responses/DataPoints'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - admin: []
+      summary: Query authentications
+      tags:
+      - WorkspaceMetrics
+  /servers/{wid}/authentications/{group}:
+    get:
+      description: Query authentication data points by group.
+      operationId: workspaceAggregatedAuthenticationMetrics
+      parameters:
+      - default: default
+        description: Workspace ID
+        in: path
+        name: wid
+        required: true
+        type: string
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
+        type: string
+      - default: auto
+        description: Bucket
+        enum:
+        - auto
+        - all
+        - 1m
+        - 5m
+        - 15m
+        - 30m
+        - 1h
+        - 3h
+        - 6h
+        - 12h
+        - 1d
+        - 1w
+        - 1M
+        - 3M
+        - 6M
+        - 1Y
+        in: query
+        name: bucket
+        type: string
+      - description: Origin
+        format: date-time
+        in: query
+        name: origin
+        type: string
+      - description: Filter by result (works only for grouping by method)
+        in: query
+        name: result
+        type: string
+      - description: Filter by method (works only for grouping by result)
+        in: query
+        name: method
+        type: string
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - default: count
+        description: Function
+        enum:
+        - count
+        in: query
+        name: function
+        type: string
+      - default: result
+        description: Group by
+        enum:
+        - result
+        - method
+        - device_type
+        - grid_1_0
+        in: path
+        name: group
+        required: true
+        type: string
+      responses:
+        "200":
+          $ref: '#/responses/AggregatedDataPoints'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - admin: []
+      summary: Query authentications by group
+      tags:
+      - WorkspaceMetrics
+  /servers/{wid}/gateway-requests:
+    get:
+      description: Query gateway request data points.
+      operationId: workspaceSingleGatewayRequestMetrics
+      parameters:
+      - default: default
+        description: Workspace ID
+        in: path
+        name: wid
+        required: true
+        type: string
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
+        type: string
+      - default: auto
+        description: Bucket
+        enum:
+        - auto
+        - all
+        - 1m
+        - 5m
+        - 15m
+        - 30m
+        - 1h
+        - 3h
+        - 6h
+        - 12h
+        - 1d
+        - 1w
+        - 1M
+        - 3M
+        - 6M
+        - 1Y
+        in: query
+        name: bucket
+        type: string
+      - description: Origin
+        format: date-time
+        in: query
+        name: origin
         type: string
       - description: A server will only return requested resources if the resource
           matches one of the listed ETag value
@@ -1669,7 +2018,7 @@ paths:
       - admin: []
       summary: Query gateway requests
       tags:
-      - Metrics
+      - WorkspaceMetrics
   /servers/{wid}/gateway-requests/{group}:
     get:
       description: Query gateway request data points by group.
@@ -1680,6 +2029,14 @@ paths:
         in: path
         name: wid
         required: true
+        type: string
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
         type: string
       - default: auto
         description: Bucket
@@ -1707,14 +2064,6 @@ paths:
         format: date-time
         in: query
         name: origin
-        type: string
-      - description: From
-        in: query
-        name: from
-        type: string
-      - description: To
-        in: query
-        name: to
         type: string
       - description: A server will only return requested resources if the resource
           matches one of the listed ETag value
@@ -1757,7 +2106,7 @@ paths:
       - admin: []
       summary: Query gateway requests by group
       tags:
-      - Metrics
+      - WorkspaceMetrics
   /servers/{wid}/http-requests:
     get:
       description: Query http request data points.
@@ -1768,6 +2117,14 @@ paths:
         in: path
         name: wid
         required: true
+        type: string
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
         type: string
       - default: auto
         description: Bucket
@@ -1795,14 +2152,6 @@ paths:
         format: date-time
         in: query
         name: origin
-        type: string
-      - description: From
-        in: query
-        name: from
-        type: string
-      - description: To
-        in: query
-        name: to
         type: string
       - description: A server will only return requested resources if the resource
           matches one of the listed ETag value
@@ -1844,7 +2193,7 @@ paths:
       - admin: []
       summary: Query http requests
       tags:
-      - Metrics
+      - WorkspaceMetrics
   /servers/{wid}/http-requests/{group}:
     get:
       description: Query http request data points by group.
@@ -1855,6 +2204,14 @@ paths:
         in: path
         name: wid
         required: true
+        type: string
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
         type: string
       - default: auto
         description: Bucket
@@ -1882,14 +2239,6 @@ paths:
         format: date-time
         in: query
         name: origin
-        type: string
-      - description: From
-        in: query
-        name: from
-        type: string
-      - description: To
-        in: query
-        name: to
         type: string
       - description: A server will only return requested resources if the resource
           matches one of the listed ETag value
@@ -1941,7 +2290,7 @@ paths:
       - admin: []
       summary: Query http requests by group
       tags:
-      - Metrics
+      - WorkspaceMetrics
   /servers/{wid}/loa:
     get:
       description: Query level of assurance.
@@ -1952,6 +2301,14 @@ paths:
         in: path
         name: wid
         required: true
+        type: string
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
         type: string
       - default: auto
         description: Bucket
@@ -1979,14 +2336,6 @@ paths:
         format: date-time
         in: query
         name: origin
-        type: string
-      - description: From
-        in: query
-        name: from
-        type: string
-      - description: To
-        in: query
-        name: to
         type: string
       - description: A server will only return requested resources if the resource
           matches one of the listed ETag value
@@ -2016,7 +2365,7 @@ paths:
       - admin: []
       summary: Query level of assurance
       tags:
-      - Metrics
+      - WorkspaceMetrics
   /servers/{wid}/otp-operations:
     get:
       description: Query otp operation data points.
@@ -2027,6 +2376,14 @@ paths:
         in: path
         name: wid
         required: true
+        type: string
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
         type: string
       - default: auto
         description: Bucket
@@ -2054,14 +2411,6 @@ paths:
         format: date-time
         in: query
         name: origin
-        type: string
-      - description: From
-        in: query
-        name: from
-        type: string
-      - description: To
-        in: query
-        name: to
         type: string
       - description: A server will only return requested resources if the resource
           matches one of the listed ETag value
@@ -2091,7 +2440,7 @@ paths:
       - admin: []
       summary: Query otp operations
       tags:
-      - Metrics
+      - WorkspaceMetrics
   /servers/{wid}/otp-operations/{group}:
     get:
       description: Query otp operation data points by group.
@@ -2102,6 +2451,14 @@ paths:
         in: path
         name: wid
         required: true
+        type: string
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
         type: string
       - default: auto
         description: Bucket
@@ -2129,14 +2486,6 @@ paths:
         format: date-time
         in: query
         name: origin
-        type: string
-      - description: From
-        in: query
-        name: from
-        type: string
-      - description: To
-        in: query
-        name: to
         type: string
       - description: A server will only return requested resources if the resource
           matches one of the listed ETag value
@@ -2174,7 +2523,7 @@ paths:
       - admin: []
       summary: Query otp operations by group
       tags:
-      - Metrics
+      - WorkspaceMetrics
   /servers/{wid}/policy-validations:
     get:
       description: Query policy validation data points.
@@ -2185,6 +2534,14 @@ paths:
         in: path
         name: wid
         required: true
+        type: string
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
         type: string
       - default: auto
         description: Bucket
@@ -2212,14 +2569,6 @@ paths:
         format: date-time
         in: query
         name: origin
-        type: string
-      - description: From
-        in: query
-        name: from
-        type: string
-      - description: To
-        in: query
-        name: to
         type: string
       - description: A server will only return requested resources if the resource
           matches one of the listed ETag value
@@ -2249,7 +2598,7 @@ paths:
       - admin: []
       summary: Query policy validations
       tags:
-      - Metrics
+      - WorkspaceMetrics
   /servers/{wid}/policy-validations/{group}:
     get:
       description: Query policy validation data points by group.
@@ -2260,6 +2609,14 @@ paths:
         in: path
         name: wid
         required: true
+        type: string
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
         type: string
       - default: auto
         description: Bucket
@@ -2287,14 +2644,6 @@ paths:
         format: date-time
         in: query
         name: origin
-        type: string
-      - description: From
-        in: query
-        name: from
-        type: string
-      - description: To
-        in: query
-        name: to
         type: string
       - description: A server will only return requested resources if the resource
           matches one of the listed ETag value
@@ -2332,12 +2681,68 @@ paths:
       - admin: []
       summary: Query policy validations by group
       tags:
-      - Metrics
+      - WorkspaceMetrics
+  /servers/{wid}/top:
+    get:
+      description: 'Query top aggregates'
+      operationId: workspaceTopMetrics
+      parameters:
+      - default: default
+        description: Workspace ID
+        in: path
+        name: wid
+        required: true
+        type: string
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
+        type: string
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - default: clients
+        description: Aggregate
+        enum:
+        - clients
+        in: query
+        name: aggregate
+        type: string
+      responses:
+        "200":
+          $ref: '#/responses/TopN'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - admin: []
+      summary: Query top aggregates
+      tags:
+      - WorkspaceMetrics
   /tenants/{tenantID}/access-tokens:
     get:
       description: Query access token data points.
       operationId: systemTenantSingleAccessTokenMetrics
       parameters:
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
+        type: string
       - default: auto
         description: Bucket
         enum:
@@ -2364,14 +2769,6 @@ paths:
         format: date-time
         in: query
         name: origin
-        type: string
-      - description: From
-        in: query
-        name: from
-        type: string
-      - description: To
-        in: query
-        name: to
         type: string
       - default: default
         description: Tenant ID
@@ -2411,12 +2808,20 @@ paths:
       - admin: []
       summary: Query access tokens
       tags:
-      - Metrics
+      - SystemTenantMetrics
   /tenants/{tenantID}/access-tokens/{group}:
     get:
       description: Query access token data points by group.
       operationId: systemTenantAggregatedAccessTokenMetrics
       parameters:
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
+        type: string
       - default: auto
         description: Bucket
         enum:
@@ -2443,14 +2848,6 @@ paths:
         format: date-time
         in: query
         name: origin
-        type: string
-      - description: From
-        in: query
-        name: from
-        type: string
-      - description: To
-        in: query
-        name: to
         type: string
       - default: default
         description: Tenant ID
@@ -2498,12 +2895,20 @@ paths:
       - admin: []
       summary: Query access tokens by group
       tags:
-      - Metrics
+      - SystemTenantMetrics
   /tenants/{tenantID}/authentications:
     get:
       description: Query authentications data points.
       operationId: systemTenantSingleAuthenticationMetrics
       parameters:
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
+        type: string
       - default: auto
         description: Bucket
         enum:
@@ -2530,14 +2935,6 @@ paths:
         format: date-time
         in: query
         name: origin
-        type: string
-      - description: From
-        in: query
-        name: from
-        type: string
-      - description: To
-        in: query
-        name: to
         type: string
       - default: default
         description: Tenant ID
@@ -2573,12 +2970,20 @@ paths:
       - admin: []
       summary: Query authentications
       tags:
-      - Metrics
+      - SystemTenantMetrics
   /tenants/{tenantID}/authentications/{group}:
     get:
       description: Query authentications data points by group.
       operationId: systemTenantAggregatedAuthenticationMetrics
       parameters:
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
+        type: string
       - default: auto
         description: Bucket
         enum:
@@ -2605,14 +3010,6 @@ paths:
         format: date-time
         in: query
         name: origin
-        type: string
-      - description: From
-        in: query
-        name: from
-        type: string
-      - description: To
-        in: query
-        name: to
         type: string
       - default: default
         description: Tenant ID
@@ -2667,12 +3064,20 @@ paths:
       - admin: []
       summary: Query authentications by group
       tags:
-      - Metrics
+      - SystemTenantMetrics
   /tenants/{tenantID}/faas:
     get:
       description: Query faas data points.
       operationId: systemTenantSingleFaasMetrics
       parameters:
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
+        type: string
       - default: auto
         description: Bucket
         enum:
@@ -2699,14 +3104,6 @@ paths:
         format: date-time
         in: query
         name: origin
-        type: string
-      - description: From
-        in: query
-        name: from
-        type: string
-      - description: To
-        in: query
-        name: to
         type: string
       - default: default
         description: Tenant ID
@@ -2754,12 +3151,20 @@ paths:
       - admin: []
       summary: Query faas duration
       tags:
-      - Metrics
+      - SystemTenantMetrics
   /tenants/{tenantID}/faas/{group}:
     get:
       description: Query faas data points by group.
       operationId: systemTenantAggregatedFaasMetrics
       parameters:
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
+        type: string
       - default: auto
         description: Bucket
         enum:
@@ -2786,14 +3191,6 @@ paths:
         format: date-time
         in: query
         name: origin
-        type: string
-      - description: From
-        in: query
-        name: from
-        type: string
-      - description: To
-        in: query
-        name: to
         type: string
       - default: default
         description: Tenant ID
@@ -2849,12 +3246,20 @@ paths:
       - admin: []
       summary: Query faas duration by group
       tags:
-      - Metrics
+      - SystemTenantMetrics
   /tenants/{tenantID}/http-requests:
     get:
       description: Query http request data points.
       operationId: systemTenantSingleHttpRequestMetrics
       parameters:
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
+        type: string
       - default: auto
         description: Bucket
         enum:
@@ -2881,14 +3286,6 @@ paths:
         format: date-time
         in: query
         name: origin
-        type: string
-      - description: From
-        in: query
-        name: from
-        type: string
-      - description: To
-        in: query
-        name: to
         type: string
       - default: default
         description: Tenant ID
@@ -2936,12 +3333,20 @@ paths:
       - admin: []
       summary: Query http requests
       tags:
-      - Metrics
+      - SystemTenantMetrics
   /tenants/{tenantID}/http-requests/{group}:
     get:
       description: Query http request data points by group.
       operationId: systemTenantAggregatedHttpRequestMetrics
       parameters:
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
+        type: string
       - default: auto
         description: Bucket
         enum:
@@ -2968,14 +3373,6 @@ paths:
         format: date-time
         in: query
         name: origin
-        type: string
-      - description: From
-        in: query
-        name: from
-        type: string
-      - description: To
-        in: query
-        name: to
         type: string
       - default: default
         description: Tenant ID
@@ -3033,12 +3430,20 @@ paths:
       - admin: []
       summary: Query http requests by group
       tags:
-      - Metrics
+      - SystemTenantMetrics
   /tenants/{tenantID}/servers/{wid}/access-tokens:
     get:
       description: Query access token data points.
       operationId: systemWorkspaceSingleAccessTokenMetrics
       parameters:
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
+        type: string
       - default: auto
         description: Bucket
         enum:
@@ -3065,14 +3470,6 @@ paths:
         format: date-time
         in: query
         name: origin
-        type: string
-      - description: From
-        in: query
-        name: from
-        type: string
-      - description: To
-        in: query
-        name: to
         type: string
       - default: default
         description: Tenant ID
@@ -3118,12 +3515,20 @@ paths:
       - setup: []
       summary: Query access tokens
       tags:
-      - Metrics
+      - SystemWorkspaceMetrics
   /tenants/{tenantID}/servers/{wid}/access-tokens/{group}:
     get:
       description: Query access token data points by group.
       operationId: systemWorkspaceAggregatedAccessTokenMetrics
       parameters:
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
+        type: string
       - default: auto
         description: Bucket
         enum:
@@ -3150,14 +3555,6 @@ paths:
         format: date-time
         in: query
         name: origin
-        type: string
-      - description: From
-        in: query
-        name: from
-        type: string
-      - description: To
-        in: query
-        name: to
         type: string
       - default: default
         description: Tenant ID
@@ -3211,12 +3608,20 @@ paths:
       - setup: []
       summary: Query access tokens by group
       tags:
-      - Metrics
+      - SystemWorkspaceMetrics
   /tenants/{tenantID}/users:
     get:
       description: Query users data points.
       operationId: systemTenantSingleUsersMetrics
       parameters:
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
+        type: string
       - default: auto
         description: Bucket
         enum:
@@ -3243,14 +3648,6 @@ paths:
         format: date-time
         in: query
         name: origin
-        type: string
-      - description: From
-        in: query
-        name: from
-        type: string
-      - description: To
-        in: query
-        name: to
         type: string
       - default: default
         description: Tenant ID
@@ -3288,12 +3685,20 @@ paths:
       - admin: []
       summary: Query users metrics
       tags:
-      - Metrics
+      - SystemTenantMetrics
   /users:
     get:
       description: Query tenant users data points.
       operationId: tenantSingleUsersMetrics
       parameters:
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
+        type: string
       - default: auto
         description: Bucket
         enum:
@@ -3320,14 +3725,6 @@ paths:
         format: date-time
         in: query
         name: origin
-        type: string
-      - description: From
-        in: query
-        name: from
-        type: string
-      - description: To
-        in: query
-        name: to
         type: string
       - description: A server will only return requested resources if the resource
           matches one of the listed ETag value
@@ -3359,7 +3756,7 @@ paths:
       - admin: []
       summary: Query tenant users metrics
       tags:
-      - Metrics
+      - TenantMetrics
 produces:
 - application/json
 - text/csv
@@ -3388,6 +3785,18 @@ responses:
         type: string
     schema:
       $ref: '#/definitions/DataPoints'
+  TopN:
+    description: TopN
+    headers:
+      etag:
+        description: |-
+          The ETag HTTP header is an identifier for a specific version of a resource
+
+          in:header
+        format: etag
+        type: string
+    schema:
+      $ref: '#/definitions/TopDataPoints'
   badRequestHTTPError:
     description: Bad request
     schema:

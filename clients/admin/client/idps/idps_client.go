@@ -86,9 +86,13 @@ type ClientService interface {
 
 	CreateMicrosoftIDP(params *CreateMicrosoftIDPParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*CreateMicrosoftIDPCreated, error)
 
+	CreateOAuth2IDP(params *CreateOAuth2IDPParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*CreateOAuth2IDPCreated, error)
+
 	CreateOIDCIDP(params *CreateOIDCIDPParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*CreateOIDCIDPCreated, error)
 
 	CreateOktaIDP(params *CreateOktaIDPParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*CreateOktaIDPCreated, error)
+
+	CreateOktaV2IDP(params *CreateOktaV2IDPParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*CreateOktaV2IDPCreated, error)
 
 	CreateOrganizationIDP(params *CreateOrganizationIDPParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*CreateOrganizationIDPCreated, error)
 
@@ -172,6 +176,10 @@ type ClientService interface {
 
 	GetMicrosoftIDPClient(params *GetMicrosoftIDPClientParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetMicrosoftIDPClientOK, error)
 
+	GetOAuth2IDP(params *GetOAuth2IDPParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetOAuth2IDPOK, error)
+
+	GetOAuth2IDPClient(params *GetOAuth2IDPClientParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetOAuth2IDPClientOK, error)
+
 	GetOIDCIDP(params *GetOIDCIDPParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetOIDCIDPOK, error)
 
 	GetOIDCIDPClient(params *GetOIDCIDPClientParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetOIDCIDPClientOK, error)
@@ -179,6 +187,10 @@ type ClientService interface {
 	GetOktaIDP(params *GetOktaIDPParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetOktaIDPOK, error)
 
 	GetOktaIDPClient(params *GetOktaIDPClientParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetOktaIDPClientOK, error)
+
+	GetOktaV2IDP(params *GetOktaV2IDPParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetOktaV2IDPOK, error)
+
+	GetOktaV2IDPClient(params *GetOktaV2IDPClientParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetOktaV2IDPClientOK, error)
 
 	GetOrganizationIDP(params *GetOrganizationIDPParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetOrganizationIDPOK, error)
 
@@ -242,9 +254,13 @@ type ClientService interface {
 
 	UpdateMicrosoftIDP(params *UpdateMicrosoftIDPParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UpdateMicrosoftIDPOK, error)
 
+	UpdateOAuth2IDP(params *UpdateOAuth2IDPParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UpdateOAuth2IDPOK, error)
+
 	UpdateOIDCIDP(params *UpdateOIDCIDPParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UpdateOIDCIDPOK, error)
 
 	UpdateOktaIDP(params *UpdateOktaIDPParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UpdateOktaIDPOK, error)
+
+	UpdateOktaV2IDP(params *UpdateOktaV2IDPParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UpdateOktaV2IDPOK, error)
 
 	UpdateOrganizationIDP(params *UpdateOrganizationIDPParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UpdateOrganizationIDPOK, error)
 
@@ -877,6 +893,47 @@ func (a *Client) CreateMicrosoftIDP(params *CreateMicrosoftIDPParams, authInfo r
 }
 
 /*
+CreateOAuth2IDP creates o auth2 ID p
+
+Create OAuth2 IDP.
+*/
+func (a *Client) CreateOAuth2IDP(params *CreateOAuth2IDPParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*CreateOAuth2IDPCreated, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewCreateOAuth2IDPParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "createOAuth2IDP",
+		Method:             "POST",
+		PathPattern:        "/servers/{wid}/idps/oauth2",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &CreateOAuth2IDPReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*CreateOAuth2IDPCreated)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for createOAuth2IDP: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
 CreateOIDCIDP creates o ID c ID p
 
 Create OIDC IDP.
@@ -955,6 +1012,47 @@ func (a *Client) CreateOktaIDP(params *CreateOktaIDPParams, authInfo runtime.Cli
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for createOktaIDP: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+CreateOktaV2IDP creates okta v2 ID p
+
+Create OktaV2 IDP.
+*/
+func (a *Client) CreateOktaV2IDP(params *CreateOktaV2IDPParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*CreateOktaV2IDPCreated, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewCreateOktaV2IDPParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "createOktaV2IDP",
+		Method:             "POST",
+		PathPattern:        "/servers/{wid}/idps/okta_v2",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &CreateOktaV2IDPReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*CreateOktaV2IDPCreated)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for createOktaV2IDP: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 
@@ -2610,6 +2708,86 @@ func (a *Client) GetMicrosoftIDPClient(params *GetMicrosoftIDPClientParams, auth
 }
 
 /*
+GetOAuth2IDP gets o auth2 ID p
+
+Get OAuth2 IDP.
+*/
+func (a *Client) GetOAuth2IDP(params *GetOAuth2IDPParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetOAuth2IDPOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetOAuth2IDPParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "getOAuth2IDP",
+		Method:             "GET",
+		PathPattern:        "/servers/{wid}/idps/oauth2/{iid}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &GetOAuth2IDPReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*GetOAuth2IDPOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for getOAuth2IDP: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+GetOAuth2IDPClient returns o auth2 ID p client
+*/
+func (a *Client) GetOAuth2IDPClient(params *GetOAuth2IDPClientParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetOAuth2IDPClientOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetOAuth2IDPClientParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "getOAuth2IDPClient",
+		Method:             "GET",
+		PathPattern:        "/servers/{wid}/idps/oauth2/{iid}/client",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &GetOAuth2IDPClientReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*GetOAuth2IDPClientOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for getOAuth2IDPClient: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
 GetOIDCIDP gets o ID c ID p
 
 Get OIDC IDP.
@@ -2766,6 +2944,86 @@ func (a *Client) GetOktaIDPClient(params *GetOktaIDPClientParams, authInfo runti
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for getOktaIDPClient: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+GetOktaV2IDP gets okta v2 ID p
+
+Get OktaV2 IDP.
+*/
+func (a *Client) GetOktaV2IDP(params *GetOktaV2IDPParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetOktaV2IDPOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetOktaV2IDPParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "getOktaV2IDP",
+		Method:             "GET",
+		PathPattern:        "/servers/{wid}/idps/okta_v2/{iid}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &GetOktaV2IDPReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*GetOktaV2IDPOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for getOktaV2IDP: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+GetOktaV2IDPClient returns okta v2 ID p client
+*/
+func (a *Client) GetOktaV2IDPClient(params *GetOktaV2IDPClientParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetOktaV2IDPClientOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetOktaV2IDPClientParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "getOktaV2IDPClient",
+		Method:             "GET",
+		PathPattern:        "/servers/{wid}/idps/okta_v2/{iid}/client",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &GetOktaV2IDPClientReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*GetOktaV2IDPClientOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for getOktaV2IDPClient: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 
@@ -4025,6 +4283,47 @@ func (a *Client) UpdateMicrosoftIDP(params *UpdateMicrosoftIDPParams, authInfo r
 }
 
 /*
+UpdateOAuth2IDP updates o auth2 ID p
+
+Update OAuth2 IDP.
+*/
+func (a *Client) UpdateOAuth2IDP(params *UpdateOAuth2IDPParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UpdateOAuth2IDPOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewUpdateOAuth2IDPParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "updateOAuth2IDP",
+		Method:             "PUT",
+		PathPattern:        "/servers/{wid}/idps/oauth2/{iid}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &UpdateOAuth2IDPReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*UpdateOAuth2IDPOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for updateOAuth2IDP: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
 UpdateOIDCIDP updates o ID c ID p
 
 Update OIDC IDP.
@@ -4103,6 +4402,47 @@ func (a *Client) UpdateOktaIDP(params *UpdateOktaIDPParams, authInfo runtime.Cli
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for updateOktaIDP: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+UpdateOktaV2IDP updates okta v2 ID p
+
+Update OktaV2 IDP.
+*/
+func (a *Client) UpdateOktaV2IDP(params *UpdateOktaV2IDPParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UpdateOktaV2IDPOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewUpdateOktaV2IDPParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "updateOktaV2IDP",
+		Method:             "PUT",
+		PathPattern:        "/servers/{wid}/idps/okta_v2/{iid}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &UpdateOktaV2IDPReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*UpdateOktaV2IDPOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for updateOktaV2IDP: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 
