@@ -19,6 +19,10 @@ type GoogleWorkspaceCredentials struct {
 
 	// Application secret from your GoogleWorkspace application settings
 	ClientSecret string `json:"client_secret,omitempty" yaml:"client_secret,omitempty"`
+
+	// service account JSON containing credentials to fetch groups using admin directory API
+	// required if `fetch_groups` is set to `true`
+	ServiceAccount map[string]interface{} `json:"service_account,omitempty" yaml:"service_account,omitempty"`
 }
 
 // Validate validates this google workspace credentials

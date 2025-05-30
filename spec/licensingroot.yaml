@@ -11,6 +11,14 @@ definitions:
       enabled:
         type: boolean
         x-nullable: false
+      monthly_limit:
+        format: int64
+        type: integer
+        x-nullable: false
+      total_limit:
+        format: int64
+        type: integer
+        x-nullable: false
     type: object
   Dump:
     properties:

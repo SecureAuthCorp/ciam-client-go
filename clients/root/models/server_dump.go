@@ -245,7 +245,7 @@ type ServerDump struct {
 	// specific configuration patterns. For example, you can instantly create an Open Banking
 	// compliant workspace that has all of the required mechanisms and settings already in place.
 	// Example: default
-	// Enum: ["default","demo","workforce","consumer","partners","third_party","fapi_advanced","fapi_rw","fapi_ro","openbanking_uk_fapi_advanced","openbanking_uk","openbanking_br","openbanking_br_unico","cdr_australia","cdr_australia_fapi_rw","fdx","openbanking_ksa","fapi_20_security","fapi_20_message_signing","connect_id"]
+	// Enum: ["default","demo","workforce","workforce_v2","consumer","partners","third_party","fapi_advanced","fapi_rw","fapi_ro","openbanking_uk_fapi_advanced","openbanking_uk","openbanking_br","openbanking_br_unico","cdr_australia","cdr_australia_fapi_rw","fdx","openbanking_ksa","fapi_20_security","fapi_20_message_signing","connect_id"]
 	Profile string `json:"profile,omitempty" yaml:"profile,omitempty"`
 
 	// Custom pushed authentication request TTL
@@ -301,9 +301,12 @@ type ServerDump struct {
 	// styling
 	Styling *Styling `json:"styling,omitempty" yaml:"styling,omitempty"`
 
+	// The authentication context attribute name that will be used as subject when the custom subject format is used.
+	SubjectCustomAttribute string `json:"subject_custom_attribute,omitempty" yaml:"subject_custom_attribute,omitempty"`
+
 	// Define the format of a subject
 	// When set to hash sub value is a one way hash of idp id and idp sub
-	// Enum: ["hash","legacy"]
+	// Enum: ["hash","legacy","custom"]
 	SubjectFormat string `json:"subject_format,omitempty" yaml:"subject_format,omitempty"`
 
 	// Salt used to hash `subject` when the `pairwise` subject type is used.
@@ -368,6 +371,9 @@ type ServerDump struct {
 	// server version to track internal changes
 	// version that is currently the latest: 3
 	Version int64 `json:"version,omitempty" yaml:"version,omitempty"`
+
+	// workforce
+	Workforce *WorkforceConfiguration `json:"workforce,omitempty" yaml:"workforce,omitempty"`
 }
 
 // Validate validates this server dump
@@ -519,6 +525,10 @@ func (m *ServerDump) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateType(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateWorkforce(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -986,7 +996,7 @@ var serverDumpTypeProfilePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["default","demo","workforce","consumer","partners","third_party","fapi_advanced","fapi_rw","fapi_ro","openbanking_uk_fapi_advanced","openbanking_uk","openbanking_br","openbanking_br_unico","cdr_australia","cdr_australia_fapi_rw","fdx","openbanking_ksa","fapi_20_security","fapi_20_message_signing","connect_id"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["default","demo","workforce","workforce_v2","consumer","partners","third_party","fapi_advanced","fapi_rw","fapi_ro","openbanking_uk_fapi_advanced","openbanking_uk","openbanking_br","openbanking_br_unico","cdr_australia","cdr_australia_fapi_rw","fdx","openbanking_ksa","fapi_20_security","fapi_20_message_signing","connect_id"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -1004,6 +1014,9 @@ const (
 
 	// ServerDumpProfileWorkforce captures enum value "workforce"
 	ServerDumpProfileWorkforce string = "workforce"
+
+	// ServerDumpProfileWorkforceV2 captures enum value "workforce_v2"
+	ServerDumpProfileWorkforceV2 string = "workforce_v2"
 
 	// ServerDumpProfileConsumer captures enum value "consumer"
 	ServerDumpProfileConsumer string = "consumer"
@@ -1220,7 +1233,7 @@ var serverDumpTypeSubjectFormatPropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["hash","legacy"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["hash","legacy","custom"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -1235,6 +1248,9 @@ const (
 
 	// ServerDumpSubjectFormatLegacy captures enum value "legacy"
 	ServerDumpSubjectFormatLegacy string = "legacy"
+
+	// ServerDumpSubjectFormatCustom captures enum value "custom"
+	ServerDumpSubjectFormatCustom string = "custom"
 )
 
 // prop value enum
@@ -1445,6 +1461,25 @@ func (m *ServerDump) validateType(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *ServerDump) validateWorkforce(formats strfmt.Registry) error {
+	if swag.IsZero(m.Workforce) { // not required
+		return nil
+	}
+
+	if m.Workforce != nil {
+		if err := m.Workforce.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("workforce")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("workforce")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
 // ContextValidate validate this server dump based on the context it is used
 func (m *ServerDump) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
@@ -1526,6 +1561,10 @@ func (m *ServerDump) ContextValidate(ctx context.Context, formats strfmt.Registr
 	}
 
 	if err := m.contextValidateTrustAnchorConfiguration(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateWorkforce(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -1941,6 +1980,27 @@ func (m *ServerDump) contextValidateTrustAnchorConfiguration(ctx context.Context
 				return ve.ValidateName("trust_anchor_configuration")
 			} else if ce, ok := err.(*errors.CompositeError); ok {
 				return ce.ValidateName("trust_anchor_configuration")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *ServerDump) contextValidateWorkforce(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Workforce != nil {
+
+		if swag.IsZero(m.Workforce) { // not required
+			return nil
+		}
+
+		if err := m.Workforce.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("workforce")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("workforce")
 			}
 			return err
 		}

@@ -24,6 +24,9 @@ type NewUserVerifiableAddress struct {
 	// Required: true
 	Address string `json:"address" yaml:"address"`
 
+	// is allowed for 2FA
+	AllowedFor2fa bool `json:"allowed_for_2fa,omitempty" yaml:"allowed_for_2fa,omitempty"`
+
 	// general purpose metadata
 	Metadata map[string]interface{} `json:"metadata,omitempty" yaml:"metadata,omitempty"`
 

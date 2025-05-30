@@ -29,6 +29,9 @@ type RiskContext struct {
 
 	// loa
 	Loa RiskLOA `json:"loa,omitempty" yaml:"loa,omitempty"`
+
+	// risks
+	Risks []string `json:"risks" yaml:"risks"`
 }
 
 // Validate validates this risk context

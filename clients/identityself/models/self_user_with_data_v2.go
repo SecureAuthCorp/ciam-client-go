@@ -64,6 +64,9 @@ type SelfUserWithDataV2 struct {
 	// Enum: ["totp","password","otp","email_otp","sms_otp","webauthn"]
 	SecondFactorPreferredAuthenticationMechanism string `json:"second_factor_preferred_authentication_mechanism,omitempty" yaml:"second_factor_preferred_authentication_mechanism,omitempty"`
 
+	// totp issuer
+	TotpIssuer string `json:"totp_issuer,omitempty" yaml:"totp_issuer,omitempty"`
+
 	// verifiable addresses
 	VerifiableAddresses []*SelfUserVerifiableAddress `json:"verifiable_addresses" yaml:"verifiable_addresses"`
 }

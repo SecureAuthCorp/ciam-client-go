@@ -67,7 +67,7 @@ type WorkspaceResponse struct {
 	// specific configuration patterns. For example, you can instantly create an Open Banking
 	// compliant workspace that has all of the required mechanisms and settings already in place.
 	// Example: default
-	// Enum: ["default","demo","workforce","consumer","partners","third_party","fapi_advanced","fapi_rw","fapi_ro","openbanking_uk_fapi_advanced","openbanking_uk","openbanking_br","openbanking_br_unico","cdr_australia","cdr_australia_fapi_rw","fdx","openbanking_ksa","fapi_20_security","fapi_20_message_signing","connect_id"]
+	// Enum: ["default","demo","workforce","workforce_v2","consumer","partners","third_party","fapi_advanced","fapi_rw","fapi_ro","openbanking_uk_fapi_advanced","openbanking_uk","openbanking_br","openbanking_br_unico","cdr_australia","cdr_australia_fapi_rw","fdx","openbanking_ksa","fapi_20_security","fapi_20_message_signing","connect_id"]
 	Profile string `json:"profile,omitempty" yaml:"profile,omitempty"`
 
 	// settings
@@ -77,7 +77,7 @@ type WorkspaceResponse struct {
 	Sso *SSOConfiguration `json:"sso,omitempty" yaml:"sso,omitempty"`
 
 	// Subject format
-	// Enum: ["hash","legacy"]
+	// Enum: ["hash","legacy","custom"]
 	SubjectFormat string `json:"subject_format,omitempty" yaml:"subject_format,omitempty"`
 
 	// Subject identifier algorithm salt
@@ -96,6 +96,9 @@ type WorkspaceResponse struct {
 	// Example: regular
 	// Enum: ["admin","developer","system","regular","organization"]
 	Type string `json:"type,omitempty" yaml:"type,omitempty"`
+
+	// workforce
+	Workforce *WorkforceConfiguration `json:"workforce,omitempty" yaml:"workforce,omitempty"`
 }
 
 // Validate validates this workspace response
@@ -135,6 +138,10 @@ func (m *WorkspaceResponse) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateType(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateWorkforce(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -241,7 +248,7 @@ var workspaceResponseTypeProfilePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["default","demo","workforce","consumer","partners","third_party","fapi_advanced","fapi_rw","fapi_ro","openbanking_uk_fapi_advanced","openbanking_uk","openbanking_br","openbanking_br_unico","cdr_australia","cdr_australia_fapi_rw","fdx","openbanking_ksa","fapi_20_security","fapi_20_message_signing","connect_id"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["default","demo","workforce","workforce_v2","consumer","partners","third_party","fapi_advanced","fapi_rw","fapi_ro","openbanking_uk_fapi_advanced","openbanking_uk","openbanking_br","openbanking_br_unico","cdr_australia","cdr_australia_fapi_rw","fdx","openbanking_ksa","fapi_20_security","fapi_20_message_signing","connect_id"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -259,6 +266,9 @@ const (
 
 	// WorkspaceResponseProfileWorkforce captures enum value "workforce"
 	WorkspaceResponseProfileWorkforce string = "workforce"
+
+	// WorkspaceResponseProfileWorkforceV2 captures enum value "workforce_v2"
+	WorkspaceResponseProfileWorkforceV2 string = "workforce_v2"
 
 	// WorkspaceResponseProfileConsumer captures enum value "consumer"
 	WorkspaceResponseProfileConsumer string = "consumer"
@@ -375,7 +385,7 @@ var workspaceResponseTypeSubjectFormatPropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["hash","legacy"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["hash","legacy","custom"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -390,6 +400,9 @@ const (
 
 	// WorkspaceResponseSubjectFormatLegacy captures enum value "legacy"
 	WorkspaceResponseSubjectFormatLegacy string = "legacy"
+
+	// WorkspaceResponseSubjectFormatCustom captures enum value "custom"
+	WorkspaceResponseSubjectFormatCustom string = "custom"
 )
 
 // prop value enum
@@ -464,6 +477,25 @@ func (m *WorkspaceResponse) validateType(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *WorkspaceResponse) validateWorkforce(formats strfmt.Registry) error {
+	if swag.IsZero(m.Workforce) { // not required
+		return nil
+	}
+
+	if m.Workforce != nil {
+		if err := m.Workforce.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("workforce")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("workforce")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
 // ContextValidate validate this workspace response based on the context it is used
 func (m *WorkspaceResponse) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
@@ -485,6 +517,10 @@ func (m *WorkspaceResponse) ContextValidate(ctx context.Context, formats strfmt.
 	}
 
 	if err := m.contextValidateSso(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateWorkforce(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -591,6 +627,27 @@ func (m *WorkspaceResponse) contextValidateSso(ctx context.Context, formats strf
 				return ve.ValidateName("sso")
 			} else if ce, ok := err.(*errors.CompositeError); ok {
 				return ce.ValidateName("sso")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *WorkspaceResponse) contextValidateWorkforce(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Workforce != nil {
+
+		if swag.IsZero(m.Workforce) { // not required
+			return nil
+		}
+
+		if err := m.Workforce.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("workforce")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("workforce")
 			}
 			return err
 		}

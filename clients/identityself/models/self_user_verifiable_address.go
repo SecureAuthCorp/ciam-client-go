@@ -24,6 +24,9 @@ type SelfUserVerifiableAddress struct {
 	// Required: true
 	Address string `json:"address" yaml:"address"`
 
+	// allowed for 2fa
+	AllowedFor2fa bool `json:"allowed_for_2fa,omitempty" yaml:"allowed_for_2fa,omitempty"`
+
 	// created at
 	// Required: true
 	// Format: date-time

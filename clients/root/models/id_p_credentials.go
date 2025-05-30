@@ -45,6 +45,9 @@ type IDPCredentials struct {
 	// google
 	Google *GoogleCredentials `json:"google,omitempty" yaml:"google,omitempty"`
 
+	// google workspace
+	GoogleWorkspace *GoogleWorkspaceCredentials `json:"google_workspace,omitempty" yaml:"google_workspace,omitempty"`
+
 	// intelli trust
 	IntelliTrust *IntelliTrustCredentials `json:"intelli_trust,omitempty" yaml:"intelli_trust,omitempty"`
 
@@ -57,11 +60,17 @@ type IDPCredentials struct {
 	// microsoft
 	Microsoft *MicrosoftCredentials `json:"microsoft,omitempty" yaml:"microsoft,omitempty"`
 
+	// oauth2
+	Oauth2 *OAuth2Credentials `json:"oauth2,omitempty" yaml:"oauth2,omitempty"`
+
 	// oidc
 	Oidc *OIDCCredentials `json:"oidc,omitempty" yaml:"oidc,omitempty"`
 
 	// okta
 	Okta *OktaCredentials `json:"okta,omitempty" yaml:"okta,omitempty"`
+
+	// okta v2
+	OktaV2 *OktaV2Credentials `json:"okta_v2,omitempty" yaml:"okta_v2,omitempty"`
 
 	// saml
 	Saml *SAMLCredentials `json:"saml,omitempty" yaml:"saml,omitempty"`
@@ -73,7 +82,7 @@ type IDPCredentials struct {
 	Static *StaticCredentials `json:"static,omitempty" yaml:"static,omitempty"`
 
 	// x
-	X XCredentials `json:"x,omitempty" yaml:"x,omitempty"`
+	X *XCredentials `json:"x,omitempty" yaml:"x,omitempty"`
 }
 
 // Validate validates this ID p credentials
@@ -112,6 +121,10 @@ func (m *IDPCredentials) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateGoogleWorkspace(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateIntelliTrust(formats); err != nil {
 		res = append(res, err)
 	}
@@ -128,11 +141,19 @@ func (m *IDPCredentials) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateOauth2(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateOidc(formats); err != nil {
 		res = append(res, err)
 	}
 
 	if err := m.validateOkta(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateOktaV2(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -145,6 +166,10 @@ func (m *IDPCredentials) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateStatic(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateX(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -306,6 +331,25 @@ func (m *IDPCredentials) validateGoogle(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *IDPCredentials) validateGoogleWorkspace(formats strfmt.Registry) error {
+	if swag.IsZero(m.GoogleWorkspace) { // not required
+		return nil
+	}
+
+	if m.GoogleWorkspace != nil {
+		if err := m.GoogleWorkspace.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("google_workspace")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("google_workspace")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (m *IDPCredentials) validateIntelliTrust(formats strfmt.Registry) error {
 	if swag.IsZero(m.IntelliTrust) { // not required
 		return nil
@@ -382,6 +426,25 @@ func (m *IDPCredentials) validateMicrosoft(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *IDPCredentials) validateOauth2(formats strfmt.Registry) error {
+	if swag.IsZero(m.Oauth2) { // not required
+		return nil
+	}
+
+	if m.Oauth2 != nil {
+		if err := m.Oauth2.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("oauth2")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("oauth2")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (m *IDPCredentials) validateOidc(formats strfmt.Registry) error {
 	if swag.IsZero(m.Oidc) { // not required
 		return nil
@@ -412,6 +475,25 @@ func (m *IDPCredentials) validateOkta(formats strfmt.Registry) error {
 				return ve.ValidateName("okta")
 			} else if ce, ok := err.(*errors.CompositeError); ok {
 				return ce.ValidateName("okta")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *IDPCredentials) validateOktaV2(formats strfmt.Registry) error {
+	if swag.IsZero(m.OktaV2) { // not required
+		return nil
+	}
+
+	if m.OktaV2 != nil {
+		if err := m.OktaV2.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("okta_v2")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("okta_v2")
 			}
 			return err
 		}
@@ -477,6 +559,25 @@ func (m *IDPCredentials) validateStatic(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *IDPCredentials) validateX(formats strfmt.Registry) error {
+	if swag.IsZero(m.X) { // not required
+		return nil
+	}
+
+	if m.X != nil {
+		if err := m.X.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("x")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("x")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
 // ContextValidate validate this ID p credentials based on the context it is used
 func (m *IDPCredentials) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
@@ -513,6 +614,10 @@ func (m *IDPCredentials) ContextValidate(ctx context.Context, formats strfmt.Reg
 		res = append(res, err)
 	}
 
+	if err := m.contextValidateGoogleWorkspace(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.contextValidateIntelliTrust(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -529,11 +634,19 @@ func (m *IDPCredentials) ContextValidate(ctx context.Context, formats strfmt.Reg
 		res = append(res, err)
 	}
 
+	if err := m.contextValidateOauth2(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.contextValidateOidc(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
 	if err := m.contextValidateOkta(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateOktaV2(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -546,6 +659,10 @@ func (m *IDPCredentials) ContextValidate(ctx context.Context, formats strfmt.Reg
 	}
 
 	if err := m.contextValidateStatic(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateX(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -723,6 +840,27 @@ func (m *IDPCredentials) contextValidateGoogle(ctx context.Context, formats strf
 	return nil
 }
 
+func (m *IDPCredentials) contextValidateGoogleWorkspace(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.GoogleWorkspace != nil {
+
+		if swag.IsZero(m.GoogleWorkspace) { // not required
+			return nil
+		}
+
+		if err := m.GoogleWorkspace.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("google_workspace")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("google_workspace")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (m *IDPCredentials) contextValidateIntelliTrust(ctx context.Context, formats strfmt.Registry) error {
 
 	if m.IntelliTrust != nil {
@@ -807,6 +945,27 @@ func (m *IDPCredentials) contextValidateMicrosoft(ctx context.Context, formats s
 	return nil
 }
 
+func (m *IDPCredentials) contextValidateOauth2(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Oauth2 != nil {
+
+		if swag.IsZero(m.Oauth2) { // not required
+			return nil
+		}
+
+		if err := m.Oauth2.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("oauth2")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("oauth2")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (m *IDPCredentials) contextValidateOidc(ctx context.Context, formats strfmt.Registry) error {
 
 	if m.Oidc != nil {
@@ -841,6 +1000,27 @@ func (m *IDPCredentials) contextValidateOkta(ctx context.Context, formats strfmt
 				return ve.ValidateName("okta")
 			} else if ce, ok := err.(*errors.CompositeError); ok {
 				return ce.ValidateName("okta")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *IDPCredentials) contextValidateOktaV2(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.OktaV2 != nil {
+
+		if swag.IsZero(m.OktaV2) { // not required
+			return nil
+		}
+
+		if err := m.OktaV2.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("okta_v2")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("okta_v2")
 			}
 			return err
 		}
@@ -904,6 +1084,27 @@ func (m *IDPCredentials) contextValidateStatic(ctx context.Context, formats strf
 				return ve.ValidateName("static")
 			} else if ce, ok := err.(*errors.CompositeError); ok {
 				return ce.ValidateName("static")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *IDPCredentials) contextValidateX(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.X != nil {
+
+		if swag.IsZero(m.X) { // not required
+			return nil
+		}
+
+		if err := m.X.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("x")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("x")
 			}
 			return err
 		}

@@ -21,6 +21,9 @@ type AppleSettings struct {
 	// Example: client
 	ClientID string `json:"client_id,omitempty" yaml:"client_id,omitempty"`
 
+	// key id
+	KeyID string `json:"key_id,omitempty" yaml:"key_id,omitempty"`
+
 	// An array of additional scopes your client requests
 	// Example: ["email","profile","openid"]
 	Scopes []string `json:"scopes" yaml:"scopes"`

@@ -34,6 +34,9 @@ type ScopeGrant struct {
 	// Language
 	Language string `json:"language,omitempty" yaml:"language,omitempty"`
 
+	// pool id of a user who granted the scope
+	PoolID string `json:"pool_id,omitempty" yaml:"pool_id,omitempty"`
+
 	// The scope name as it's set initially. This parameter supports dynamic scope syntax, thus can include a scope
 	// root—a fixed core of the dynamic scope name supplemented with a wildcard—a symbol representing
 	// an adjustable extension to the scope root allowing to retrieve a specific requested scope.
@@ -52,6 +55,9 @@ type ScopeGrant struct {
 	// Identifier of the tenant where the client app is hosted.
 	// Example: my-company
 	TenantID string `json:"tenant_id,omitempty" yaml:"tenant_id,omitempty"`
+
+	// user id of a user who granted the scope
+	UserID string `json:"user_id,omitempty" yaml:"user_id,omitempty"`
 }
 
 // Validate validates this scope grant

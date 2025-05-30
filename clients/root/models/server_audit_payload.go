@@ -236,7 +236,7 @@ type ServerAuditPayload struct {
 	// specific configuration patterns. For example, you can instantly create an Open Banking
 	// compliant workspace that has all of the required mechanisms and settings already in place.
 	// Example: default
-	// Enum: ["default","demo","workforce","consumer","partners","third_party","fapi_advanced","fapi_rw","fapi_ro","openbanking_uk_fapi_advanced","openbanking_uk","openbanking_br","openbanking_br_unico","cdr_australia","cdr_australia_fapi_rw","fdx","openbanking_ksa","fapi_20_security","fapi_20_message_signing","connect_id"]
+	// Enum: ["default","demo","workforce","workforce_v2","consumer","partners","third_party","fapi_advanced","fapi_rw","fapi_ro","openbanking_uk_fapi_advanced","openbanking_uk","openbanking_br","openbanking_br_unico","cdr_australia","cdr_australia_fapi_rw","fdx","openbanking_ksa","fapi_20_security","fapi_20_message_signing","connect_id"]
 	Profile string `json:"profile,omitempty" yaml:"profile,omitempty"`
 
 	// Custom pushed authentication request TTL
@@ -274,9 +274,12 @@ type ServerAuditPayload struct {
 	// styling
 	Styling *Styling `json:"styling,omitempty" yaml:"styling,omitempty"`
 
+	// The authentication context attribute name that will be used as subject when the custom subject format is used.
+	SubjectCustomAttribute string `json:"subject_custom_attribute,omitempty" yaml:"subject_custom_attribute,omitempty"`
+
 	// Define the format of a subject
 	// When set to hash sub value is a one way hash of idp id and idp sub
-	// Enum: ["hash","legacy"]
+	// Enum: ["hash","legacy","custom"]
 	SubjectFormat string `json:"subject_format,omitempty" yaml:"subject_format,omitempty"`
 
 	// An array that defines supported subject identifier types.
@@ -330,6 +333,9 @@ type ServerAuditPayload struct {
 	// server version to track internal changes
 	// version that is currently the latest: 3
 	Version int64 `json:"version,omitempty" yaml:"version,omitempty"`
+
+	// workforce
+	Workforce *WorkforceConfiguration `json:"workforce,omitempty" yaml:"workforce,omitempty"`
 }
 
 // Validate validates this server audit payload
@@ -477,6 +483,10 @@ func (m *ServerAuditPayload) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateType(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateWorkforce(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -925,7 +935,7 @@ var serverAuditPayloadTypeProfilePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["default","demo","workforce","consumer","partners","third_party","fapi_advanced","fapi_rw","fapi_ro","openbanking_uk_fapi_advanced","openbanking_uk","openbanking_br","openbanking_br_unico","cdr_australia","cdr_australia_fapi_rw","fdx","openbanking_ksa","fapi_20_security","fapi_20_message_signing","connect_id"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["default","demo","workforce","workforce_v2","consumer","partners","third_party","fapi_advanced","fapi_rw","fapi_ro","openbanking_uk_fapi_advanced","openbanking_uk","openbanking_br","openbanking_br_unico","cdr_australia","cdr_australia_fapi_rw","fdx","openbanking_ksa","fapi_20_security","fapi_20_message_signing","connect_id"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -943,6 +953,9 @@ const (
 
 	// ServerAuditPayloadProfileWorkforce captures enum value "workforce"
 	ServerAuditPayloadProfileWorkforce string = "workforce"
+
+	// ServerAuditPayloadProfileWorkforceV2 captures enum value "workforce_v2"
+	ServerAuditPayloadProfileWorkforceV2 string = "workforce_v2"
 
 	// ServerAuditPayloadProfileConsumer captures enum value "consumer"
 	ServerAuditPayloadProfileConsumer string = "consumer"
@@ -1159,7 +1172,7 @@ var serverAuditPayloadTypeSubjectFormatPropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["hash","legacy"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["hash","legacy","custom"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -1174,6 +1187,9 @@ const (
 
 	// ServerAuditPayloadSubjectFormatLegacy captures enum value "legacy"
 	ServerAuditPayloadSubjectFormatLegacy string = "legacy"
+
+	// ServerAuditPayloadSubjectFormatCustom captures enum value "custom"
+	ServerAuditPayloadSubjectFormatCustom string = "custom"
 )
 
 // prop value enum
@@ -1384,6 +1400,25 @@ func (m *ServerAuditPayload) validateType(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *ServerAuditPayload) validateWorkforce(formats strfmt.Registry) error {
+	if swag.IsZero(m.Workforce) { // not required
+		return nil
+	}
+
+	if m.Workforce != nil {
+		if err := m.Workforce.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("workforce")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("workforce")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
 // ContextValidate validate this server audit payload based on the context it is used
 func (m *ServerAuditPayload) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
@@ -1461,6 +1496,10 @@ func (m *ServerAuditPayload) ContextValidate(ctx context.Context, formats strfmt
 	}
 
 	if err := m.contextValidateTrustAnchorConfiguration(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateWorkforce(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -1855,6 +1894,27 @@ func (m *ServerAuditPayload) contextValidateTrustAnchorConfiguration(ctx context
 				return ve.ValidateName("trust_anchor_configuration")
 			} else if ce, ok := err.(*errors.CompositeError); ok {
 				return ce.ValidateName("trust_anchor_configuration")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *ServerAuditPayload) contextValidateWorkforce(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Workforce != nil {
+
+		if swag.IsZero(m.Workforce) { // not required
+			return nil
+		}
+
+		if err := m.Workforce.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("workforce")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("workforce")
 			}
 			return err
 		}

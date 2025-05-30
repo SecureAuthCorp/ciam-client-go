@@ -17,9 +17,16 @@ import (
 // swagger:model GoogleWorkspaceSettings
 type GoogleWorkspaceSettings struct {
 
+	// The email of a super user which the service account will impersonate when listing groups
+	// required if `fetch_groups` is set to `true`
+	AdminEmail string `json:"admin_email,omitempty" yaml:"admin_email,omitempty"`
+
 	// OAuth client application identifier
 	// Example: client
 	ClientID string `json:"client_id,omitempty" yaml:"client_id,omitempty"`
+
+	// Fetch user groups
+	FetchGroups bool `json:"fetch_groups,omitempty" yaml:"fetch_groups,omitempty"`
 
 	// List of domains permitted for user authentication
 	HostedDomains []string `json:"hosted_domains" yaml:"hosted_domains"`
