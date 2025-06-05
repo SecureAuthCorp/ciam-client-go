@@ -12,6 +12,7 @@ import (
 
 	"github.com/cloudentity/acp-client-go/clients/licensingroot/client/configuration"
 	"github.com/cloudentity/acp-client-go/clients/licensingroot/client/licenses"
+	"github.com/cloudentity/acp-client-go/clients/licensingroot/client/usage"
 )
 
 // Default acp HTTP client.
@@ -58,6 +59,7 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *Acp {
 	cli.Transport = transport
 	cli.Configuration = configuration.New(transport, formats)
 	cli.Licenses = licenses.New(transport, formats)
+	cli.Usage = usage.New(transport, formats)
 	return cli
 }
 
@@ -106,6 +108,8 @@ type Acp struct {
 
 	Licenses licenses.ClientService
 
+	Usage usage.ClientService
+
 	Transport runtime.ClientTransport
 }
 
@@ -114,4 +118,5 @@ func (c *Acp) SetTransport(transport runtime.ClientTransport) {
 	c.Transport = transport
 	c.Configuration.SetTransport(transport)
 	c.Licenses.SetTransport(transport)
+	c.Usage.SetTransport(transport)
 }

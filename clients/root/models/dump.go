@@ -76,9 +76,6 @@ type Dump struct {
 	// idps
 	Idps IDPs `json:"idps,omitempty" yaml:"idps,omitempty"`
 
-	// licenses
-	Licenses []*TenantLicense `json:"licenses" yaml:"licenses"`
-
 	// mfa methods
 	MfaMethods []*MFAMethod `json:"mfa_methods" yaml:"mfa_methods"`
 
@@ -241,10 +238,6 @@ func (m *Dump) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateIdps(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateLicenses(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -846,32 +839,6 @@ func (m *Dump) validateIdps(formats strfmt.Registry) error {
 			return ce.ValidateName("idps")
 		}
 		return err
-	}
-
-	return nil
-}
-
-func (m *Dump) validateLicenses(formats strfmt.Registry) error {
-	if swag.IsZero(m.Licenses) { // not required
-		return nil
-	}
-
-	for i := 0; i < len(m.Licenses); i++ {
-		if swag.IsZero(m.Licenses[i]) { // not required
-			continue
-		}
-
-		if m.Licenses[i] != nil {
-			if err := m.Licenses[i].Validate(formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("licenses" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
-					return ce.ValidateName("licenses" + "." + strconv.Itoa(i))
-				}
-				return err
-			}
-		}
-
 	}
 
 	return nil
@@ -1685,10 +1652,6 @@ func (m *Dump) ContextValidate(ctx context.Context, formats strfmt.Registry) err
 		res = append(res, err)
 	}
 
-	if err := m.contextValidateLicenses(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
 	if err := m.contextValidateMfaMethods(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -2266,31 +2229,6 @@ func (m *Dump) contextValidateIdps(ctx context.Context, formats strfmt.Registry)
 			return ce.ValidateName("idps")
 		}
 		return err
-	}
-
-	return nil
-}
-
-func (m *Dump) contextValidateLicenses(ctx context.Context, formats strfmt.Registry) error {
-
-	for i := 0; i < len(m.Licenses); i++ {
-
-		if m.Licenses[i] != nil {
-
-			if swag.IsZero(m.Licenses[i]) { // not required
-				return nil
-			}
-
-			if err := m.Licenses[i].ContextValidate(ctx, formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("licenses" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
-					return ce.ValidateName("licenses" + "." + strconv.Itoa(i))
-				}
-				return err
-			}
-		}
-
 	}
 
 	return nil

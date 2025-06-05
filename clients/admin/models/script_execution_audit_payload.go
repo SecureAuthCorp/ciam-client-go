@@ -35,7 +35,7 @@ type ScriptExecutionAuditPayload struct {
 	ExecutedAt strfmt.DateTime `json:"executed_at,omitempty" yaml:"executed_at,omitempty"`
 
 	// execution point
-	// Enum: ["post_authn_ctx","allowed_idp_ids","token_minting","client_token_minting"]
+	// Enum: ["post_authn_ctx","allowed_idp_ids","identifier_idp_selection","token_minting","client_token_minting"]
 	ExecutionPoint string `json:"execution_point,omitempty" yaml:"execution_point,omitempty"`
 
 	// input
@@ -110,7 +110,7 @@ var scriptExecutionAuditPayloadTypeExecutionPointPropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["post_authn_ctx","allowed_idp_ids","token_minting","client_token_minting"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["post_authn_ctx","allowed_idp_ids","identifier_idp_selection","token_minting","client_token_minting"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -125,6 +125,9 @@ const (
 
 	// ScriptExecutionAuditPayloadExecutionPointAllowedIdpIds captures enum value "allowed_idp_ids"
 	ScriptExecutionAuditPayloadExecutionPointAllowedIdpIds string = "allowed_idp_ids"
+
+	// ScriptExecutionAuditPayloadExecutionPointIdentifierIdpSelection captures enum value "identifier_idp_selection"
+	ScriptExecutionAuditPayloadExecutionPointIdentifierIdpSelection string = "identifier_idp_selection"
 
 	// ScriptExecutionAuditPayloadExecutionPointTokenMinting captures enum value "token_minting"
 	ScriptExecutionAuditPayloadExecutionPointTokenMinting string = "token_minting"

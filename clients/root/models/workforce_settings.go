@@ -17,6 +17,9 @@ import (
 // swagger:model WorkforceSettings
 type WorkforceSettings struct {
 
+	// faye url
+	FayeURL string `json:"faye_url,omitempty" yaml:"faye_url,omitempty"`
+
 	// manifest url
 	ManifestURL string `json:"manifest_url,omitempty" yaml:"manifest_url,omitempty"`
 

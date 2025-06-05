@@ -35,6 +35,9 @@ type Environment struct {
 	// allow Identity Pool OTP Challenge confirmation via web page
 	AllowIdentityPoolOtpChallengeConfirmationViaWebPage bool `json:"allow_identity_pool_otp_challenge_confirmation_via_web_page,omitempty" yaml:"allow_identity_pool_otp_challenge_confirmation_via_web_page,omitempty"`
 
+	// allow to skip 2FA if user does not have any authn methods configured
+	AllowSkip2faIfNoneSetUp bool `json:"allow_skip_2fa_if_none_set_up,omitempty" yaml:"allow_skip_2fa_if_none_set_up,omitempty"`
+
 	// analytics duration
 	// Format: duration
 	AnalyticsDuration strfmt.Duration `json:"analytics_duration,omitempty" yaml:"analytics_duration,omitempty"`
@@ -66,6 +69,9 @@ type Environment struct {
 
 	// stores client secrets as one-way hashes
 	ClientSecretsStoredAsOneWayHash bool `json:"client_secrets_stored_as_one_way_hash,omitempty" yaml:"client_secrets_stored_as_one_way_hash,omitempty"`
+
+	// generate random ids for scripts in the new workspace when using clone workspace feature
+	CloneWorkspaceScriptsFix bool `json:"clone_workspace_scripts_fix,omitempty" yaml:"clone_workspace_scripts_fix,omitempty"`
 
 	// Cloudentity IDP
 	CloudentityIdp bool `json:"cloudentity_idp,omitempty" yaml:"cloudentity_idp,omitempty"`
@@ -120,6 +126,9 @@ type Environment struct {
 
 	// use fake data (such as ips) - needed for qa testing
 	FakeData bool `json:"fake_data,omitempty" yaml:"fake_data,omitempty"`
+
+	// faye url
+	FayeURL string `json:"faye_url,omitempty" yaml:"faye_url,omitempty"`
 
 	// Groups
 	Groups bool `json:"groups,omitempty" yaml:"groups,omitempty"`

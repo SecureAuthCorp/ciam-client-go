@@ -73,6 +73,9 @@ type AdvancedConfiguration struct {
 	// Return iss parameter in the authorization response
 	ReturnIssParameterInAuthorizationResponse bool `json:"return_iss_parameter_in_authorization_response,omitempty" yaml:"return_iss_parameter_in_authorization_response,omitempty"`
 
+	// Enforces a single-value audience in authentication JWTs sent to the authorization server, matching the server's issuer URL.
+	SingleAudienceEqualsIssuerInAuthenticationJwts bool `json:"single_audience_equals_issuer_in_authentication_jwts,omitempty" yaml:"single_audience_equals_issuer_in_authentication_jwts,omitempty"`
+
 	// Disables SSO as a fallback mechanism for post-logout redirect URI validation
 	StrictPostLogoutRedirectEnforcement bool `json:"strict_post_logout_redirect_enforcement,omitempty" yaml:"strict_post_logout_redirect_enforcement,omitempty"`
 }

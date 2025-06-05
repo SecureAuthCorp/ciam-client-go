@@ -20,6 +20,9 @@ import (
 // swagger:model Pool
 type Pool struct {
 
+	// allow skip 2fa
+	AllowSkip2fa bool `json:"allow_skip_2fa,omitempty" yaml:"allow_skip_2fa,omitempty"`
+
 	// authentication mechanisms
 	AuthenticationMechanisms AuthenticationMechanisms `json:"authentication_mechanisms,omitempty" yaml:"authentication_mechanisms,omitempty"`
 
@@ -97,6 +100,9 @@ type Pool struct {
 	// Required: true
 	TenantID string `json:"tenant_id" yaml:"tenant_id"`
 
+	// totp settings
+	TotpSettings *TotpSettings `json:"totp_settings,omitempty" yaml:"totp_settings,omitempty"`
+
 	// workspace id
 	WorkspaceID string `json:"workspace_id,omitempty" yaml:"workspace_id,omitempty"`
 }
@@ -146,6 +152,10 @@ func (m *Pool) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateTenantID(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateTotpSettings(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -403,6 +413,25 @@ func (m *Pool) validateTenantID(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *Pool) validateTotpSettings(formats strfmt.Registry) error {
+	if swag.IsZero(m.TotpSettings) { // not required
+		return nil
+	}
+
+	if m.TotpSettings != nil {
+		if err := m.TotpSettings.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("totp_settings")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("totp_settings")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
 // ContextValidate validate this pool based on the context it is used
 func (m *Pool) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
@@ -428,6 +457,10 @@ func (m *Pool) ContextValidate(ctx context.Context, formats strfmt.Registry) err
 	}
 
 	if err := m.contextValidateSecondFactorAuthenticationMechanisms(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateTotpSettings(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -544,6 +577,27 @@ func (m *Pool) contextValidateSecondFactorAuthenticationMechanisms(ctx context.C
 			return ce.ValidateName("second_factor_authentication_mechanisms")
 		}
 		return err
+	}
+
+	return nil
+}
+
+func (m *Pool) contextValidateTotpSettings(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.TotpSettings != nil {
+
+		if swag.IsZero(m.TotpSettings) { // not required
+			return nil
+		}
+
+		if err := m.TotpSettings.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("totp_settings")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("totp_settings")
+			}
+			return err
+		}
 	}
 
 	return nil

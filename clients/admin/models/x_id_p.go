@@ -34,7 +34,7 @@ type XIDP struct {
 	Config *IDPConfiguration `json:"config,omitempty" yaml:"config,omitempty"`
 
 	// credentials
-	Credentials XCredentials `json:"credentials,omitempty" yaml:"credentials,omitempty"`
+	Credentials *XCredentials `json:"credentials,omitempty" yaml:"credentials,omitempty"`
 
 	// If set to `true`, the IDP is disabled
 	//
@@ -127,6 +127,10 @@ func (m *XIDP) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateCredentials(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateDiscoverySettings(formats); err != nil {
 		res = append(res, err)
 	}
@@ -185,6 +189,25 @@ func (m *XIDP) validateConfig(formats strfmt.Registry) error {
 				return ve.ValidateName("config")
 			} else if ce, ok := err.(*errors.CompositeError); ok {
 				return ce.ValidateName("config")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *XIDP) validateCredentials(formats strfmt.Registry) error {
+	if swag.IsZero(m.Credentials) { // not required
+		return nil
+	}
+
+	if m.Credentials != nil {
+		if err := m.Credentials.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("credentials")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("credentials")
 			}
 			return err
 		}
@@ -317,6 +340,10 @@ func (m *XIDP) ContextValidate(ctx context.Context, formats strfmt.Registry) err
 		res = append(res, err)
 	}
 
+	if err := m.contextValidateCredentials(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.contextValidateDiscoverySettings(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -374,6 +401,27 @@ func (m *XIDP) contextValidateConfig(ctx context.Context, formats strfmt.Registr
 				return ve.ValidateName("config")
 			} else if ce, ok := err.(*errors.CompositeError); ok {
 				return ce.ValidateName("config")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *XIDP) contextValidateCredentials(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Credentials != nil {
+
+		if swag.IsZero(m.Credentials) { // not required
+			return nil
+		}
+
+		if err := m.Credentials.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("credentials")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("credentials")
 			}
 			return err
 		}
