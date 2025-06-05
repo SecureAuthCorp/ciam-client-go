@@ -56,6 +56,10 @@ definitions:
         format: verifiableAddress
         type: string
         x-nullable: false
+      allowed_for_2fa:
+        description: is allowed for 2FA
+        type: boolean
+        x-nullable: false
       metadata:
         additionalProperties:
           type: object
@@ -1068,6 +1072,10 @@ definitions:
         format: verifiableAddress
         type: string
         x-nullable: false
+      allowed_for_2fa:
+        description: is allowed for 2FA
+        type: boolean
+        x-nullable: false
       metadata:
         additionalProperties:
           type: object
@@ -1206,6 +1214,9 @@ definitions:
     type: object
   Pool:
     properties:
+      allow_skip_2fa:
+        type: boolean
+        x-nullable: false
       authentication_mechanisms:
         $ref: '#/definitions/AuthenticationMechanisms'
       badge_color:
@@ -1296,6 +1307,8 @@ definitions:
         format: tenantID
         type: string
         x-nullable: false
+      totp_settings:
+        $ref: '#/definitions/TotpSettings'
       workspace_id:
         format: serverID
         type: string
@@ -1306,6 +1319,9 @@ definitions:
     type: object
   PoolResponse:
     properties:
+      allow_skip_2fa:
+        type: boolean
+        x-nullable: false
       authentication_mechanisms:
         $ref: '#/definitions/AuthenticationMechanisms'
       badge_color:
@@ -1408,6 +1424,8 @@ definitions:
         format: tenantID
         type: string
         x-nullable: false
+      totp_settings:
+        $ref: '#/definitions/TotpSettings'
       workspace_id:
         format: serverID
         type: string
@@ -1891,6 +1909,12 @@ definitions:
         type: array
         x-nullable: false
     type: object
+  TotpSettings:
+    properties:
+      issuer:
+        type: string
+        x-nullable: false
+    type: object
   URLEncodedBase64:
     description: |-
       When fields of this type are unmarshalled from JSON, the data is base64
@@ -1943,6 +1967,10 @@ definitions:
       address:
         format: verifiableAddress
         type: string
+        x-nullable: false
+      allowed_for_2fa:
+        description: is allowed for 2FA
+        type: boolean
         x-nullable: false
       metadata:
         additionalProperties:
@@ -2195,6 +2223,10 @@ definitions:
       address_lc:
         format: verifiableAddress
         type: string
+        x-nullable: false
+      allowed_for_2fa:
+        description: is allowed for 2FA
+        type: boolean
         x-nullable: false
       created_at:
         format: date-time

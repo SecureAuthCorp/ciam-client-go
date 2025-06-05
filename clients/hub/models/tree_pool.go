@@ -20,6 +20,9 @@ import (
 // swagger:model TreePool
 type TreePool struct {
 
+	// allow skip 2fa
+	AllowSkip2fa bool `json:"allow_skip_2fa,omitempty" yaml:"allow_skip_2fa,omitempty"`
+
 	// authentication mechanisms
 	AuthenticationMechanisms AuthenticationMechanisms `json:"authentication_mechanisms,omitempty" yaml:"authentication_mechanisms,omitempty"`
 
@@ -88,6 +91,9 @@ type TreePool struct {
 
 	// system
 	System bool `json:"system,omitempty" yaml:"system,omitempty"`
+
+	// totp settings
+	TotpSettings *TotpSettings `json:"totp_settings,omitempty" yaml:"totp_settings,omitempty"`
 }
 
 // Validate validates this tree pool
@@ -131,6 +137,10 @@ func (m *TreePool) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateSecondFactorPreferredAuthenticationMechanism(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateTotpSettings(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -379,6 +389,25 @@ func (m *TreePool) validateSecondFactorPreferredAuthenticationMechanism(formats 
 	return nil
 }
 
+func (m *TreePool) validateTotpSettings(formats strfmt.Registry) error {
+	if swag.IsZero(m.TotpSettings) { // not required
+		return nil
+	}
+
+	if m.TotpSettings != nil {
+		if err := m.TotpSettings.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("totp_settings")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("totp_settings")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
 // ContextValidate validate this tree pool based on the context it is used
 func (m *TreePool) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
@@ -404,6 +433,10 @@ func (m *TreePool) ContextValidate(ctx context.Context, formats strfmt.Registry)
 	}
 
 	if err := m.contextValidateSecondFactorAuthenticationMechanisms(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateTotpSettings(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -520,6 +553,27 @@ func (m *TreePool) contextValidateSecondFactorAuthenticationMechanisms(ctx conte
 			return ce.ValidateName("second_factor_authentication_mechanisms")
 		}
 		return err
+	}
+
+	return nil
+}
+
+func (m *TreePool) contextValidateTotpSettings(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.TotpSettings != nil {
+
+		if swag.IsZero(m.TotpSettings) { // not required
+			return nil
+		}
+
+		if err := m.TotpSettings.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("totp_settings")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("totp_settings")
+			}
+			return err
+		}
 	}
 
 	return nil

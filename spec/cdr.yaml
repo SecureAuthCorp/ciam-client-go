@@ -3934,6 +3934,11 @@ definitions:
         format: language
         type: string
         x-nullable: false
+      pool_id:
+        description: pool id of a user who granted the scope
+        format: poolID
+        type: string
+        x-nullable: false
       scope_name:
         description: |-
           The scope name as it's set initially. This parameter supports dynamic scope syntax, thus can include a scope
@@ -3960,6 +3965,11 @@ definitions:
         description: Identifier of the tenant where the client app is hosted.
         example: my-company
         format: tenantID
+        type: string
+        x-nullable: false
+      user_id:
+        description: user id of a user who granted the scope
+        format: userID
         type: string
         x-nullable: false
     type: object

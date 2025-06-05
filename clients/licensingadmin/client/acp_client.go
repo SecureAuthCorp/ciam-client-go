@@ -11,6 +11,7 @@ import (
 	"github.com/go-openapi/strfmt"
 
 	"github.com/cloudentity/acp-client-go/clients/licensingadmin/client/license"
+	"github.com/cloudentity/acp-client-go/clients/licensingadmin/client/usage"
 )
 
 // Default acp HTTP client.
@@ -56,6 +57,7 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *Acp {
 	cli := new(Acp)
 	cli.Transport = transport
 	cli.License = license.New(transport, formats)
+	cli.Usage = usage.New(transport, formats)
 	return cli
 }
 
@@ -102,6 +104,8 @@ func (cfg *TransportConfig) WithSchemes(schemes []string) *TransportConfig {
 type Acp struct {
 	License license.ClientService
 
+	Usage usage.ClientService
+
 	Transport runtime.ClientTransport
 }
 
@@ -109,4 +113,5 @@ type Acp struct {
 func (c *Acp) SetTransport(transport runtime.ClientTransport) {
 	c.Transport = transport
 	c.License.SetTransport(transport)
+	c.Usage.SetTransport(transport)
 }

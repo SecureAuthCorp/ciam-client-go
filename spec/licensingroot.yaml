@@ -11,6 +11,14 @@ definitions:
       enabled:
         type: boolean
         x-nullable: false
+      monthly_limit:
+        format: int64
+        type: integer
+        x-nullable: false
+      total_limit:
+        format: int64
+        type: integer
+        x-nullable: false
     type: object
   Dump:
     properties:
@@ -100,6 +108,17 @@ definitions:
         type: array
         x-nullable: false
     type: object
+  MetricUsage:
+    properties:
+      limit:
+        format: int64
+        type: integer
+        x-nullable: false
+      used:
+        format: int64
+        type: integer
+        x-nullable: false
+    type: object
   Rfc6902PatchOperation:
     properties:
       op:
@@ -162,6 +181,13 @@ definitions:
         example: trial
         type: string
         x-nullable: false
+    type: object
+  Usage:
+    properties:
+      enterprise_idps:
+        $ref: '#/definitions/MetricUsage'
+      monthly_tokens_issued:
+        $ref: '#/definitions/MetricUsage'
     type: object
 host: localhost:8443
 info:
@@ -463,6 +489,33 @@ paths:
       summary: Set tenant license
       tags:
       - licenses
+  /system/tenants/{tenantID}/usage:
+    get:
+      description: Get usage.
+      operationId: systemGetTenantUsage
+      parameters:
+      - default: default
+        description: Tenant id
+        in: path
+        name: tenantID
+        required: true
+        type: string
+      responses:
+        "200":
+          $ref: '#/responses/SystemUsageResponse'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - setup: []
+      summary: Get usage
+      tags:
+      - usage
 produces:
 - application/json
 responses:
@@ -474,6 +527,10 @@ responses:
     description: Licenses
     schema:
       $ref: '#/definitions/Licenses'
+  SystemUsageResponse:
+    description: Usage
+    schema:
+      $ref: '#/definitions/Usage'
   badRequestHTTPError:
     description: Bad request
     schema:

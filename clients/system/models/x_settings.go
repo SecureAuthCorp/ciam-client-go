@@ -7,15 +7,22 @@ package models
 
 import (
 	"context"
+	"encoding/json"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // XSettings X IDP specific settings
 //
 // swagger:model XSettings
 type XSettings struct {
+
+	// Client authentication method
+	// Enum: ["client_secret","none"]
+	AuthenticationMethod string `json:"authentication_method,omitempty" yaml:"authentication_method,omitempty"`
 
 	// OAuth client application identifier
 	// Example: client
@@ -28,6 +35,57 @@ type XSettings struct {
 
 // Validate validates this x settings
 func (m *XSettings) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateAuthenticationMethod(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+var xSettingsTypeAuthenticationMethodPropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["client_secret","none"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		xSettingsTypeAuthenticationMethodPropEnum = append(xSettingsTypeAuthenticationMethodPropEnum, v)
+	}
+}
+
+const (
+
+	// XSettingsAuthenticationMethodClientSecret captures enum value "client_secret"
+	XSettingsAuthenticationMethodClientSecret string = "client_secret"
+
+	// XSettingsAuthenticationMethodNone captures enum value "none"
+	XSettingsAuthenticationMethodNone string = "none"
+)
+
+// prop value enum
+func (m *XSettings) validateAuthenticationMethodEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, xSettingsTypeAuthenticationMethodPropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *XSettings) validateAuthenticationMethod(formats strfmt.Registry) error {
+	if swag.IsZero(m.AuthenticationMethod) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateAuthenticationMethodEnum("authentication_method", "body", m.AuthenticationMethod); err != nil {
+		return err
+	}
+
 	return nil
 }
 

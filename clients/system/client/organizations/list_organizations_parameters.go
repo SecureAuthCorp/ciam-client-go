@@ -121,6 +121,12 @@ type ListOrganizationsParams struct {
 	*/
 	Template *bool
 
+	/* WithChildCount.
+
+	   Count child organizations for each organization
+	*/
+	WithChildCount *bool
+
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
@@ -273,6 +279,17 @@ func (o *ListOrganizationsParams) SetTemplate(template *bool) {
 	o.Template = template
 }
 
+// WithWithChildCount adds the withChildCount to the list organizations params
+func (o *ListOrganizationsParams) WithWithChildCount(withChildCount *bool) *ListOrganizationsParams {
+	o.SetWithChildCount(withChildCount)
+	return o
+}
+
+// SetWithChildCount adds the withChildCount to the list organizations params
+func (o *ListOrganizationsParams) SetWithChildCount(withChildCount *bool) {
+	o.WithChildCount = withChildCount
+}
+
 // WriteToRequest writes these params to a swagger request
 func (o *ListOrganizationsParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Registry) error {
 
@@ -403,6 +420,23 @@ func (o *ListOrganizationsParams) WriteToRequest(r runtime.ClientRequest, reg st
 		if qTemplate != "" {
 
 			if err := r.SetQueryParam("template", qTemplate); err != nil {
+				return err
+			}
+		}
+	}
+
+	if o.WithChildCount != nil {
+
+		// query param with_child_count
+		var qrWithChildCount bool
+
+		if o.WithChildCount != nil {
+			qrWithChildCount = *o.WithChildCount
+		}
+		qWithChildCount := swag.FormatBool(qrWithChildCount)
+		if qWithChildCount != "" {
+
+			if err := r.SetQueryParam("with_child_count", qWithChildCount); err != nil {
 				return err
 			}
 		}

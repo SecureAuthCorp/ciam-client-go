@@ -58,7 +58,7 @@ type OrganizationResponse struct {
 	ParentID string `json:"parent_id,omitempty" yaml:"parent_id,omitempty"`
 
 	// subject format
-	// Enum: ["hash","legacy"]
+	// Enum: ["hash","legacy","custom"]
 	SubjectFormat string `json:"subject_format,omitempty" yaml:"subject_format,omitempty"`
 
 	// subject identifier algorithm salt
@@ -152,7 +152,7 @@ var organizationResponseTypeSubjectFormatPropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["hash","legacy"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["hash","legacy","custom"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -167,6 +167,9 @@ const (
 
 	// OrganizationResponseSubjectFormatLegacy captures enum value "legacy"
 	OrganizationResponseSubjectFormatLegacy string = "legacy"
+
+	// OrganizationResponseSubjectFormatCustom captures enum value "custom"
+	OrganizationResponseSubjectFormatCustom string = "custom"
 )
 
 // prop value enum

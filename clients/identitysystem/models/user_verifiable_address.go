@@ -28,6 +28,9 @@ type UserVerifiableAddress struct {
 	// Required: true
 	AddressLc string `json:"address_lc" yaml:"address_lc"`
 
+	// is allowed for 2FA
+	AllowedFor2fa bool `json:"allowed_for_2fa,omitempty" yaml:"allowed_for_2fa,omitempty"`
+
 	// created at
 	// Required: true
 	// Format: date-time

@@ -42,6 +42,24 @@ definitions:
         type: string
         x-nullable: false
     type: object
+  MetricUsage:
+    properties:
+      limit:
+        format: int64
+        type: integer
+        x-nullable: false
+      used:
+        format: int64
+        type: integer
+        x-nullable: false
+    type: object
+  Usage:
+    properties:
+      enterprise_idps:
+        $ref: '#/definitions/MetricUsage'
+      monthly_tokens_issued:
+        $ref: '#/definitions/MetricUsage'
+    type: object
 host: localhost:8443
 info:
   description: |-
@@ -79,6 +97,26 @@ paths:
       summary: Get license
       tags:
       - license
+  /admin/usage:
+    get:
+      description: Get usage.
+      operationId: getUsage
+      responses:
+        "200":
+          $ref: '#/responses/UsageResponse'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - admin: []
+      summary: Get usage
+      tags:
+      - usage
 produces:
 - application/json
 responses:
@@ -86,6 +124,10 @@ responses:
     description: License
     schema:
       $ref: '#/definitions/License'
+  UsageResponse:
+    description: Usage
+    schema:
+      $ref: '#/definitions/Usage'
   badRequestHTTPError:
     description: Bad request
     schema:

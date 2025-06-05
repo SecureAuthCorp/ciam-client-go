@@ -48,6 +48,12 @@ type AuditEventMetadata struct {
 	// DBFP jwt fingerprint
 	DbfpFingerprint string `json:"dbfp_fingerprint,omitempty" yaml:"dbfp_fingerprint,omitempty"`
 
+	// Device browser based on the user agent
+	DeviceBrowser string `json:"device_browser,omitempty" yaml:"device_browser,omitempty"`
+
+	// Device OS based on the user agent
+	DeviceOs string `json:"device_os,omitempty" yaml:"device_os,omitempty"`
+
 	// Device type based on the user agent (computer, tablet, phone, console, wearable, tv)
 	DeviceType string `json:"device_type,omitempty" yaml:"device_type,omitempty"`
 
@@ -91,6 +97,9 @@ type AuditEventMetadata struct {
 	//
 	// Represents the correlation ID passed as X-Correlation-ID header to a HTTP request
 	RequestCorrelationID string `json:"request_correlation_id,omitempty" yaml:"request_correlation_id,omitempty"`
+
+	// action result (success, failure)
+	Result string `json:"result,omitempty" yaml:"result,omitempty"`
 
 	// risk id
 	RiskID RiskID `json:"risk_id,omitempty" yaml:"risk_id,omitempty"`

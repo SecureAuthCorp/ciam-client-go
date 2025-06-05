@@ -657,6 +657,11 @@ definitions:
         description: Return iss parameter in the authorization response
         type: boolean
         x-nullable: false
+      single_audience_equals_issuer_in_authentication_jwts:
+        description: Enforces a single-value audience in authentication JWTs sent
+          to the authorization server, matching the server's issuer URL.
+        type: boolean
+        x-nullable: false
       strict_post_logout_redirect_enforcement:
         description: Disables SSO as a fallback mechanism for post-logout redirect
           URI validation
@@ -859,6 +864,10 @@ definitions:
       client_id:
         description: OAuth client application identifier
         example: client
+        type: string
+        x-nullable: false
+      key_id:
+        description: key id
         type: string
         x-nullable: false
       scopes:
@@ -1192,6 +1201,14 @@ definitions:
         description: DBFP jwt fingerprint
         type: string
         x-nullable: false
+      device_browser:
+        description: Device browser based on the user agent
+        type: string
+        x-nullable: false
+      device_os:
+        description: Device OS based on the user agent
+        type: string
+        x-nullable: false
       device_type:
         description: Device type based on the user agent (computer, tablet, phone,
           console, wearable, tv)
@@ -1261,6 +1278,10 @@ definitions:
 
           Represents the correlation ID passed as X-Correlation-ID header to a HTTP request
         format: requestCorrelationID
+        type: string
+        x-nullable: false
+      result:
+        description: action result (success, failure)
         type: string
         x-nullable: false
       risk_id:
@@ -7424,6 +7445,10 @@ definitions:
         description: allow Identity Pool OTP Challenge confirmation via web page
         type: boolean
         x-nullable: false
+      allow_skip_2fa_if_none_set_up:
+        description: allow to skip 2FA if user does not have any authn methods configured
+        type: boolean
+        x-nullable: false
       analytics_duration:
         format: duration
         type: string
@@ -7461,6 +7486,11 @@ definitions:
         x-nullable: false
       client_secrets_stored_as_one_way_hash:
         description: stores client secrets as one-way hashes
+        type: boolean
+        x-nullable: false
+      clone_workspace_scripts_fix:
+        description: generate random ids for scripts in the new workspace when using
+          clone workspace feature
         type: boolean
         x-nullable: false
       cloudentity_idp:
@@ -7532,6 +7562,9 @@ definitions:
       fake_data:
         description: use fake data (such as ips) - needed for qa testing
         type: boolean
+        x-nullable: false
+      faye_url:
+        type: string
         x-nullable: false
       groups:
         description: Groups
@@ -9056,6 +9089,14 @@ definitions:
         description: Application secret from your GoogleWorkspace application settings
         type: string
         x-nullable: false
+      service_account:
+        additionalProperties:
+          type: object
+        description: |-
+          service account JSON containing credentials to fetch groups using admin directory API
+          required if `fetch_groups` is set to `true`
+        type: object
+        x-nullable: false
     type: object
   GoogleWorkspaceIDP:
     properties:
@@ -9187,10 +9228,20 @@ definitions:
   GoogleWorkspaceSettings:
     description: GoogleWorkspace IDP specific settings
     properties:
+      admin_email:
+        description: |-
+          The email of a super user which the service account will impersonate when listing groups
+          required if `fetch_groups` is set to `true`
+        type: string
+        x-nullable: false
       client_id:
         description: OAuth client application identifier
         example: client
         type: string
+        x-nullable: false
+      fetch_groups:
+        description: Fetch user groups
+        type: boolean
         x-nullable: false
       hosted_domains:
         description: List of domains permitted for user authentication
@@ -10610,29 +10661,6 @@ definitions:
       party:
         $ref: '#/definitions/FDXParty'
     type: object
-  License:
-    properties:
-      end_date:
-        description: License end date
-        example: "2023-03-01T09:02:27.127932Z"
-        format: date-time
-        type: string
-        x-nullable: false
-      enforcement_enabled:
-        description: Is enforcement enabled
-        type: boolean
-        x-nullable: false
-      has_enterprise_idps_capability:
-        description: Is enterprise IDPs capability enabled
-        type: boolean
-        x-nullable: false
-      start_date:
-        description: License start date
-        example: "2023-03-01T09:02:27.127932Z"
-        format: date-time
-        type: string
-        x-nullable: false
-    type: object
   LinkedInCredentials:
     description: LinkedIn IDP specific credentials
     properties:
@@ -11394,6 +11422,168 @@ definitions:
   NameIDFormat:
     description: NameIDFormat is the format of the id
     type: string
+  OAuth2Credentials:
+    description: OAuth2 IDP specific credentials
+    properties:
+      client_secret:
+        description: OAuth client application secret
+        type: string
+        x-nullable: false
+    type: object
+  OAuth2IDP:
+    properties:
+      attributes:
+        $ref: '#/definitions/Attributes'
+      authorization_server_id:
+        description: ID of the authorization server (workspace) to which the IDP is
+          connected
+        format: serverID
+        type: string
+        x-nullable: false
+      client_id:
+        description: |-
+          Client application ID
+
+          It serves as a reference to a client application that is created in the System authorization
+          server (workspace), when a custom login page is created.
+        format: clientID
+        type: string
+        x-nullable: false
+      config:
+        $ref: '#/definitions/IDPConfiguration'
+      credentials:
+        $ref: '#/definitions/OAuth2Credentials'
+      disabled:
+        description: |-
+          If set to `true`, the IDP is disabled
+
+          When an IDP is disabled, it is not available for the users to be used. It is also not
+          displayed on the login page.
+        type: boolean
+        x-nullable: false
+      discovery_settings:
+        $ref: '#/definitions/IDPDiscoverySettings'
+      display_order:
+        description: Can be used to e.g. modify the order in which the Identity Providers
+          are presented on the login page.
+        example: 1
+        format: int64
+        type: integer
+        x-nullable: false
+      hidden:
+        description: |-
+          If set to `true`, the IDP is not displayed on the login page.
+
+          When an IDP is hidden, it will not be displayed on the login page. It can still be used
+          and script extensions can enabled it.
+        type: boolean
+        x-nullable: false
+      id:
+        description: |-
+          Unique ID of your identity provider
+
+          If not provided, a random ID is generated.
+        format: idpID
+        type: string
+        x-nullable: false
+      identity_pool_id:
+        description: ID of the Identity Pool to which the IDP is connected
+        format: poolID
+        type: string
+        x-nullable: false
+      jit:
+        $ref: '#/definitions/JITSettings'
+      logo_uri:
+        description: Logo URI
+        type: string
+        x-nullable: false
+      mappings:
+        $ref: '#/definitions/Mappings'
+      method:
+        description: |-
+          Defines the type of an IDP
+
+          Cloudentity is designed to make it possible for you to bring any of your own IDPs and integrate it
+          with Cloudentity as it delivers enterprise connectors for major Cloud IDPs and a possibility for
+          custom integration DKS for home-built solutions. You can also use built-in Sandbox IDP, which
+          is a static IDP, to create an IDP for testing purposes.
+        format: idpMethod
+        type: string
+        x-nullable: false
+      name:
+        description: Display name of your IDP
+        type: string
+        x-nullable: false
+      post_authn_app_id:
+        description: Points to the ID of the custom app, null if not set
+        format: customAppID
+        type: string
+        x-nullable: false
+      settings:
+        $ref: '#/definitions/OAuth2Settings'
+      sso_settings:
+        $ref: '#/definitions/IDPSSOSettings'
+      static_amr:
+        description: |-
+          Authentication method reference
+
+          An array of case sensitive strings for authentication methods that are used in the user
+          authentication.
+
+          For example, an IDP may require the user to provide a biometric authentication using facial
+          recognition. For that, the value of the authentication method reference is `face`.
+        items:
+          format: amr
+          type: string
+        type: array
+        x-nullable: false
+      tenant_id:
+        description: ID of the tenant where an IDP is connected
+        format: tenantID
+        type: string
+        x-nullable: false
+      token_exchange_settings:
+        $ref: '#/definitions/IDPTokenExchangeSettings'
+      version:
+        description: |-
+          IDP version to track internal changes
+          version that is currently supported: 3
+        format: int64
+        type: integer
+        x-nullable: false
+      workspace_id:
+        description: ID of the Workspace to which the IDP is connected
+        format: serverID
+        type: string
+        x-nullable: false
+    type: object
+  OAuth2Settings:
+    description: OAuth2 IDP specific settings
+    properties:
+      authorization_endpoint:
+        description: OAuth2 authorization endpoint
+        type: string
+        x-nullable: false
+      client_id:
+        description: OAuth client application identifier
+        example: client
+        type: string
+        x-nullable: false
+      scopes:
+        description: An array of additional scopes your client requests
+        example:
+        - email
+        - profile
+        - openid
+        items:
+          type: string
+        type: array
+        x-nullable: false
+      token_endpoint:
+        description: OAuth2 token endpoint
+        type: string
+        x-nullable: false
+    type: object
   OBBRConfiguration:
     properties:
       industry:
@@ -11829,6 +12019,204 @@ definitions:
         type: string
         x-nullable: false
     type: object
+  OktaV2Credentials:
+    description: OktaV2 IDP specific credentials
+    properties:
+      client_secret:
+        description: OAuth client application secret
+        type: string
+        x-nullable: false
+      private_key_jwt:
+        $ref: '#/definitions/PrivateKeyJWTCredentials'
+    type: object
+  OktaV2IDP:
+    properties:
+      attributes:
+        $ref: '#/definitions/Attributes'
+      authorization_server_id:
+        description: ID of the authorization server (workspace) to which the IDP is
+          connected
+        format: serverID
+        type: string
+        x-nullable: false
+      client_id:
+        description: |-
+          Client application ID
+
+          It serves as a reference to a client application that is created in the System authorization
+          server (workspace), when a custom login page is created.
+        format: clientID
+        type: string
+        x-nullable: false
+      config:
+        $ref: '#/definitions/IDPConfiguration'
+      credentials:
+        $ref: '#/definitions/OktaV2Credentials'
+      disabled:
+        description: |-
+          If set to `true`, the IDP is disabled
+
+          When an IDP is disabled, it is not available for the users to be used. It is also not
+          displayed on the login page.
+        type: boolean
+        x-nullable: false
+      discovery_settings:
+        $ref: '#/definitions/IDPDiscoverySettings'
+      display_order:
+        description: Can be used to e.g. modify the order in which the Identity Providers
+          are presented on the login page.
+        example: 1
+        format: int64
+        type: integer
+        x-nullable: false
+      hidden:
+        description: |-
+          If set to `true`, the IDP is not displayed on the login page.
+
+          When an IDP is hidden, it will not be displayed on the login page. It can still be used
+          and script extensions can enabled it.
+        type: boolean
+        x-nullable: false
+      id:
+        description: |-
+          Unique ID of your identity provider
+
+          If not provided, a random ID is generated.
+        format: idpID
+        type: string
+        x-nullable: false
+      identity_pool_id:
+        description: ID of the Identity Pool to which the IDP is connected
+        format: poolID
+        type: string
+        x-nullable: false
+      jit:
+        $ref: '#/definitions/JITSettings'
+      logo_uri:
+        description: Logo URI
+        type: string
+        x-nullable: false
+      mappings:
+        $ref: '#/definitions/Mappings'
+      method:
+        description: |-
+          Defines the type of an IDP
+
+          Cloudentity is designed to make it possible for you to bring any of your own IDPs and integrate it
+          with Cloudentity as it delivers enterprise connectors for major Cloud IDPs and a possibility for
+          custom integration DKS for home-built solutions. You can also use built-in Sandbox IDP, which
+          is a static IDP, to create an IDP for testing purposes.
+        format: idpMethod
+        type: string
+        x-nullable: false
+      name:
+        description: Display name of your IDP
+        type: string
+        x-nullable: false
+      post_authn_app_id:
+        description: Points to the ID of the custom app, null if not set
+        format: customAppID
+        type: string
+        x-nullable: false
+      settings:
+        $ref: '#/definitions/OktaV2Settings'
+      sso_settings:
+        $ref: '#/definitions/IDPSSOSettings'
+      static_amr:
+        description: |-
+          Authentication method reference
+
+          An array of case sensitive strings for authentication methods that are used in the user
+          authentication.
+
+          For example, an IDP may require the user to provide a biometric authentication using facial
+          recognition. For that, the value of the authentication method reference is `face`.
+        items:
+          format: amr
+          type: string
+        type: array
+        x-nullable: false
+      tenant_id:
+        description: ID of the tenant where an IDP is connected
+        format: tenantID
+        type: string
+        x-nullable: false
+      token_exchange_settings:
+        $ref: '#/definitions/IDPTokenExchangeSettings'
+      version:
+        description: |-
+          IDP version to track internal changes
+          version that is currently supported: 3
+        format: int64
+        type: integer
+        x-nullable: false
+      workspace_id:
+        description: ID of the Workspace to which the IDP is connected
+        format: serverID
+        type: string
+        x-nullable: false
+    type: object
+  OktaV2Settings:
+    description: OktaV2 IDP specific settings
+    properties:
+      authentication_method:
+        description: Client authentication method
+        enum:
+        - client_secret
+        - private_key_jwt
+        - none
+        type: string
+        x-nullable: false
+      authorization_server_id:
+        description: |-
+          ID of a custom authorization server
+
+          If the `use_org_authorization_server` parameter is set to `false`, use this field to specify
+          the ID of a custom authorization server.
+
+          If not provided, the `default` value is used.
+        type: string
+        x-nullable: false
+      client_id:
+        description: OAuth client application identifier
+        example: client
+        type: string
+        x-nullable: false
+      domain:
+        description: String represented domain of the Okta Authentication Service
+          for your organization
+        example: dev-316761.okta.com
+        type: string
+        x-nullable: false
+      get_user_info:
+        description: If enabled, users' data is collected by calling the `userinfo`
+          endpoint.
+        type: boolean
+        x-nullable: false
+      scopes:
+        description: An array of additional scopes your client requests
+        example:
+        - email
+        - profile
+        - openid
+        items:
+          type: string
+        type: array
+        x-nullable: false
+      send_login_hint:
+        description: Whether to send the identifier as a `login_hint` parameter to
+          the IDP
+        type: boolean
+        x-nullable: false
+      use_org_authorization_server:
+        description: If set to `true`, the built-in authorization server is used
+        type: boolean
+        x-nullable: false
+      use_pkce:
+        description: Use PKCE
+        type: boolean
+        x-nullable: false
+    type: object
   OpenbankingServerConsent:
     properties:
       bank_url:
@@ -12123,6 +12511,7 @@ definitions:
         enum:
         - hash
         - legacy
+        - custom
         type: string
         x-nullable: false
       subject_identifier_algorithm_salt:
@@ -13007,6 +13396,11 @@ definitions:
         $ref: '#/definitions/RiskID'
       loa:
         $ref: '#/definitions/RiskLOA'
+      risks:
+        items:
+          type: string
+        type: array
+        x-nullable: false
     type: object
   RiskID:
     description: Risk engine transaction id
@@ -13850,6 +14244,11 @@ definitions:
         format: language
         type: string
         x-nullable: false
+      pool_id:
+        description: pool id of a user who granted the scope
+        format: poolID
+        type: string
+        x-nullable: false
       scope_name:
         description: |-
           The scope name as it's set initially. This parameter supports dynamic scope syntax, thus can include a scope
@@ -13876,6 +14275,11 @@ definitions:
         description: Identifier of the tenant where the client app is hosted.
         example: my-company
         format: tenantID
+        type: string
+        x-nullable: false
+      user_id:
+        description: user id of a user who granted the scope
+        format: userID
         type: string
         x-nullable: false
     type: object
@@ -14127,6 +14531,7 @@ definitions:
         enum:
         - post_authn_ctx
         - allowed_idp_ids
+        - identifier_idp_selection
         - token_minting
         - client_token_minting
         type: string
@@ -14188,6 +14593,7 @@ definitions:
         enum:
         - post_authn_ctx
         - allowed_idp_ids
+        - identifier_idp_selection
         - token_minting
         - client_token_minting
         example: post_authn_ctx
@@ -14796,6 +15202,7 @@ definitions:
         - default
         - demo
         - workforce
+        - workforce_v2
         - consumer
         - partners
         - third_party
@@ -14887,6 +15294,11 @@ definitions:
         $ref: '#/definitions/SSOConfiguration'
       styling:
         $ref: '#/definitions/Styling'
+      subject_custom_attribute:
+        description: The authentication context attribute name that will be used as
+          subject when the custom subject format is used.
+        type: string
+        x-nullable: false
       subject_format:
         description: |-
           Define the format of a subject
@@ -14894,6 +15306,7 @@ definitions:
         enum:
         - hash
         - legacy
+        - custom
         type: string
         x-nullable: false
       subject_identifier_algorithm_salt:
@@ -15024,6 +15437,8 @@ definitions:
         format: int64
         type: integer
         x-nullable: false
+      workforce:
+        $ref: '#/definitions/WorkforceConfiguration'
     required:
     - tenant_id
     type: object
@@ -15351,6 +15766,7 @@ definitions:
         - default
         - demo
         - workforce
+        - workforce_v2
         - consumer
         - partners
         - third_party
@@ -15416,6 +15832,11 @@ definitions:
         $ref: '#/definitions/SSOConfiguration'
       styling:
         $ref: '#/definitions/Styling'
+      subject_custom_attribute:
+        description: The authentication context attribute name that will be used as
+          subject when the custom subject format is used.
+        type: string
+        x-nullable: false
       subject_format:
         description: |-
           Define the format of a subject
@@ -15423,6 +15844,7 @@ definitions:
         enum:
         - hash
         - legacy
+        - custom
         type: string
         x-nullable: false
       subject_identifier_types:
@@ -15540,6 +15962,8 @@ definitions:
         format: int64
         type: integer
         x-nullable: false
+      workforce:
+        $ref: '#/definitions/WorkforceConfiguration'
     required:
     - tenant_id
     type: object
@@ -15588,6 +16012,7 @@ definitions:
         - default
         - demo
         - workforce
+        - workforce_v2
         - consumer
         - partners
         - third_party
@@ -15726,6 +16151,7 @@ definitions:
         - default
         - demo
         - workforce
+        - workforce_v2
         - consumer
         - partners
         - third_party
@@ -16276,6 +16702,7 @@ definitions:
         - default
         - demo
         - workforce
+        - workforce_v2
         - consumer
         - partners
         - third_party
@@ -16367,6 +16794,11 @@ definitions:
         $ref: '#/definitions/SSOConfiguration'
       styling:
         $ref: '#/definitions/Styling'
+      subject_custom_attribute:
+        description: The authentication context attribute name that will be used as
+          subject when the custom subject format is used.
+        type: string
+        x-nullable: false
       subject_format:
         description: |-
           Define the format of a subject
@@ -16374,6 +16806,7 @@ definitions:
         enum:
         - hash
         - legacy
+        - custom
         type: string
         x-nullable: false
       subject_identifier_algorithm_salt:
@@ -16529,6 +16962,8 @@ definitions:
         format: int64
         type: integer
         x-nullable: false
+      workforce:
+        $ref: '#/definitions/WorkforceConfiguration'
     required:
     - tenant_id
     type: object
@@ -19260,8 +19695,22 @@ definitions:
         type: array
         x-nullable: false
     type: object
+  WorkforceConfiguration:
+    properties:
+      status:
+        $ref: '#/definitions/WorkforceProvisioningStatus'
+      tenant_slug:
+        description: workforce tenant slug
+        type: string
+        x-nullable: false
+    type: object
+  WorkforceProvisioningStatus:
+    type: string
   WorkforceSettings:
     properties:
+      faye_url:
+        type: string
+        x-nullable: false
       manifest_url:
         type: string
         x-nullable: false
@@ -19615,6 +20064,7 @@ definitions:
         - default
         - demo
         - workforce
+        - workforce_v2
         - consumer
         - partners
         - third_party
@@ -19644,6 +20094,7 @@ definitions:
         enum:
         - hash
         - legacy
+        - custom
         type: string
         x-nullable: false
       subject_identifier_algorithm_salt:
@@ -19674,6 +20125,8 @@ definitions:
         example: regular
         type: string
         x-nullable: false
+      workforce:
+        $ref: '#/definitions/WorkforceConfiguration'
     type: object
   WorkspaceRoleSubject:
     properties:
@@ -19766,6 +20219,11 @@ definitions:
     type: object
   XCredentials:
     description: X IDP specific credentials
+    properties:
+      client_secret:
+        description: OAuth client application secret
+        type: string
+        x-nullable: false
     type: object
   XIDP:
     properties:
@@ -19897,6 +20355,13 @@ definitions:
   XSettings:
     description: X IDP specific settings
     properties:
+      authentication_method:
+        description: Client authentication method
+        enum:
+        - client_secret
+        - none
+        type: string
+        x-nullable: false
       client_id:
         description: OAuth client application identifier
         example: client
@@ -21712,26 +22177,6 @@ paths:
       summary: Search images
       tags:
       - images
-  /license:
-    get:
-      description: Get license.
-      operationId: getAdminLicense
-      responses:
-        "200":
-          $ref: '#/responses/LicenseResponse'
-        "401":
-          $ref: '#/responses/unauthorizedHTTPError'
-        "403":
-          $ref: '#/responses/forbiddenHTTPError'
-        "404":
-          $ref: '#/responses/notFoundHTTPError'
-        "429":
-          $ref: '#/responses/tooManyRequestsHTTPError'
-      security:
-      - admin: []
-      summary: Get license
-      tags:
-      - license
   /mfa-methods:
     get:
       description: List MFA methods.
@@ -22033,6 +22478,10 @@ paths:
         minimum: 1
         name: limit
         type: integer
+      - description: Count child organizations for each organization
+        in: query
+        name: with_child_count
+        type: boolean
       responses:
         "200":
           $ref: '#/responses/Orgs'
@@ -26945,6 +27394,178 @@ paths:
       summary: Return Microsoft IDP client
       tags:
       - idps
+  /servers/{wid}/idps/oauth2:
+    post:
+      description: Create OAuth2 IDP.
+      operationId: createOAuth2IDP
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - default: default
+        description: Authorization server id
+        in: path
+        name: wid
+        required: true
+        type: string
+      - description: OAuth2IDP
+        in: body
+        name: OAuth2IDP
+        schema:
+          $ref: '#/definitions/OAuth2IDP'
+      responses:
+        "201":
+          description: OAuth2IDP
+          schema:
+            $ref: '#/definitions/OAuth2IDP'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "422":
+          $ref: '#/responses/unprocessableEntityHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - admin: []
+      summary: Create OAuth2 IDP
+      tags:
+      - idps
+  /servers/{wid}/idps/oauth2/{iid}:
+    get:
+      description: Get OAuth2 IDP.
+      operationId: getOAuth2IDP
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - default: default
+        description: Authorization server id
+        in: path
+        name: wid
+        required: true
+        type: string
+      - description: IDP id
+        in: path
+        name: iid
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OAuth2IDP
+          schema:
+            $ref: '#/definitions/OAuth2IDP'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - admin: []
+      summary: Get OAuth2 IDP
+      tags:
+      - idps
+    put:
+      description: Update OAuth2 IDP.
+      operationId: updateOAuth2IDP
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - default: default
+        description: Authorization server id
+        in: path
+        name: wid
+        required: true
+        type: string
+      - default: default
+        description: IDP id
+        in: path
+        name: iid
+        required: true
+        type: string
+      - description: OAuth2IDP
+        in: body
+        name: OAuth2IDP
+        schema:
+          $ref: '#/definitions/OAuth2IDP'
+      responses:
+        "200":
+          description: OAuth2IDP
+          schema:
+            $ref: '#/definitions/OAuth2IDP'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "422":
+          $ref: '#/responses/unprocessableEntityHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - admin: []
+      summary: Update OAuth2 IDP
+      tags:
+      - idps
+  /servers/{wid}/idps/oauth2/{iid}/client:
+    get:
+      operationId: getOAuth2IDPClient
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - default: default
+        description: Authorization server id
+        in: path
+        name: wid
+        required: true
+        type: string
+      - description: IDP id
+        in: path
+        name: iid
+        required: true
+        type: string
+      responses:
+        "200":
+          $ref: '#/responses/ClientAdminResponse'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - admin: []
+      summary: Return OAuth2 IDP client
+      tags:
+      - idps
   /servers/{wid}/idps/oidc:
     post:
       description: Create OIDC IDP.
@@ -27287,6 +27908,178 @@ paths:
       security:
       - admin: []
       summary: Return Okta IDP client
+      tags:
+      - idps
+  /servers/{wid}/idps/okta_v2:
+    post:
+      description: Create OktaV2 IDP.
+      operationId: createOktaV2IDP
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - default: default
+        description: Authorization server id
+        in: path
+        name: wid
+        required: true
+        type: string
+      - description: OktaV2IDP
+        in: body
+        name: OktaV2IDP
+        schema:
+          $ref: '#/definitions/OktaV2IDP'
+      responses:
+        "201":
+          description: OktaV2IDP
+          schema:
+            $ref: '#/definitions/OktaV2IDP'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "422":
+          $ref: '#/responses/unprocessableEntityHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - admin: []
+      summary: Create OktaV2 IDP
+      tags:
+      - idps
+  /servers/{wid}/idps/okta_v2/{iid}:
+    get:
+      description: Get OktaV2 IDP.
+      operationId: getOktaV2IDP
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - default: default
+        description: Authorization server id
+        in: path
+        name: wid
+        required: true
+        type: string
+      - description: IDP id
+        in: path
+        name: iid
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OktaV2IDP
+          schema:
+            $ref: '#/definitions/OktaV2IDP'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - admin: []
+      summary: Get OktaV2 IDP
+      tags:
+      - idps
+    put:
+      description: Update OktaV2 IDP.
+      operationId: updateOktaV2IDP
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - default: default
+        description: Authorization server id
+        in: path
+        name: wid
+        required: true
+        type: string
+      - default: default
+        description: IDP id
+        in: path
+        name: iid
+        required: true
+        type: string
+      - description: OktaV2IDP
+        in: body
+        name: OktaV2IDP
+        schema:
+          $ref: '#/definitions/OktaV2IDP'
+      responses:
+        "200":
+          description: OktaV2IDP
+          schema:
+            $ref: '#/definitions/OktaV2IDP'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "422":
+          $ref: '#/responses/unprocessableEntityHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - admin: []
+      summary: Update OktaV2 IDP
+      tags:
+      - idps
+  /servers/{wid}/idps/okta_v2/{iid}/client:
+    get:
+      operationId: getOktaV2IDPClient
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - default: default
+        description: Authorization server id
+        in: path
+        name: wid
+        required: true
+        type: string
+      - description: IDP id
+        in: path
+        name: iid
+        required: true
+        type: string
+      responses:
+        "200":
+          $ref: '#/responses/ClientAdminResponse'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - admin: []
+      summary: Return OktaV2 IDP client
       tags:
       - idps
   /servers/{wid}/idps/organization:
@@ -28771,6 +29564,39 @@ paths:
       summary: Set policy execution points
       tags:
       - policies
+  /servers/{wid}/revokeRotatedSecrets:
+    post:
+      description: Revoke all rotated server's secrets.
+      operationId: revokeRotatedServerSecrets
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - default: default
+        description: Authorization server id
+        in: path
+        name: wid
+        required: true
+        type: string
+      responses:
+        "204":
+          description: ' all server''s rotated secrets has been revoked'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - admin: []
+      summary: Revoke rotated secrets.
+      tags:
+      - servers
   /servers/{wid}/roles:
     get:
       description: List workspace roles.
@@ -28882,6 +29708,42 @@ paths:
       summary: Revoke workspace role
       tags:
       - roles
+  /servers/{wid}/rotateSecret:
+    post:
+      description: Generate a new server secret and move old secret to rotated secrets
+        list.
+      operationId: rotateServerSecret
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - default: default
+        description: Authorization server id
+        in: path
+        name: wid
+        required: true
+        type: string
+      responses:
+        "204":
+          description: ' secret has been rotated'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - admin: []
+      summary: Rotate server's secret.
+      tags:
+      - servers
   /servers/{wid}/scopes:
     get:
       description: List scopes.
@@ -32275,10 +33137,6 @@ responses:
         type: string
     schema:
       $ref: '#/definitions/KeysResponse'
-  LicenseResponse:
-    description: License
-    schema:
-      $ref: '#/definitions/License'
   MFAMethodResponse:
     description: MFA method
     headers:
