@@ -195,6 +195,8 @@ definitions:
         format: schemaID
         type: string
         x-nullable: false
+      preferences:
+        $ref: '#/definitions/UserPreferences'
       status:
         enum:
         - active
@@ -259,6 +261,8 @@ definitions:
         format: schemaID
         type: string
         x-nullable: false
+      preferences:
+        $ref: '#/definitions/UserPreferences'
       status:
         enum:
         - active
@@ -286,6 +290,8 @@ definitions:
         format: schemaID
         type: string
         x-nullable: false
+      preferences:
+        $ref: '#/definitions/UserPreferences'
       status:
         enum:
         - active
@@ -324,6 +330,8 @@ definitions:
         format: schemaID
         type: string
         x-nullable: false
+      preferences:
+        $ref: '#/definitions/UserPreferences'
       status:
         enum:
         - active
@@ -542,6 +550,8 @@ definitions:
         format: schemaID
         type: string
         x-nullable: false
+      preferences:
+        $ref: '#/definitions/UserPreferences'
       status:
         enum:
         - active
@@ -637,6 +647,19 @@ definitions:
     required:
     - code
     type: object
+  MFAPreferences:
+    properties:
+      preferred_2fa:
+        enum:
+        - totp
+        - password
+        - otp
+        - email_otp
+        - sms_otp
+        - webauthn
+        type: string
+        x-nullable: false
+    type: object
   NewUserCredential:
     properties:
       must_be_changed:
@@ -649,7 +672,7 @@ definitions:
       must_be_reset:
         default: false
         description: |-
-          Indicates if user is required to reset their credentials before first authentication. Currently, it is enforced only for password credentials, but it may change any time.
+          Indicates if user is required to reset their credentials before first authentication.
           This flag takes precedence over MustBeChanged.
         type: boolean
         x-nullable: false
@@ -747,6 +770,8 @@ definitions:
         format: schemaID
         type: string
         x-nullable: false
+      preferences:
+        $ref: '#/definitions/UserPreferences'
       status:
         enum:
         - active
@@ -1222,6 +1247,18 @@ definitions:
       do_not_allow_users_to_self_reset_credentials:
         type: boolean
         x-nullable: false
+      reset_password_older_than:
+        format: date-time
+        type: string
+        x-nullable: false
+      reset_totp_older_than:
+        format: date-time
+        type: string
+        x-nullable: false
+      reset_webauthn_older_than:
+        format: date-time
+        type: string
+        x-nullable: false
     type: object
   Schema:
     properties:
@@ -1456,6 +1493,8 @@ definitions:
         format: schemaID
         type: string
         x-nullable: false
+      preferences:
+        $ref: '#/definitions/UserPreferences'
       status:
         enum:
         - active
@@ -1666,6 +1705,11 @@ definitions:
         type: array
         x-nullable: false
     type: object
+  UserPreferences:
+    properties:
+      mfa:
+        $ref: '#/definitions/MFAPreferences'
+    type: object
   UserVerifiableAddress:
     properties:
       address:
@@ -1799,6 +1843,8 @@ definitions:
         format: schemaID
         type: string
         x-nullable: false
+      preferences:
+        $ref: '#/definitions/UserPreferences'
       status:
         enum:
         - active
@@ -1874,6 +1920,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: path
         name: ipID
@@ -2053,6 +2107,60 @@ paths:
       summary: Get B2B User Details
       tags:
       - B2BUsers
+    patch:
+      description: |-
+        Patch operates on the same fields as the **Update B2B User Record** endpoint.
+
+        example for RFC6902:
+        [{"op": "replace", "path": "/payload/first_name", "value": "John"}]
+
+        example for RFC7396:
+        {"payload": {"first_name": "John"}}
+      operationId: patchB2BUser
+      parameters:
+      - in: path
+        name: ipID
+        required: true
+        type: string
+      - in: path
+        name: userID
+        required: true
+        type: string
+      - default: "7396"
+        description: RFC version
+        enum:
+        - "6902"
+        - "7396"
+        in: query
+        name: rfc_version
+        type: string
+      - description: Patch spec in format matching RFC Version
+        in: body
+        name: patch
+        schema:
+          type: object
+      responses:
+        "200":
+          $ref: '#/responses/AdminB2BUserResponse'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "409":
+          $ref: '#/responses/conflictHTTPError'
+        "422":
+          $ref: '#/responses/unprocessableEntityHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - admin: []
+      summary: Patches existing B2B User (supports both RFC6902 and RFC7396 JSON Patch)
+      tags:
+      - B2BUsers
     put:
       description: |-
         Update the basic set of business user data: payload, schemas, and status. Provide the required values for the fields
@@ -2172,6 +2280,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       responses:
         "200":
           description: Pools
@@ -2205,6 +2321,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: body
         name: Pool
@@ -2247,6 +2371,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - in: path
         name: ipID
         required: true
@@ -2286,6 +2418,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - in: path
         name: ipID
         required: true
@@ -2319,6 +2459,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: path
         name: ipID
@@ -2705,6 +2853,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - in: path
         name: ipID
         required: true
@@ -2738,6 +2894,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: path
         name: ipID
@@ -2831,6 +2995,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - in: path
         name: ipID
         required: true
@@ -2873,6 +3045,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - in: path
         name: ipID
         required: true
@@ -2911,6 +3091,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - in: path
         name: ipID
         required: true
@@ -2935,6 +3123,74 @@ paths:
       summary: Get User Details
       tags:
       - Users
+    patch:
+      description: |-
+        Patch operates on the same fields as the **Update User Record** endpoint.
+
+        example for RFC6902:
+        [{"op": "replace", "path": "/payload/first_name", "value": "John"}]
+
+        example for RFC7396:
+        {"payload": {"first_name": "John"}}
+      operationId: patchUser
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
+      - in: path
+        name: ipID
+        required: true
+        type: string
+      - in: path
+        name: userID
+        required: true
+        type: string
+      - default: "7396"
+        description: RFC version
+        enum:
+        - "6902"
+        - "7396"
+        in: query
+        name: rfc_version
+        type: string
+      - description: Patch spec in format matching RFC Version
+        in: body
+        name: patch
+        schema:
+          type: object
+      responses:
+        "200":
+          $ref: '#/responses/AdminUserResponse'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "409":
+          $ref: '#/responses/conflictHTTPError'
+        "422":
+          $ref: '#/responses/unprocessableEntityHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - admin: []
+      summary: Patches existing User (supports both RFC6902 and RFC7396 JSON Patch)
+      tags:
+      - Users
     put:
       description: |-
         Update the basic set of user data: payload, metadata, schemas, and status. Provide the required values for the fields
@@ -2955,6 +3211,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: path
         name: ipID
@@ -3021,6 +3285,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: path
         name: ipID
@@ -3146,6 +3418,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - in: path
         name: ipID
         required: true
@@ -3188,6 +3468,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - in: path
         name: ipID
         required: true
@@ -3226,6 +3514,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: path
         name: ipID
@@ -3378,6 +3674,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - in: path
         name: ipID
         required: true
@@ -3419,6 +3723,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - in: path
         name: ipID
         required: true
@@ -3457,6 +3769,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: path
         name: ipID
@@ -3500,6 +3820,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: path
         name: ipID
@@ -3720,6 +4048,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       responses:
         "200":
           description: Schemas
@@ -3746,6 +4082,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: body
         name: Schema
@@ -3787,6 +4131,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - in: path
         name: schID
         required: true
@@ -3821,6 +4173,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - in: path
         name: schID
         required: true
@@ -3851,6 +4211,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: path
         name: schID
@@ -3958,6 +4326,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - default: default
         description: Workspace id
         in: path
@@ -3997,6 +4373,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - default: default
         description: Workspace id
@@ -4045,6 +4429,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - default: default
         description: Workspace id
         in: path
@@ -4086,6 +4478,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - default: default
         description: Workspace id
         in: path
@@ -4118,6 +4518,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - default: default
         description: Workspace id
@@ -4161,6 +4569,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - default: default
         description: Workspace id
@@ -4211,6 +4627,18 @@ responses:
           in:header
         format: etag
         type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
     schema:
       $ref: '#/definitions/UserVerifiableAddress'
   AdminB2BUserResponse:
@@ -4227,6 +4655,18 @@ responses:
           in:header
         format: etag
         type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
     schema:
       $ref: '#/definitions/UserIdentifier'
   AdminUserResponse:
@@ -4238,6 +4678,18 @@ responses:
 
           in:header
         format: etag
+        type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
         type: string
     schema:
       $ref: '#/definitions/UserWithData'
@@ -4265,6 +4717,18 @@ responses:
           in:header
         format: etag
         type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
     schema:
       $ref: '#/definitions/PoolPermissionsResponse'
   PoolResponseParams:
@@ -4276,6 +4740,18 @@ responses:
 
           in:header
         format: etag
+        type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
         type: string
     schema:
       $ref: '#/definitions/PoolResponse'
@@ -4289,6 +4765,18 @@ responses:
           in:header
         format: etag
         type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
     schema:
       $ref: '#/definitions/Pools'
   SchemaResponse:
@@ -4301,6 +4789,18 @@ responses:
           in:header
         format: etag
         type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
     schema:
       $ref: '#/definitions/Schema'
   SchemasResponse:
@@ -4312,6 +4812,18 @@ responses:
 
           in:header
         format: etag
+        type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
         type: string
     schema:
       $ref: '#/definitions/Schemas'
@@ -4329,6 +4841,18 @@ responses:
           in:header
         format: etag
         type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
     schema:
       $ref: '#/definitions/UserMetadataWithSchema'
   UserPoolsResponse:
@@ -4341,6 +4865,18 @@ responses:
           in:header
         format: etag
         type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
     schema:
       $ref: '#/definitions/UserPools'
   UsersResponse:
@@ -4352,6 +4888,18 @@ responses:
 
           in:header
         format: etag
+        type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
         type: string
     schema:
       $ref: '#/definitions/Users'
@@ -4404,7 +4952,7 @@ schemes:
 securityDefinitions:
   admin:
     authorizationUrl: /default/admin/oauth2/authorize
-    flow: accessCode
+    flow: application
     tokenUrl: /default/admin/oauth2/token
     type: oauth2
 swagger: "2.0"

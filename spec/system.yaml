@@ -197,6 +197,14 @@ definitions:
         description: optional consent identifier
         type: string
         x-nullable: false
+      granted_authorization_details:
+        description: granted authorization details
+        items:
+          additionalProperties:
+            type: object
+          type: object
+        type: array
+        x-nullable: false
       granted_claims:
         $ref: '#/definitions/GrantedClaims'
       granted_scopes:
@@ -316,6 +324,12 @@ definitions:
           Stores the information which grant type was selected to perfom a given action.
           Matches one of allowed OAuth client grant types for a given client.
         type: string
+        x-nullable: false
+      granted_scopes:
+        description: Granted scopes
+        items:
+          type: string
+        type: array
         x-nullable: false
       group_id:
         description: ID of the Group in Identity Pool
@@ -535,6 +549,12 @@ definitions:
           Stores the information which grant type was selected to perfom a given action.
           Matches one of allowed OAuth client grant types for a given client.
         type: string
+        x-nullable: false
+      granted_scopes:
+        description: Granted scopes
+        items:
+          type: string
+        type: array
         x-nullable: false
       group_id:
         description: ID of the Group in Identity Pool
@@ -1184,6 +1204,10 @@ definitions:
         format: groupID
         type: string
         x-nullable: false
+      high_risk:
+        description: High risk
+        type: boolean
+        x-nullable: false
       identity_pool_id:
         description: ID of the Identity Pool
         format: poolID
@@ -1426,9 +1450,9 @@ definitions:
       role_revoked:
         $ref: '#/definitions/RoleGrantAuditPayload'
       saml_assertion_denied:
-        $ref: '#/definitions/AccessRequestDataWithError'
+        $ref: '#/definitions/SAMLAssertionDeniedPayload'
       saml_assertion_issued:
-        $ref: '#/definitions/AccessRequestData'
+        $ref: '#/definitions/SAMLAssertionIssuedPayload'
       schema_created:
         $ref: '#/definitions/SchemaAuditPayload'
       schema_deleted:
@@ -2124,6 +2148,8 @@ definitions:
         example: email
         type: string
         x-nullable: false
+      metadata:
+        $ref: '#/definitions/ClaimMetadata'
       name:
         description: claim name in outgoing id / access token
         example: email
@@ -2218,6 +2244,17 @@ definitions:
       verified:
         description: mark claim as verified (required by identity assurance spec)
         type: boolean
+        x-nullable: false
+    type: object
+  ClaimGroupMembershipMode:
+    type: string
+  ClaimMetadata:
+    properties:
+      group_membership_mode:
+        $ref: '#/definitions/ClaimGroupMembershipMode'
+      pool_id:
+        format: poolID
+        type: string
         x-nullable: false
     type: object
   ClaimRequest:
@@ -2752,6 +2789,22 @@ definitions:
           type: string
         type: array
         x-nullable: false
+      saml_idp_attributes_override:
+        $ref: '#/definitions/SAMLIDPAttributesOverride'
+      saml_idp_custom_entity_id:
+        description: custom entity id
+        type: string
+        x-nullable: false
+      saml_idp_custom_sso_url:
+        description: custom sso url
+        type: string
+        x-nullable: false
+      saml_idp_override_enabled:
+        description: enable flag
+        type: boolean
+        x-nullable: false
+      saml_idp_signing_key:
+        $ref: '#/definitions/ServerJWK'
       saml_metadata:
         $ref: '#/definitions/EntityDescriptor'
       saml_metadata_updated_at:
@@ -4627,6 +4680,9 @@ definitions:
         example: '#007FFF'
         type: string
         x-nullable: false
+      deactivated:
+        type: boolean
+        x-nullable: false
       description:
         description: Display description of the organization
         example: Organization description
@@ -4806,6 +4862,36 @@ definitions:
 
           If not provided, the `generic` type is set.
         format: customIDPType
+        type: string
+        x-nullable: false
+    type: object
+  CustomTranslation:
+    properties:
+      content:
+        additionalProperties:
+          type: object
+        description: content of the translation
+        type: object
+        x-nullable: false
+      created_at:
+        description: timestamp when the translation was created
+        format: date-time
+        type: string
+        x-nullable: false
+      enabled:
+        type: boolean
+        x-nullable: false
+      locale:
+        format: locale
+        type: string
+        x-nullable: false
+      tenant_id:
+        format: tenantID
+        type: string
+        x-nullable: false
+      updated_at:
+        description: timestamp when the translation was last updated
+        format: date-time
         type: string
         x-nullable: false
     type: object
@@ -5271,6 +5357,10 @@ definitions:
     properties:
       credentials:
         $ref: '#/definitions/ExternalServiceCredentials'
+      insecure:
+        description: Do not validate cert when calling authenticator service
+        type: boolean
+        x-nullable: false
       url:
         description: url to the ciba authenticator service
         type: string
@@ -6899,6 +6989,14 @@ definitions:
           type: string
         type: array
         x-nullable: false
+      authorization_details:
+        description: Granted authorization details
+        items:
+          additionalProperties:
+            type: object
+          type: object
+        type: array
+        x-nullable: false
       client_id:
         description: |-
           A client application identifier for the OAuth 2.0 client that
@@ -8129,6 +8227,9 @@ definitions:
         example: '#007FFF'
         type: string
         x-nullable: false
+      deactivated:
+        type: boolean
+        x-nullable: false
       description:
         description: Display description of the organization
         example: Organization description
@@ -8227,6 +8328,9 @@ definitions:
         description: Your organization's label color in a HEX format.
         example: '#007FFF'
         type: string
+        x-nullable: false
+      deactivated:
+        type: boolean
         x-nullable: false
       description:
         description: Display description of the organization
@@ -9145,6 +9249,9 @@ definitions:
       dbfp_fingerprint:
         type: string
         x-nullable: false
+      high_risk:
+        type: boolean
+        x-nullable: false
       id:
         $ref: '#/definitions/RiskID'
       loa:
@@ -9302,6 +9409,470 @@ definitions:
         type: string
         x-nullable: false
     type: object
+  SAMLAssertionDeniedPayload:
+    properties:
+      actor_claims:
+        additionalProperties:
+          type: object
+        description: Actor claims
+        type: object
+        x-nullable: false
+      affected_user_id:
+        description: ID of the User in Identity Pool that is affected by an action
+        format: userID
+        type: string
+        x-nullable: false
+      affected_user_pool_id:
+        description: ID of the Identity Pool of the User that is affected by an action
+        format: poolID
+        type: string
+        x-nullable: false
+      authentication_mechanisms:
+        description: The authentication mechanisms a user used to login.
+        items:
+          enum:
+          - totp
+          - password
+          - otp
+          - email_otp
+          - sms_otp
+          - webauthn
+          type: string
+        type: array
+        x-nullable: false
+      city:
+        description: The visitor's city
+        type: string
+        x-nullable: false
+      client_id:
+        description: OAuth client application identifier.
+        format: clientID
+        type: string
+        x-nullable: false
+      client_name:
+        description: Human readable name of a client application
+        type: string
+        x-nullable: false
+      country_code:
+        description: The visitor's country
+        type: string
+        x-nullable: false
+      created_by_developer:
+        description: Stores information if the owner of the client application is
+          a developer.
+        type: boolean
+        x-nullable: false
+      dbfp:
+        description: Arculix DBFP `jwt` cookie.
+        type: string
+        x-nullable: false
+      error:
+        description: High level error name (request_forbidden, access_denied, invalid_request).
+        type: string
+        x-nullable: false
+      error_cause:
+        description: Error root cause (invalid_pkce, invalid_state, user_policy_failed).
+        type: string
+        x-nullable: false
+      error_description:
+        description: Human readable error description
+        type: string
+        x-nullable: false
+      error_hint:
+        description: Error hint
+        type: string
+        x-nullable: false
+      external_error:
+        description: External error
+        type: boolean
+        x-nullable: false
+      grant_type:
+        description: |-
+          Stores the information which grant type was selected to perfom a given action.
+          Matches one of allowed OAuth client grant types for a given client.
+        type: string
+        x-nullable: false
+      granted_scopes:
+        description: Granted scopes
+        items:
+          type: string
+        type: array
+        x-nullable: false
+      group_id:
+        description: ID of the Group in Identity Pool
+        format: groupID
+        type: string
+        x-nullable: false
+      identity_pool_id:
+        description: ID of the Identity Pool
+        format: poolID
+        type: string
+        x-nullable: false
+      idp_id:
+        description: IDP identifier
+        format: idpID
+        type: string
+        x-nullable: false
+      idp_initiated:
+        type: boolean
+        x-nullable: false
+      idp_method:
+        description: IDP method
+        type: string
+        x-nullable: false
+      idp_subject:
+        description: Subject within the Identity Provider
+        format: subject
+        type: string
+        x-nullable: false
+      latitude:
+        description: The visitor's latitude
+        type: string
+        x-nullable: false
+      longitude:
+        description: The visitor's longitude
+        type: string
+        x-nullable: false
+      may_act_claims:
+        additionalProperties:
+          type: object
+        description: May act claims
+        type: object
+        x-nullable: false
+      organization_id:
+        description: ID of the Organization
+        format: serverID
+        type: string
+        x-nullable: false
+      public:
+        description: Stores information if the client application is a public one.
+        type: boolean
+        x-nullable: false
+      recovery:
+        description: True if user had to do login recovery during authentication
+        type: boolean
+        x-nullable: false
+      remote_addr:
+        description: Requester IP address obtained from system network socket information.
+        type: string
+        x-nullable: false
+      risk_engine_context:
+        $ref: '#/definitions/RiskContext'
+      server_id:
+        description: ID of the authorization server (workspace) to which an access
+          request is tied.
+        format: serverID
+        type: string
+        x-nullable: false
+      service_provider_id:
+        type: string
+        x-nullable: false
+      session_id:
+        description: |-
+          Session id of a given subject. It's uniform across the authentication processes.
+          It can be used as a correlation ID between a different audit events.
+        format: loginID
+        type: string
+        x-nullable: false
+      subject:
+        description: |-
+          Identification of the principal that is the subject of authorization.
+          For the authorization grant, the subject typically identifies an authorized accessor for which the access token is being requested.
+          For client authentication, the subject is the client_id of the OAuth client.
+        format: subject
+        type: string
+        x-nullable: false
+      system:
+        description: Stores information if the client application is a system tenant's
+          application.
+        type: boolean
+        x-nullable: false
+      token_endpoint_authn_method:
+        description: Token endpoint authentication method configured for a client
+          application.
+        enum:
+        - client_secret_basic
+        - client_secret_post
+        - client_secret_jwt
+        - private_key_jwt
+        - self_signed_tls_client_auth
+        - tls_client_auth
+        - none
+        - unspecified
+        type: string
+        x-nullable: false
+      token_signature:
+        description: Token signature
+        type: string
+        x-nullable: false
+      true_client_ip:
+        description: Requester IP address obtained from True-Client-IP header.
+        type: string
+        x-nullable: false
+      user_agent:
+        description: A characteristic string that lets servers and network peers identify
+          the application, operating system, vendor, and/or version of the requesting
+          user agent.
+        type: string
+        x-nullable: false
+      user_id:
+        description: ID of the User in Identity Pool
+        format: userID
+        type: string
+        x-nullable: false
+      user_pool_id:
+        description: ID of the Identity Pool
+        format: poolID
+        type: string
+        x-nullable: false
+      workspace_id:
+        description: ID of the authorization server (workspace) to which a resource
+          is tied.
+        format: serverID
+        type: string
+        x-nullable: false
+      x_forwarded_for:
+        description: Requester IP address obtained from X-Forwarded-For header.
+        type: string
+        x-nullable: false
+      x_real_ip:
+        description: Requester IP address obtained from X-Real-IP header.
+        type: string
+        x-nullable: false
+    type: object
+  SAMLAssertionIssuedPayload:
+    properties:
+      actor_claims:
+        additionalProperties:
+          type: object
+        description: Actor claims
+        type: object
+        x-nullable: false
+      affected_user_id:
+        description: ID of the User in Identity Pool that is affected by an action
+        format: userID
+        type: string
+        x-nullable: false
+      affected_user_pool_id:
+        description: ID of the Identity Pool of the User that is affected by an action
+        format: poolID
+        type: string
+        x-nullable: false
+      authentication_mechanisms:
+        description: The authentication mechanisms a user used to login.
+        items:
+          enum:
+          - totp
+          - password
+          - otp
+          - email_otp
+          - sms_otp
+          - webauthn
+          type: string
+        type: array
+        x-nullable: false
+      city:
+        description: The visitor's city
+        type: string
+        x-nullable: false
+      client_id:
+        description: OAuth client application identifier.
+        format: clientID
+        type: string
+        x-nullable: false
+      client_name:
+        description: Human readable name of a client application
+        type: string
+        x-nullable: false
+      country_code:
+        description: The visitor's country
+        type: string
+        x-nullable: false
+      created_by_developer:
+        description: Stores information if the owner of the client application is
+          a developer.
+        type: boolean
+        x-nullable: false
+      dbfp:
+        description: Arculix DBFP `jwt` cookie.
+        type: string
+        x-nullable: false
+      grant_type:
+        description: |-
+          Stores the information which grant type was selected to perfom a given action.
+          Matches one of allowed OAuth client grant types for a given client.
+        type: string
+        x-nullable: false
+      granted_scopes:
+        description: Granted scopes
+        items:
+          type: string
+        type: array
+        x-nullable: false
+      group_id:
+        description: ID of the Group in Identity Pool
+        format: groupID
+        type: string
+        x-nullable: false
+      identity_pool_id:
+        description: ID of the Identity Pool
+        format: poolID
+        type: string
+        x-nullable: false
+      idp_id:
+        description: IDP identifier
+        format: idpID
+        type: string
+        x-nullable: false
+      idp_initiated:
+        type: boolean
+        x-nullable: false
+      idp_method:
+        description: IDP method
+        type: string
+        x-nullable: false
+      idp_subject:
+        description: Subject within the Identity Provider
+        format: subject
+        type: string
+        x-nullable: false
+      latitude:
+        description: The visitor's latitude
+        type: string
+        x-nullable: false
+      longitude:
+        description: The visitor's longitude
+        type: string
+        x-nullable: false
+      may_act_claims:
+        additionalProperties:
+          type: object
+        description: May act claims
+        type: object
+        x-nullable: false
+      organization_id:
+        description: ID of the Organization
+        format: serverID
+        type: string
+        x-nullable: false
+      public:
+        description: Stores information if the client application is a public one.
+        type: boolean
+        x-nullable: false
+      recovery:
+        description: True if user had to do login recovery during authentication
+        type: boolean
+        x-nullable: false
+      remote_addr:
+        description: Requester IP address obtained from system network socket information.
+        type: string
+        x-nullable: false
+      risk_engine_context:
+        $ref: '#/definitions/RiskContext'
+      server_id:
+        description: ID of the authorization server (workspace) to which an access
+          request is tied.
+        format: serverID
+        type: string
+        x-nullable: false
+      service_provider_id:
+        type: string
+        x-nullable: false
+      session_id:
+        description: |-
+          Session id of a given subject. It's uniform across the authentication processes.
+          It can be used as a correlation ID between a different audit events.
+        format: loginID
+        type: string
+        x-nullable: false
+      subject:
+        description: |-
+          Identification of the principal that is the subject of authorization.
+          For the authorization grant, the subject typically identifies an authorized accessor for which the access token is being requested.
+          For client authentication, the subject is the client_id of the OAuth client.
+        format: subject
+        type: string
+        x-nullable: false
+      system:
+        description: Stores information if the client application is a system tenant's
+          application.
+        type: boolean
+        x-nullable: false
+      token_endpoint_authn_method:
+        description: Token endpoint authentication method configured for a client
+          application.
+        enum:
+        - client_secret_basic
+        - client_secret_post
+        - client_secret_jwt
+        - private_key_jwt
+        - self_signed_tls_client_auth
+        - tls_client_auth
+        - none
+        - unspecified
+        type: string
+        x-nullable: false
+      token_signature:
+        description: Token signature
+        type: string
+        x-nullable: false
+      true_client_ip:
+        description: Requester IP address obtained from True-Client-IP header.
+        type: string
+        x-nullable: false
+      user_agent:
+        description: A characteristic string that lets servers and network peers identify
+          the application, operating system, vendor, and/or version of the requesting
+          user agent.
+        type: string
+        x-nullable: false
+      user_id:
+        description: ID of the User in Identity Pool
+        format: userID
+        type: string
+        x-nullable: false
+      user_pool_id:
+        description: ID of the Identity Pool
+        format: poolID
+        type: string
+        x-nullable: false
+      workspace_id:
+        description: ID of the authorization server (workspace) to which a resource
+          is tied.
+        format: serverID
+        type: string
+        x-nullable: false
+      x_forwarded_for:
+        description: Requester IP address obtained from X-Forwarded-For header.
+        type: string
+        x-nullable: false
+      x_real_ip:
+        description: Requester IP address obtained from X-Real-IP header.
+        type: string
+        x-nullable: false
+    type: object
+  SAMLAttribute:
+    properties:
+      name:
+        description: claim name
+        type: string
+        x-nullable: false
+      saml_name:
+        example: email
+        type: string
+        x-nullable: false
+      saml_name_format:
+        example: urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
+        type: string
+        x-nullable: false
+      source_path:
+        description: path to the attribute in source type context where claim value
+          should be picked from
+        type: string
+        x-nullable: false
+      source_type:
+        $ref: '#/definitions/ClaimSourceType'
+    type: object
   SAMLConfiguration:
     properties:
       organization_display_name:
@@ -9316,6 +9887,8 @@ definitions:
         description: Organization URL
         type: string
         x-nullable: false
+      response_binding_mode:
+        $ref: '#/definitions/SAMLResponseBindingMode'
       signing_hash_algorithms:
         default:
         - sha-256
@@ -9358,6 +9931,12 @@ definitions:
         type: string
         x-nullable: false
     type: object
+  SAMLIDPAttributesOverride:
+    items:
+      $ref: '#/definitions/SAMLAttribute'
+    type: array
+  SAMLResponseBindingMode:
+    type: string
   SAMLSettings:
     description: SAML IDP specific settings
     properties:
@@ -10705,6 +11284,8 @@ definitions:
         format: serverID
         type: string
         x-nullable: false
+      preferences:
+        $ref: '#/definitions/ServerPreferences'
       profile:
         default: default
         description: |-
@@ -10735,6 +11316,7 @@ definitions:
         - fapi_20_security
         - fapi_20_message_signing
         - connect_id
+        - agentic_ai
         example: default
         type: string
         x-nullable: false
@@ -11257,6 +11839,8 @@ definitions:
         format: serverID
         type: string
         x-nullable: false
+      preferences:
+        $ref: '#/definitions/ServerPreferences'
       profile:
         default: default
         description: |-
@@ -11287,6 +11871,7 @@ definitions:
         - fapi_20_security
         - fapi_20_message_signing
         - connect_id
+        - agentic_ai
         example: default
         type: string
         x-nullable: false
@@ -11700,8 +12285,22 @@ definitions:
       schema:
         $ref: '#/definitions/SupportedJSONSchema'
     type: object
+  ServerPreferences:
+    properties:
+      display_identity_pool_idp:
+        description: display identity pool IDP
+        type: boolean
+        x-nullable: false
+      display_organization_idp:
+        description: display organization IDP
+        type: boolean
+        x-nullable: false
+    type: object
   ServerSettings:
     properties:
+      deactivated:
+        type: boolean
+        x-nullable: false
       default_client_id:
         format: clientID
         type: string
@@ -12569,7 +13168,7 @@ definitions:
         x-nullable: false
       translations:
         items:
-          $ref: '#/definitions/Translation'
+          $ref: '#/definitions/CustomTranslation'
         type: array
         x-nullable: false
       vanity_domains:
@@ -12728,51 +13327,6 @@ definitions:
         example: consent
         type: string
         x-nullable: false
-    type: object
-  Translation:
-    description: Translation
-    properties:
-      built_in_exists:
-        description: built-in exists
-        type: boolean
-        x-nullable: false
-      content:
-        additionalProperties:
-          type: object
-        description: content of the translation
-        type: object
-        x-nullable: false
-      created_at:
-        description: timestamp when the translation was created
-        format: date-time
-        type: string
-        x-nullable: false
-      enabled:
-        type: boolean
-        x-nullable: false
-      is_built_in:
-        description: Is built-in translation
-        type: boolean
-        x-nullable: false
-      locale:
-        description: translation locale
-        format: locale
-        type: string
-        x-nullable: false
-      tenant_id:
-        description: ID of the tenant
-        example: default
-        format: tenantID
-        type: string
-        x-nullable: false
-      updated_at:
-        description: timestamp when the translation was last updated
-        format: date-time
-        type: string
-        x-nullable: false
-    required:
-    - locale
-    - tenant_id
     type: object
   TrustAnchorConfiguration:
     properties:
@@ -13302,6 +13856,8 @@ definitions:
         format: int64
         type: integer
         x-nullable: false
+      preferences:
+        $ref: '#/definitions/ServerPreferences'
       profile:
         default: default
         description: |-
@@ -13332,6 +13888,7 @@ definitions:
         - fapi_20_security
         - fapi_20_message_signing
         - connect_id
+        - agentic_ai
         example: default
         type: string
         x-nullable: false
@@ -13497,6 +14054,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - default: default
         description: Client id
         in: path
@@ -13538,6 +14103,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - default: default
         description: Client id
@@ -14108,6 +14681,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - description: |-
           Optional search phrase: organization id OR organization name substring (case insensitive)
           SearchPhrase
@@ -14182,6 +14763,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - in: body
         name: Org
         schema:
@@ -14220,6 +14809,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - default: default
         description: Organization id
         in: path
@@ -14255,6 +14852,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - default: default
         description: Organization id
         in: path
@@ -14287,6 +14892,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - default: default
         description: Organization id
@@ -14333,6 +14946,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - default: default
         description: Identity pool id
@@ -14583,6 +15204,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - default: default
         description: Workspace id
         in: path
@@ -14619,6 +15248,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - default: admin
         description: Authorization server id
         in: path
@@ -14642,6 +15279,18 @@ paths:
           IP
         in: query
         name: ip
+        type: string
+      - description: |-
+          optional list audit events with high risk
+          IP
+        in: query
+        name: high_risk
+        type: string
+      - description: |-
+          optional list audit events with a given result (success/failure)
+          IP
+        in: query
+        name: result
         type: string
       - description: |-
           optional list audit events with a given session id
@@ -14791,6 +15440,93 @@ paths:
       summary: List audit events
       tags:
       - auditEvents
+  /servers/{wid}/revokeRotatedSecrets:
+    post:
+      description: Revoke all rotated server's secrets.
+      operationId: revokeRotatedServerSecrets
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
+      - default: default
+        description: Authorization server id
+        in: path
+        name: wid
+        required: true
+        type: string
+      responses:
+        "204":
+          description: ' all server''s rotated secrets has been revoked'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - system:
+        - manage_servers
+      summary: Revoke rotated secrets.
+      tags:
+      - servers
+  /servers/{wid}/rotateSecret:
+    post:
+      description: Generate a new server secret and move old secret to rotated secrets
+        list.
+      operationId: rotateServerSecret
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
+      - default: default
+        description: Authorization server id
+        in: path
+        name: wid
+        required: true
+        type: string
+      responses:
+        "204":
+          description: ' secret has been rotated'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - system:
+        - manage_servers
+      summary: Rotate server's secret.
+      tags:
+      - servers
   /servers/{wid}/secrets:
     get:
       description: |-
@@ -14803,6 +15539,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - default: default
         description: Authorization server id
@@ -14838,6 +15582,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - default: default
         description: Authorization server id
@@ -14884,6 +15636,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - default: default
         description: Authorization server id
         in: path
@@ -14924,6 +15684,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - default: default
         description: Authorization server id
@@ -15026,6 +15794,18 @@ responses:
           in:header
         format: etag
         type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
     schema:
       $ref: '#/definitions/AuditEvents'
   Client:
@@ -15082,6 +15862,18 @@ responses:
           in:header
         format: etag
         type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
     schema:
       $ref: '#/definitions/OrganizationResponse'
   OrganizationMetadata:
@@ -15094,6 +15886,18 @@ responses:
           in:header
         format: etag
         type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
     schema:
       $ref: '#/definitions/OrganizationMetadata'
   Orgs:
@@ -15105,6 +15909,18 @@ responses:
 
           in:header
         format: etag
+        type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
         type: string
     schema:
       $ref: '#/definitions/OrganizationsResponse'
@@ -15125,6 +15941,18 @@ responses:
 
           in:header
         format: etag
+        type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
         type: string
     schema:
       $ref: '#/definitions/RotateClientSecretResponse'
@@ -15154,6 +15982,18 @@ responses:
           in:header
         format: etag
         type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
     schema:
       $ref: '#/definitions/Secret'
   SecretsResponse:
@@ -15165,6 +16005,18 @@ responses:
 
           in:header
         format: etag
+        type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
         type: string
     schema:
       $ref: '#/definitions/SecretsResponse'
@@ -15186,6 +16038,18 @@ responses:
           in:header
         format: etag
         type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
     schema:
       $ref: '#/definitions/UserOrganizationsResponse'
   UserWorkspaces:
@@ -15197,6 +16061,18 @@ responses:
 
           in:header
         format: etag
+        type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
         type: string
     schema:
       $ref: '#/definitions/UserWorkspacesResponse'
@@ -15210,6 +16086,18 @@ responses:
           in:header
         format: etag
         type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
     schema:
       $ref: '#/definitions/WorkspaceResponse'
   WorkspaceMetadata:
@@ -15222,6 +16110,18 @@ responses:
           in:header
         format: etag
         type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
     schema:
       $ref: '#/definitions/WorkspaceMetadata'
   Workspaces:
@@ -15233,6 +16133,18 @@ responses:
 
           in:header
         format: etag
+        type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
         type: string
     schema:
       $ref: '#/definitions/WorkspacesResponse'
@@ -15285,7 +16197,7 @@ schemes:
 securityDefinitions:
   system:
     authorizationUrl: /default/system/oauth2/authorize
-    flow: accessCode
+    flow: application
     scopes:
       introspect_tokens: introspect_tokens
       manage_clients: manage_clients

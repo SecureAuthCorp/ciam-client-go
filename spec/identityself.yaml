@@ -352,6 +352,19 @@ definitions:
         type: array
         x-nullable: false
     type: object
+  MFAPreferences:
+    properties:
+      preferred_2fa:
+        enum:
+        - totp
+        - password
+        - otp
+        - email_otp
+        - sms_otp
+        - webauthn
+        type: string
+        x-nullable: false
+    type: object
   NameWebAuthnKey:
     properties:
       name:
@@ -483,6 +496,8 @@ definitions:
           type: object
         type: object
         x-nullable: false
+      preferences:
+        $ref: '#/definitions/UserPreferences'
     type: object
   SelfUserVerifiableAddress:
     properties:
@@ -622,6 +637,8 @@ definitions:
         x-nullable: false
       payload_schema:
         $ref: '#/definitions/SupportedJSONSchema'
+      preferences:
+        $ref: '#/definitions/UserPreferences'
       preferred_authentication_mechanism:
         enum:
         - totp
@@ -853,6 +870,11 @@ definitions:
         type: string
         x-nullable: false
     type: object
+  UserPreferences:
+    properties:
+      mfa:
+        $ref: '#/definitions/MFAPreferences'
+    type: object
   UserVerificationRequirement:
     description: |-
       A WebAuthn Relying Party may require user verification for some of its operations but not for others,
@@ -916,6 +938,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - in: path
         name: ipID
         required: true
@@ -956,6 +986,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - in: body
         name: CompleteAddressVerification
         schema:
@@ -990,6 +1028,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: body
         name: ChangePassword
@@ -1031,6 +1077,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       responses:
         "200":
           $ref: '#/responses/GetProfileResponse'
@@ -1063,6 +1117,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: body
         name: UpdateUser
@@ -1103,6 +1165,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: body
         name: ChangePassword
@@ -1202,6 +1272,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - in: body
         name: UpdateUser
         schema:
@@ -1293,6 +1371,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - in: body
         name: SetPassword
         schema:
@@ -1333,6 +1419,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: body
         name: SetTotpSecret
@@ -1548,6 +1642,18 @@ responses:
           in:header
         format: etag
         type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
   ChangePasswordResponse:
     description: Password has been changed
     headers:
@@ -1558,6 +1664,18 @@ responses:
           in:header
         format: etag
         type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
   GetProfileResponse:
     description: User profile data
     headers:
@@ -1567,6 +1685,18 @@ responses:
 
           in:header
         format: etag
+        type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
         type: string
     schema:
       $ref: '#/definitions/SelfUserWithData'
@@ -1579,6 +1709,18 @@ responses:
 
           in:header
         format: etag
+        type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
         type: string
     schema:
       $ref: '#/definitions/SelfUserWithDataV2'
@@ -1596,6 +1738,18 @@ responses:
           in:header
         format: etag
         type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
   SetPasswordResponse:
     description: Password has been set
     headers:
@@ -1605,6 +1759,18 @@ responses:
 
           in:header
         format: etag
+        type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
         type: string
   WebAuthnCredentialBeginResponse:
     description: User WebAuthn credential data
@@ -1663,7 +1829,7 @@ schemes:
 securityDefinitions:
   self:
     authorizationUrl: /default/default/oauth2/authorize
-    flow: accessCode
+    flow: password
     scopes:
       manage_ss_profile: manage_ss_profile
       view_ss_profile: view_ss_profile

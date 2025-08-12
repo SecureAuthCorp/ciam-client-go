@@ -3406,6 +3406,14 @@ definitions:
           type: string
         type: array
         x-nullable: false
+      authorization_details:
+        description: Granted authorization details
+        items:
+          additionalProperties:
+            type: object
+          type: object
+        type: array
+        x-nullable: false
       client_id:
         description: |-
           A client application identifier for the OAuth 2.0 client that
@@ -11587,7 +11595,7 @@ securityDefinitions:
     type: oauth2
   defaultcc:
     authorizationUrl: /default/default/oauth2/authorize
-    flow: accessCode
+    flow: application
     scopes:
       accounts: accounts
       consents: consents
@@ -11596,7 +11604,7 @@ securityDefinitions:
     type: oauth2
   system:
     authorizationUrl: /default/system/oauth2/authorize
-    flow: accessCode
+    flow: application
     scopes:
       manage_openbanking_consents: manage_openbanking_consents
     tokenUrl: /default/system/oauth2/token

@@ -711,6 +711,59 @@ definitions:
         description: If b2b_orgs_client_side_search is enabled
         type: boolean
         x-nullable: false
+      faye_url:
+        type: string
+        x-nullable: false
+      image_proxy_url:
+        description: Image proxy URL
+        type: string
+        x-nullable: false
+      server_profile:
+        enum:
+        - default
+        - demo
+        - workforce
+        - workforce_v2
+        - consumer
+        - partners
+        - third_party
+        - fapi_advanced
+        - fapi_rw
+        - fapi_ro
+        - openbanking_uk_fapi_advanced
+        - openbanking_uk
+        - openbanking_br
+        - openbanking_br_unico
+        - cdr_australia
+        - cdr_australia_fapi_rw
+        - fdx
+        - openbanking_ksa
+        - fapi_20_security
+        - fapi_20_message_signing
+        - connect_id
+        - agentic_ai
+        type: string
+        x-nullable: false
+      workforce:
+        description: workforce integration
+        type: boolean
+        x-nullable: false
+      workforce_logout_url:
+        type: string
+        x-nullable: false
+      workforce_manifest_url:
+        type: string
+        x-nullable: false
+      workforce_tenant_slug:
+        type: string
+        x-nullable: false
+      workforce_url:
+        type: string
+        x-nullable: false
+      workspace_issuer_url:
+        description: Workspace Issuer URL
+        type: string
+        x-nullable: false
     type: object
   Purpose:
     properties:

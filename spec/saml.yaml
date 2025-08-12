@@ -831,10 +831,33 @@ info:
   title: Cloudentity API
   version: latest
 paths:
+  /saml/initiate:
+    get:
+      description: Alpha SAML IDP initiated SSO endpoint available behind the feature
+        flag.
+      operationId: idpInitiatedSso
+      parameters:
+      - description: Service Provider ID
+        in: query
+        name: service_provider_id
+        type: string
+      responses:
+        "302":
+          $ref: '#/responses/emptyResponse'
+        "404":
+          $ref: '#/responses/genericError'
+      summary: (Alpha) SAML IDP initiated SSO endpoint
+      tags:
+      - saml
   /saml/metadata:
     get:
       description: Returns SAML metadata.
       operationId: idpMetadata
+      parameters:
+      - description: Optional Service Provider ID
+        in: query
+        name: service_provider_id
+        type: string
       responses:
         "200":
           $ref: '#/responses/samlIDPMetadataResponse'
@@ -853,6 +876,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - description: IDP ID
         in: path
