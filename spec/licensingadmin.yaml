@@ -35,6 +35,10 @@ definitions:
         description: Is enterprise IDPs capability enabled
         type: boolean
         x-nullable: false
+      has_risk_engine_capability:
+        description: Is risk engine capability enabled
+        type: boolean
+        x-nullable: false
       start_date:
         description: License start date
         example: "2023-03-01T09:02:27.127932Z"
@@ -177,7 +181,7 @@ schemes:
 securityDefinitions:
   admin:
     authorizationUrl: /default/admin/oauth2/authorize
-    flow: accessCode
+    flow: application
     tokenUrl: /default/admin/oauth2/token
     type: oauth2
 swagger: "2.0"

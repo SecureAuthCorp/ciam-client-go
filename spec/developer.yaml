@@ -2795,7 +2795,7 @@ schemes:
 securityDefinitions:
   developer:
     authorizationUrl: /default/developer/oauth2/authorize
-    flow: accessCode
+    flow: password
     tokenUrl: /default/developer/oauth2/token
     type: oauth2
 swagger: "2.0"

@@ -280,6 +280,19 @@ definitions:
         type: integer
         x-nullable: false
     type: object
+  MFAPreferences:
+    properties:
+      preferred_2fa:
+        enum:
+        - totp
+        - password
+        - otp
+        - email_otp
+        - sms_otp
+        - webauthn
+        type: string
+        x-nullable: false
+    type: object
   OtpConfig:
     properties:
       length:
@@ -517,6 +530,18 @@ definitions:
     properties:
       do_not_allow_users_to_self_reset_credentials:
         type: boolean
+        x-nullable: false
+      reset_password_older_than:
+        format: date-time
+        type: string
+        x-nullable: false
+      reset_totp_older_than:
+        format: date-time
+        type: string
+        x-nullable: false
+      reset_webauthn_older_than:
+        format: date-time
+        type: string
         x-nullable: false
     type: object
   Rfc6902PatchOperation:
@@ -792,6 +817,8 @@ definitions:
         format: schemaID
         type: string
         x-nullable: false
+      preferences:
+        $ref: '#/definitions/UserPreferences'
       status:
         enum:
         - active
@@ -948,6 +975,11 @@ definitions:
     - type
     - created_at
     - updated_at
+    type: object
+  UserPreferences:
+    properties:
+      mfa:
+        $ref: '#/definitions/MFAPreferences'
     type: object
   UserVerifiableAddress:
     properties:
@@ -1256,12 +1288,12 @@ schemes:
 securityDefinitions:
   adminSystem:
     authorizationUrl: /system/admin/oauth2/authorize
-    flow: accessCode
+    flow: application
     tokenUrl: /system/admin/oauth2/token
     type: oauth2
   setup:
     authorizationUrl: /system/system/oauth2/authorize
-    flow: accessCode
+    flow: application
     tokenUrl: /system/system/oauth2/token
     type: oauth2
 swagger: "2.0"

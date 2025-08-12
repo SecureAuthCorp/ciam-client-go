@@ -723,6 +723,17 @@ definitions:
     type: string
   CDRRegisterURL:
     type: string
+  ClaimGroupMembershipMode:
+    type: string
+  ClaimMetadata:
+    properties:
+      group_membership_mode:
+        $ref: '#/definitions/ClaimGroupMembershipMode'
+      pool_id:
+        format: poolID
+        type: string
+        x-nullable: false
+    type: object
   ClaimSourceType:
     type: string
   ClientJWK:
@@ -1289,6 +1300,10 @@ definitions:
     properties:
       credentials:
         $ref: '#/definitions/ExternalServiceCredentials'
+      insecure:
+        description: Do not validate cert when calling authenticator service
+        type: boolean
+        x-nullable: false
       url:
         description: url to the ciba authenticator service
         type: string
@@ -3060,6 +3075,18 @@ definitions:
       do_not_allow_users_to_self_reset_credentials:
         type: boolean
         x-nullable: false
+      reset_password_older_than:
+        format: date-time
+        type: string
+        x-nullable: false
+      reset_totp_older_than:
+        format: date-time
+        type: string
+        x-nullable: false
+      reset_webauthn_older_than:
+        format: date-time
+        type: string
+        x-nullable: false
     type: object
   ResponseModes:
     items:
@@ -3187,6 +3214,28 @@ definitions:
         x-nullable: false
     title: RoleDescriptor represents the SAML element RoleDescriptor.
     type: object
+  SAMLAttribute:
+    properties:
+      name:
+        description: claim name
+        type: string
+        x-nullable: false
+      saml_name:
+        example: email
+        type: string
+        x-nullable: false
+      saml_name_format:
+        example: urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
+        type: string
+        x-nullable: false
+      source_path:
+        description: path to the attribute in source type context where claim value
+          should be picked from
+        type: string
+        x-nullable: false
+      source_type:
+        $ref: '#/definitions/ClaimSourceType'
+    type: object
   SAMLConfiguration:
     properties:
       organization_display_name:
@@ -3201,6 +3250,8 @@ definitions:
         description: Organization URL
         type: string
         x-nullable: false
+      response_binding_mode:
+        $ref: '#/definitions/SAMLResponseBindingMode'
       signing_hash_algorithms:
         default:
         - sha-256
@@ -3243,6 +3294,12 @@ definitions:
         type: string
         x-nullable: false
     type: object
+  SAMLIDPAttributesOverride:
+    items:
+      $ref: '#/definitions/SAMLAttribute'
+    type: array
+  SAMLResponseBindingMode:
+    type: string
   SAMLSettings:
     description: SAML IDP specific settings
     properties:
@@ -3890,8 +3947,22 @@ definitions:
       schema:
         $ref: '#/definitions/SupportedJSONSchema'
     type: object
+  ServerPreferences:
+    properties:
+      display_identity_pool_idp:
+        description: display identity pool IDP
+        type: boolean
+        x-nullable: false
+      display_organization_idp:
+        description: display organization IDP
+        type: boolean
+        x-nullable: false
+    type: object
   ServerSettings:
     properties:
+      deactivated:
+        type: boolean
+        x-nullable: false
       default_client_id:
         format: clientID
         type: string
@@ -4317,6 +4388,8 @@ definitions:
         example: email
         type: string
         x-nullable: false
+      metadata:
+        $ref: '#/definitions/ClaimMetadata'
       opaque:
         description: included in userinfo/introspect endpoints only
         type: boolean
@@ -4826,6 +4899,22 @@ definitions:
           type: string
         type: array
         x-nullable: false
+      saml_idp_attributes_override:
+        $ref: '#/definitions/SAMLIDPAttributesOverride'
+      saml_idp_custom_entity_id:
+        description: custom entity id
+        type: string
+        x-nullable: false
+      saml_idp_custom_sso_url:
+        description: custom sso url
+        type: string
+        x-nullable: false
+      saml_idp_override_enabled:
+        description: enable flag
+        type: boolean
+        x-nullable: false
+      saml_idp_signing_key:
+        $ref: '#/definitions/ServerJWK'
       saml_metadata:
         $ref: '#/definitions/EntityDescriptor'
       saml_metadata_updated_at:
@@ -5918,6 +6007,8 @@ definitions:
         $ref: '#/definitions/TreePolicyExecutionPoints'
       pools:
         $ref: '#/definitions/TreePools'
+      preferences:
+        $ref: '#/definitions/ServerPreferences'
       profile:
         default: default
         description: |-
@@ -5948,6 +6039,7 @@ definitions:
         - fapi_20_security
         - fapi_20_message_signing
         - connect_id
+        - agentic_ai
         example: default
         type: string
         x-nullable: false
@@ -6344,10 +6436,6 @@ definitions:
     type: object
   TreeTranslation:
     properties:
-      built_in_exists:
-        description: built-in exists
-        type: boolean
-        x-nullable: false
       content:
         additionalProperties:
           type: object
@@ -6360,10 +6448,6 @@ definitions:
         type: string
         x-nullable: false
       enabled:
-        type: boolean
-        x-nullable: false
-      is_built_in:
-        description: Is built-in translation
         type: boolean
         x-nullable: false
       updated_at:
@@ -7510,12 +7594,12 @@ schemes:
 securityDefinitions:
   setup:
     authorizationUrl: /system/system/oauth2/authorize
-    flow: accessCode
+    flow: application
     tokenUrl: /system/system/oauth2/token
     type: oauth2
   system:
     authorizationUrl: /default/system/oauth2/authorize
-    flow: accessCode
+    flow: application
     scopes:
       manage_configuration: manage_configuration
     tokenUrl: /default/system/oauth2/token

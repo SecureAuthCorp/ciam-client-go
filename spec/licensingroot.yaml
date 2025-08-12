@@ -580,12 +580,12 @@ schemes:
 securityDefinitions:
   adminSystem:
     authorizationUrl: /system/admin/oauth2/authorize
-    flow: accessCode
+    flow: application
     tokenUrl: /system/admin/oauth2/token
     type: oauth2
   setup:
     authorizationUrl: /system/system/oauth2/authorize
-    flow: accessCode
+    flow: application
     tokenUrl: /system/system/oauth2/token
     type: oauth2
 swagger: "2.0"

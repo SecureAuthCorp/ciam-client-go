@@ -453,6 +453,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       responses:
         "200":
           $ref: '#/responses/SystemsResponse'
@@ -476,6 +484,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: body
         name: System
@@ -514,6 +530,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - in: path
         name: psID
         required: true
@@ -544,6 +568,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - in: path
         name: psID
         required: true
@@ -573,6 +605,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: path
         name: psID
@@ -615,6 +655,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - in: path
         name: psID
         required: true
@@ -642,6 +690,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: path
         name: psID
@@ -684,6 +740,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - in: path
         name: psID
         required: true
@@ -718,6 +782,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - in: path
         name: psID
         required: true
@@ -751,6 +823,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: path
         name: psID
@@ -797,6 +877,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - in: path
         name: psID
         required: true
@@ -837,6 +925,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: path
         name: psID
@@ -879,6 +975,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - in: path
         name: psID
         required: true
@@ -920,6 +1024,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - in: path
         name: psID
         required: true
@@ -960,6 +1072,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - in: path
         name: psID
         required: true
@@ -999,6 +1119,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: path
         name: psID
@@ -1043,6 +1171,18 @@ responses:
           in:header
         format: etag
         type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
     schema:
       $ref: '#/definitions/CheckPermissionResponse'
   DeleteRelationshipsResponse:
@@ -1055,6 +1195,18 @@ responses:
           in:header
         format: etag
         type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
     schema:
       $ref: '#/definitions/DeleteRelationshipsResponse'
   LookupResourcesResponse:
@@ -1066,6 +1218,18 @@ responses:
 
           in:header
         format: etag
+        type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
         type: string
     schema:
       properties:
@@ -1084,6 +1248,18 @@ responses:
           in:header
         format: etag
         type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
     schema:
       properties:
         values:
@@ -1100,6 +1276,18 @@ responses:
 
           in:header
         format: etag
+        type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
         type: string
     schema:
       properties:
@@ -1118,6 +1306,18 @@ responses:
           in:header
         format: etag
         type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
     schema:
       $ref: '#/definitions/System'
   SystemsResponse:
@@ -1129,6 +1329,18 @@ responses:
 
           in:header
         format: etag
+        type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
         type: string
     schema:
       $ref: '#/definitions/Systems'
@@ -1142,6 +1354,18 @@ responses:
           in:header
         format: etag
         type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
     schema:
       $ref: '#/definitions/Token'
   TokensResponse:
@@ -1154,6 +1378,18 @@ responses:
           in:header
         format: etag
         type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
     schema:
       $ref: '#/definitions/Tokens'
   WriteRelationshipsResponse:
@@ -1165,6 +1401,18 @@ responses:
 
           in:header
         format: etag
+        type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
         type: string
     schema:
       $ref: '#/definitions/WriteRelationshipsResponse'

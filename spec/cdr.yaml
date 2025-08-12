@@ -1818,6 +1818,8 @@ definitions:
         type: string
         x-nullable: false
     type: object
+  ClaimSourceType:
+    type: string
   Client:
     properties:
       app_url:
@@ -2297,6 +2299,22 @@ definitions:
           type: string
         type: array
         x-nullable: false
+      saml_idp_attributes_override:
+        $ref: '#/definitions/SAMLIDPAttributesOverride'
+      saml_idp_custom_entity_id:
+        description: custom entity id
+        type: string
+        x-nullable: false
+      saml_idp_custom_sso_url:
+        description: custom sso url
+        type: string
+        x-nullable: false
+      saml_idp_override_enabled:
+        description: enable flag
+        type: boolean
+        x-nullable: false
+      saml_idp_signing_key:
+        $ref: '#/definitions/ServerJWK'
       saml_metadata:
         $ref: '#/definitions/EntityDescriptor'
       saml_metadata_updated_at:
@@ -3223,6 +3241,14 @@ definitions:
           type: string
         type: array
         x-nullable: false
+      authorization_details:
+        description: Granted authorization details
+        items:
+          additionalProperties:
+            type: object
+          type: object
+        type: array
+        x-nullable: false
       client_id:
         description: |-
           A client application identifier for the OAuth 2.0 client that
@@ -3837,6 +3863,32 @@ definitions:
         x-nullable: false
     title: RoleDescriptor represents the SAML element RoleDescriptor.
     type: object
+  SAMLAttribute:
+    properties:
+      name:
+        description: claim name
+        type: string
+        x-nullable: false
+      saml_name:
+        example: email
+        type: string
+        x-nullable: false
+      saml_name_format:
+        example: urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
+        type: string
+        x-nullable: false
+      source_path:
+        description: path to the attribute in source type context where claim value
+          should be picked from
+        type: string
+        x-nullable: false
+      source_type:
+        $ref: '#/definitions/ClaimSourceType'
+    type: object
+  SAMLIDPAttributesOverride:
+    items:
+      $ref: '#/definitions/SAMLAttribute'
+    type: array
   SPSSODescriptor:
     description: See http://docs.oasis-open.org/security/saml/v2.0/saml-metadata-2.0-os.pdf
       §2.4.2
@@ -3984,6 +4036,143 @@ definitions:
         format: purposeName
         type: string
         x-nullable: false
+    type: object
+  ServerJWK:
+    properties:
+      alg:
+        description: |-
+          The "alg" (algorithm) parameter identifies the algorithm intended for
+          use with the key.  The values used should either be registered in the
+          IANA "JSON Web Signature and Encryption Algorithms" registry
+          established by [JWA] or be a value that contains a Collision-
+          Resistant Name.
+        example: RS256
+        type: string
+        x-nullable: false
+      created_at:
+        description: Time when key was generated
+        format: date-time
+        type: string
+        x-nullable: false
+      crv:
+        example: P-256
+        type: string
+        x-nullable: false
+      d:
+        example: T_N8I-6He3M8a7X1vWt6TGIx4xB_GP3Mb4SsZSA4v-orvJzzRiQhLlRR81naWYxfQAYt5isDI6_C2L9bdWo4FFPjGQFvNoRX-_sBJyBI_rl-TBgsZYoUlAj3J92WmY2inbA-PwyJfsaIIDceYBC-eX-xiCu6qMqkZi3MwQAFL6bMdPEM0z4JBcwFT3VdiWAIRUuACWQwrXMq672x7fMuaIaHi7XDGgt1ith23CLfaREmJku9PQcchbt_uEY-hqrFY6ntTtS4paWWQj86xLL94S-Tf6v6xkL918PfLSOTq6XCzxvlFwzBJqApnAhbwqLjpPhgUG04EDRrqrSBc5Y1BLevn6Ip5h1AhessBp3wLkQgz_roeckt-ybvzKTjESMuagnpqLvOT7Y9veIug2MwPJZI2VjczRc1vzMs25XrFQ8DpUy-bNdp89TmvAXwctUMiJdgHloJw23Cv03gIUAkDnsTqZmkpbIf-crpgNKFmQP_EDKoe8p_PXZZgfbRri3NoEVGP7Mk6yEu8LjJhClhZaBNjuWw2-KlBfOA3g79mhfBnkInee5KO9mGR50qPk1V-MorUYNTFMZIm0kFE6eYVWFBwJHLKYhHU34DoiK1VP-svZpC2uAMFNA_UJEwM9CQ2b8qe4-5e9aywMvwcuArRkAB5mBIfOaOJao3mfukKAE
+        type: string
+        x-nullable: false
+      dp:
+        example: G4sPXkc6Ya9y8oJW9_ILj4xuppu0lzi_H7VTkS8xj5SdX3coE0oimYwxIi2emTAue0UOa5dpgFGyBJ4c8tQ2VF402XRugKDTP8akYhFo5tAA77Qe_NmtuYZc3C3m3I24G2GvR5sSDxUyAN2zq8Lfn9EUms6rY3Ob8YeiKkTiBj0
+        type: string
+        x-nullable: false
+      dq:
+        example: s9lAH9fggBsoFR8Oac2R_E2gw282rT2kGOAhvIllETE1efrA6huUUvMfBcMpn8lqeW6vzznYY5SSQF7pMdC_agI3nG8Ibp1BUb0JUiraRNqUfLhcQb_d9GF4Dh7e74WbRsobRonujTYN1xCaP6TO61jvWrX-L18txXw494Q_cgk
+        type: string
+        x-nullable: false
+      e:
+        example: AQAB
+        type: string
+        x-nullable: false
+      k:
+        example: GawgguFyGrWKav7AX4VKUg
+        type: string
+        x-nullable: false
+      kid:
+        description: |-
+          The "kid" (key ID) parameter is used to match a specific key.  This
+          is used, for instance, to choose among a set of keys within a JWK Set
+          during key rollover.  The structure of the "kid" value is
+          unspecified.  When "kid" values are used within a JWK Set, different
+          keys within the JWK Set SHOULD use distinct "kid" values.  (One
+          example in which different keys might use the same "kid" value is if
+          they have different "kty" (key type) values but are considered to be
+          equivalent alternatives by the application using them.)  The "kid"
+          value is a case-sensitive string.
+        example: 1603dfe0af8f4596
+        type: string
+        x-nullable: false
+      kty:
+        description: |-
+          The "kty" (key type) parameter identifies the cryptographic algorithm
+          family used with the key, such as "RSA" or "EC". "kty" values should
+          either be registered in the IANA "JSON Web Key Types" registry
+          established by [JWA] or be a value that contains a Collision-
+          Resistant Name.  The "kty" value is a case-sensitive string.
+        example: RSA
+        type: string
+        x-nullable: false
+      "n":
+        example: vTqrxUyQPl_20aqf5kXHwDZrel-KovIp8s7ewJod2EXHl8tWlRB3_Rem34KwBfqlKQGp1nqah-51H4Jzruqe0cFP58hPEIt6WqrvnmJCXxnNuIB53iX_uUUXXHDHBeaPCSRoNJzNysjoJ30TIUsKBiirhBa7f235PXbKiHducLevV6PcKxJ5cY8zO286qJLBWSPm-OIevwqsIsSIH44Qtm9sioFikhkbLwoqwWORGAY0nl6XvVOlhADdLjBSqSAeT1FPuCDCnXwzCDR8N9IFB_IjdStFkC-rVt2K5BYfPd0c3yFp_vHR15eRd0zJ8XQ7woBC8Vnsac6Et1pKS59pX6256DPWu8UDdEOolKAPgcd_g2NpA76cAaF_jcT80j9KrEzw8Tv0nJBGesuCjPNjGs_KzdkWTUXt23Hn9QJsdc1MZuaW0iqXBepHYfYoqNelzVte117t4BwVp0kUM6we0IqyXClaZgOI8S-WDBw2_Ovdm8e5NmhYAblEVoygcX8Y46oH6bKiaCQfKCFDMcRgChme7AoE1yZZYsPbaG_3IjPrC4LBMHQw8rM9dWjJ8ImjicvZ1pAm0dx-KHCP3y5PVKrxBDf1zSOsBRkOSjB8TPODnJMz6-jd5hTtZxpZPwPoIdCanTZ3ZD6uRBpTmDwtpRGm63UQs1m5FWPwb0T2IF0
+        type: string
+        x-nullable: false
+      p:
+        example: 6NbkXwDWUhi-eR55Cgbf27FkQDDWIamOaDr0rj1q0f1fFEz1W5A_09YvG09Fiv1AO2-D8Rl8gS1Vkz2i0zCSqnyy8A025XOcRviOMK7nIxE4OH_PEsko8dtIrb3TmE2hUXvCkmzw9EsTF1LQBOGC6iusLTXepIC1x9ukCKFZQvdgtEObQ5kzd9Nhq-cdqmSeMVLoxPLd1blviVT9Vm8-y12CtYpeJHOaIDtVPLlBhJiBoPKWg3vxSm4XxIliNOefqegIlsmTIa3MpS6WWlCK3yHhat0Q-rRxDxdyiVdG_wzJvp0Iw_2wms7pe-PgNPYvUWH9JphWP5K38YqEBiJFXQ
+        type: string
+        x-nullable: false
+      promoted_at:
+        description: Time when key was set as current key in use
+        format: date-time
+        type: string
+        x-nullable: false
+      q:
+        example: 0A1FmpOWR91_RAWpqreWSavNaZb9nXeKiBo0DQGBz32DbqKqQ8S4aBJmbRhJcctjCLjain-ivut477tAUMmzJwVJDDq2MZFwC9Q-4VYZmFU4HJityQuSzHYe64RjN-E_NQ02TWhG3QGW6roq6c57c99rrUsETwJJiwS8M5p15Miuz53DaOjv-uqqFAFfywN5WkxHbraBcjHtMiQuyQbQqkCFh-oanHkwYNeytsNhTu2mQmwR5DR2roZ2nPiFjC6nsdk-A7E3S3wMzYYFw7jvbWWoYWo9vB40_MY2Y0FYQSqcDzcBIcq_0tnnasf3VW4Fdx6m80RzOb2Fsnln7vKXAQ
+        type: string
+        x-nullable: false
+      qi:
+        example: GyM_p6JrXySiz1toFgKbWV-JdI3jQ4ypu9rbMWx3rQJBfmt0FoYzgUIZEVFEcOqwemRN81zoDAaa-Bk0KWNGDjJHZDdDmFhW3AN7lI-puxk_mHZGJ11rxyR8O55XLSe3SPmRfKwZI6yU24ZxvQKFYItdldUKGzO6Ia6zTKhAVRU
+        type: string
+        x-nullable: false
+      revoked_at:
+        description: Time when key was revoked
+        format: date-time
+        type: string
+        x-nullable: false
+      rotated_at:
+        description: Time when key was rotated
+        format: date-time
+        type: string
+        x-nullable: false
+      use:
+        description: |-
+          Use ("public key use") identifies the intended use of
+          the public key. The "use" parameter is employed to indicate whether
+          a public key is used for encrypting data or verifying the signature
+          on data. Values are commonly "sig" (signature) or "enc" (encryption).
+        example: sig
+        type: string
+        x-nullable: false
+      x:
+        example: f83OJ3D2xF1Bg8vub9tLe1gHMzV76e8Tus9uPHvRVEU
+        type: string
+        x-nullable: false
+      x5c:
+        description: |-
+          The "x5c" (X.509 certificate chain) parameter contains a chain of one
+          or more PKIX certificates [RFC5280].  The certificate chain is
+          represented as a JSON array of certificate value strings.  Each
+          string in the array is a base64-encoded (Section 4 of [RFC4648] --
+          not base64url-encoded) DER [ITU.X690.1994] PKIX certificate value.
+          The PKIX certificate containing the key value MUST be the first
+          certificate.
+        items:
+          type: string
+        type: array
+        x-nullable: false
+      x5t:
+        example: GawgguFyGrWKav7AX4VKUg
+        type: string
+        x-nullable: false
+      x5t#S256:
+        example: GawgguFyGrWKav7AX4VKUg
+        type: string
+        x-nullable: false
+      "y":
+        example: x_FEzRu9m36HLN_tue659LNpXW6pCyStikYjKIWI5a0
+        type: string
+        x-nullable: false
+    required:
+    - kty
     type: object
   Service:
     properties:
@@ -5111,7 +5300,7 @@ securityDefinitions:
     type: oauth2
   defaultcc:
     authorizationUrl: /default/default/oauth2/authorize
-    flow: accessCode
+    flow: application
     scopes:
       accounts: accounts
       consents: consents
@@ -5120,7 +5309,7 @@ securityDefinitions:
     type: oauth2
   system:
     authorizationUrl: /default/system/oauth2/authorize
-    flow: accessCode
+    flow: application
     scopes:
       manage_openbanking_consents: manage_openbanking_consents
     tokenUrl: /default/system/oauth2/token

@@ -130,6 +130,51 @@ definitions:
         type: integer
         x-nullable: false
     type: object
+  Attribute:
+    properties:
+      canonicalValues:
+        items:
+          type: string
+        type: array
+        x-nullable: false
+      caseExact:
+        type: boolean
+        x-nullable: false
+      description:
+        type: string
+        x-nullable: false
+      multiValued:
+        type: boolean
+        x-nullable: false
+      mutability:
+        type: string
+        x-nullable: false
+      name:
+        type: string
+        x-nullable: false
+      referenceTypes:
+        items:
+          type: string
+        type: array
+        x-nullable: false
+      required:
+        type: boolean
+        x-nullable: false
+      returned:
+        type: string
+        x-nullable: false
+      subAttributes:
+        items:
+          $ref: '#/definitions/Attribute'
+        type: array
+        x-nullable: false
+      type:
+        type: string
+        x-nullable: false
+      uniqueness:
+        type: string
+        x-nullable: false
+    type: object
   AuthenticationExtensions:
     additionalProperties:
       type: object
@@ -153,6 +198,27 @@ definitions:
       - webauthn
       type: string
     type: array
+  AuthenticationScheme:
+    properties:
+      description:
+        type: string
+        x-nullable: false
+      documentationUri:
+        type: string
+        x-nullable: false
+      name:
+        type: string
+        x-nullable: false
+      primary:
+        type: boolean
+        x-nullable: false
+      specUri:
+        type: string
+        x-nullable: false
+      type:
+        type: string
+        x-nullable: false
+    type: object
   Authenticator:
     properties:
       AAGUID:
@@ -258,6 +324,20 @@ definitions:
       cost:
         format: int64
         type: integer
+        x-nullable: false
+    type: object
+  BulkSupport:
+    properties:
+      maxOperations:
+        format: int64
+        type: integer
+        x-nullable: false
+      maxPayloadSize:
+        format: int64
+        type: integer
+        x-nullable: false
+      supported:
+        type: boolean
         x-nullable: false
     type: object
   ChangePassword:
@@ -713,6 +793,8 @@ definitions:
         format: schemaID
         type: string
         x-nullable: false
+      preferences:
+        $ref: '#/definitions/UserPreferences'
       status:
         enum:
         - active
@@ -751,6 +833,16 @@ definitions:
     - tenant_id
     - user_pool_id
     - status
+    type: object
+  FilterSupport:
+    properties:
+      maxResults:
+        format: int64
+        type: integer
+        x-nullable: false
+      supported:
+        type: boolean
+        x-nullable: false
     type: object
   GetUserByKey:
     properties:
@@ -917,6 +1009,31 @@ definitions:
     required:
     - user_pool_id
     type: object
+  ListUsersResponse:
+    properties:
+      Resources:
+        items:
+          $ref: '#/definitions/UserGetResponse'
+        type: array
+        x-nullable: false
+      itemsPerPage:
+        format: int64
+        type: integer
+        x-nullable: false
+      schemas:
+        items:
+          type: string
+        type: array
+        x-nullable: false
+      startIndex:
+        format: int64
+        type: integer
+        x-nullable: false
+      totalResults:
+        format: int64
+        type: integer
+        x-nullable: false
+    type: object
   MD5Config:
     properties:
       salt:
@@ -928,6 +1045,19 @@ definitions:
       salt_length:
         format: int64
         type: integer
+        x-nullable: false
+    type: object
+  MFAPreferences:
+    properties:
+      preferred_2fa:
+        enum:
+        - totp
+        - password
+        - otp
+        - email_otp
+        - sms_otp
+        - webauthn
+        type: string
         x-nullable: false
     type: object
   NameWebAuthnKey:
@@ -981,6 +1111,8 @@ definitions:
         format: schemaID
         type: string
         x-nullable: false
+      preferences:
+        $ref: '#/definitions/UserPreferences'
       status:
         enum:
         - active
@@ -1011,7 +1143,7 @@ definitions:
       must_be_reset:
         default: false
         description: |-
-          Indicates if user is required to reset their credentials before first authentication. Currently, it is enforced only for password credentials, but it may change any time.
+          Indicates if user is required to reset their credentials before first authentication.
           This flag takes precedence over MustBeChanged.
         type: boolean
         x-nullable: false
@@ -1585,6 +1717,73 @@ definitions:
       do_not_allow_users_to_self_reset_credentials:
         type: boolean
         x-nullable: false
+      reset_password_older_than:
+        format: date-time
+        type: string
+        x-nullable: false
+      reset_totp_older_than:
+        format: date-time
+        type: string
+        x-nullable: false
+      reset_webauthn_older_than:
+        format: date-time
+        type: string
+        x-nullable: false
+    type: object
+  ResourceType:
+    properties:
+      description:
+        type: string
+        x-nullable: false
+      endpoint:
+        type: string
+        x-nullable: false
+      id:
+        type: string
+        x-nullable: false
+      meta:
+        $ref: '#/definitions/SCIMv2Meta'
+      name:
+        type: string
+        x-nullable: false
+      schema:
+        type: string
+        x-nullable: false
+      schemaExtensions:
+        items:
+          $ref: '#/definitions/SchemaExtension'
+        type: array
+        x-nullable: false
+      schemas:
+        items:
+          type: string
+        type: array
+        x-nullable: false
+    type: object
+  ResourceTypes:
+    properties:
+      Resources:
+        items:
+          $ref: '#/definitions/ResourceType'
+        type: array
+        x-nullable: false
+      itemsPerPage:
+        format: int64
+        type: integer
+        x-nullable: false
+      schemas:
+        items:
+          type: string
+        type: array
+        x-nullable: false
+      startIndex:
+        format: int64
+        type: integer
+        x-nullable: false
+      totalResults:
+        format: int64
+        type: integer
+        x-nullable: false
     type: object
   Rfc6902PatchOperation:
     properties:
@@ -1620,6 +1819,155 @@ definitions:
     items:
       $ref: '#/definitions/Rfc6902PatchOperation'
     type: array
+  SCIMv2Email:
+    properties:
+      primary:
+        type: boolean
+        x-nullable: false
+      type:
+        type: string
+        x-nullable: false
+      value:
+        example: test@test.com
+        type: string
+        x-nullable: false
+      verified:
+        type: boolean
+        x-nullable: false
+    type: object
+  SCIMv2ErrorResponse:
+    properties:
+      detail:
+        type: string
+        x-nullable: false
+      schemas:
+        items:
+          type: string
+        type: array
+        x-nullable: false
+      scimType:
+        type: string
+        x-nullable: false
+      status:
+        type: string
+        x-nullable: false
+    type: object
+  SCIMv2Identifier:
+    properties:
+      type:
+        $ref: '#/definitions/SCIMv2IdentifierType'
+      value:
+        example: testUsername
+        type: string
+        x-nullable: false
+    type: object
+  SCIMv2IdentifierType:
+    type: string
+  SCIMv2Meta:
+    properties:
+      created:
+        type: string
+        x-nullable: false
+      lastModified:
+        type: string
+        x-nullable: false
+      location:
+        type: string
+        x-nullable: false
+      resourceType:
+        type: string
+        x-nullable: false
+      version:
+        type: string
+        x-nullable: false
+    type: object
+  SCIMv2Name:
+    properties:
+      familyName:
+        example: Doe
+        type: string
+        x-nullable: false
+      givenName:
+        example: John
+        type: string
+        x-nullable: false
+    type: object
+  SCIMv2Patch:
+    properties:
+      Operations:
+        $ref: '#/definitions/Rfc6902PatchOperations'
+      schemas:
+        description: example ["urn:ietf:params:scim:api:messages:2.0:PatchOp"]
+        items:
+          type: string
+        type: array
+        x-nullable: false
+    type: object
+  SCIMv2PhoneNumber:
+    properties:
+      primary:
+        type: boolean
+        x-nullable: false
+      type:
+        type: string
+        x-nullable: false
+      value:
+        example: tel:+1-201-555-0123
+        type: string
+        x-nullable: false
+      verified:
+        type: boolean
+        x-nullable: false
+    type: object
+  SCIMv2Schema:
+    properties:
+      attributes:
+        items:
+          $ref: '#/definitions/Attribute'
+        type: array
+        x-nullable: false
+      description:
+        type: string
+        x-nullable: false
+      id:
+        type: string
+        x-nullable: false
+      meta:
+        $ref: '#/definitions/SCIMv2Meta'
+      name:
+        type: string
+        x-nullable: false
+      schemas:
+        items:
+          type: string
+        type: array
+        x-nullable: false
+    type: object
+  SCIMv2Schemas:
+    properties:
+      Resources:
+        items:
+          $ref: '#/definitions/SCIMv2Schema'
+        type: array
+        x-nullable: false
+      itemsPerPage:
+        format: int64
+        type: integer
+        x-nullable: false
+      schemas:
+        items:
+          type: string
+        type: array
+        x-nullable: false
+      startIndex:
+        format: int64
+        type: integer
+        x-nullable: false
+      totalResults:
+        format: int64
+        type: integer
+        x-nullable: false
+    type: object
   SHAConfig:
     properties:
       function:
@@ -1671,6 +2019,15 @@ definitions:
     - name
     - schema
     type: object
+  SchemaExtension:
+    properties:
+      required:
+        type: boolean
+        x-nullable: false
+      schema:
+        type: string
+        x-nullable: false
+    type: object
   Schemas:
     properties:
       schemas:
@@ -1706,6 +2063,38 @@ definitions:
     required:
     - identifier
     type: object
+  ServiceProviderConfig:
+    properties:
+      authenticationSchemes:
+        items:
+          $ref: '#/definitions/AuthenticationScheme'
+        type: array
+        x-nullable: false
+      bulk:
+        $ref: '#/definitions/BulkSupport'
+      changePassword:
+        $ref: '#/definitions/SupportedFeature'
+      documentationUri:
+        type: string
+        x-nullable: false
+      etag:
+        $ref: '#/definitions/SupportedFeature'
+      filter:
+        $ref: '#/definitions/FilterSupport'
+      meta:
+        $ref: '#/definitions/SCIMv2Meta'
+      patch:
+        $ref: '#/definitions/SupportedFeature'
+      schemas:
+        items:
+          type: string
+        type: array
+        x-nullable: false
+      sort:
+        $ref: '#/definitions/SupportedFeature'
+      xmlDataFormat:
+        $ref: '#/definitions/SupportedFeature'
+    type: object
   SetPasswordStateRequest:
     properties:
       state:
@@ -1714,6 +2103,12 @@ definitions:
         - must_be_reset
         - must_be_changed
         type: string
+        x-nullable: false
+    type: object
+  SupportedFeature:
+    properties:
+      supported:
+        type: boolean
         x-nullable: false
     type: object
   SupportedJSONSchema:
@@ -1953,6 +2348,8 @@ definitions:
         format: schemaID
         type: string
         x-nullable: false
+      preferences:
+        $ref: '#/definitions/UserPreferences'
       status:
         enum:
         - active
@@ -2038,6 +2435,8 @@ definitions:
         format: schemaID
         type: string
         x-nullable: false
+      preferences:
+        $ref: '#/definitions/UserPreferences'
       status:
         enum:
         - active
@@ -2133,6 +2532,55 @@ definitions:
     - created_at
     - updated_at
     type: object
+  UserGetResponse:
+    description: UserGetResponse
+    properties:
+      active:
+        type: boolean
+        x-nullable: false
+      additionalIdentifiers:
+        items:
+          $ref: '#/definitions/SCIMv2Identifier'
+        type: array
+        x-nullable: false
+      emails:
+        items:
+          $ref: '#/definitions/SCIMv2Email'
+        type: array
+        x-nullable: false
+      externalId:
+        example: someExternalID
+        type: string
+        x-nullable: false
+      id:
+        type: string
+        x-nullable: false
+      meta:
+        $ref: '#/definitions/SCIMv2Meta'
+      name:
+        $ref: '#/definitions/SCIMv2Name'
+      password:
+        example: wIf@O&YWzdfFKSW
+        type: string
+        x-nullable: false
+      phoneNumbers:
+        items:
+          $ref: '#/definitions/SCIMv2PhoneNumber'
+        type: array
+        x-nullable: false
+      schemas:
+        example:
+        - urn:ietf:params:scim:schemas:core:2.0:User
+        - urn:secureauthciam:params:scim:schemas:extension:custom:2.0:User
+        items:
+          type: string
+        type: array
+        x-nullable: false
+      userName:
+        example: test@test.com
+        type: string
+        x-nullable: false
+    type: object
   UserID:
     properties:
       id:
@@ -2212,6 +2660,55 @@ definitions:
         items:
           $ref: '#/definitions/PoolResponse'
         type: array
+        x-nullable: false
+    type: object
+  UserPreferences:
+    properties:
+      mfa:
+        $ref: '#/definitions/MFAPreferences'
+    type: object
+  UserUpsertRequest:
+    description: UserUpsertRequest
+    properties:
+      active:
+        type: boolean
+        x-nullable: false
+      additionalIdentifiers:
+        items:
+          $ref: '#/definitions/SCIMv2Identifier'
+        type: array
+        x-nullable: false
+      emails:
+        items:
+          $ref: '#/definitions/SCIMv2Email'
+        type: array
+        x-nullable: false
+      externalId:
+        example: someExternalID
+        type: string
+        x-nullable: false
+      name:
+        $ref: '#/definitions/SCIMv2Name'
+      password:
+        example: wIf@O&YWzdfFKSW
+        type: string
+        x-nullable: false
+      phoneNumbers:
+        items:
+          $ref: '#/definitions/SCIMv2PhoneNumber'
+        type: array
+        x-nullable: false
+      schemas:
+        example:
+        - urn:ietf:params:scim:schemas:core:2.0:User
+        - urn:secureauthciam:params:scim:schemas:extension:custom:2.0:User
+        items:
+          type: string
+        type: array
+        x-nullable: false
+      userName:
+        example: test@test.com
+        type: string
         x-nullable: false
     type: object
   UserVerifiableAddress:
@@ -2356,6 +2853,8 @@ definitions:
         format: schemaID
         type: string
         x-nullable: false
+      preferences:
+        $ref: '#/definitions/UserPreferences'
       status:
         enum:
         - active
@@ -2675,6 +3174,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       responses:
         "200":
           description: Pools
@@ -2709,6 +3216,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: body
         name: Pool
@@ -2748,6 +3263,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: path
         name: ipID
@@ -2809,6 +3332,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: path
         name: ipID
@@ -3188,6 +3719,566 @@ paths:
       summary: Add user to a specific group
       tags:
       - Groups
+  /system/pools/{ipID}/scim/v2/ResourceTypes:
+    get:
+      description: Returns the supported SCIM Resource Types for the specified identity
+        pool.
+      operationId: systemSCIMv2GetResourceTypes
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
+      - in: path
+        name: ipID
+        required: true
+        type: string
+      responses:
+        "200":
+          $ref: '#/responses/ResourceTypesResponse'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "412":
+          $ref: '#/responses/payloadTooLargeHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - system:
+        - identity
+      summary: List SCIM Resource Types
+      tags:
+      - SCIMv2Configuration
+  /system/pools/{ipID}/scim/v2/ResourceTypes/{resourceID}:
+    get:
+      description: Returns requested SCIM Resource Type for the specified identity
+        pool.
+      operationId: systemSCIMv2GetResourceType
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
+      - in: path
+        name: ipID
+        required: true
+        type: string
+      - in: path
+        name: resourceID
+        required: true
+        type: string
+      responses:
+        "200":
+          $ref: '#/responses/ResourceTypeResponse'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "412":
+          $ref: '#/responses/payloadTooLargeHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - system:
+        - identity
+      summary: Get SCIM Resource Type
+      tags:
+      - SCIMv2Configuration
+  /system/pools/{ipID}/scim/v2/Schemas:
+    get:
+      description: Returns the supported SCIM Schemas for the specified identity pool.
+      operationId: systemSCIMv2GetSystemGetSCIMv2Schemas
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
+      - in: path
+        name: ipID
+        required: true
+        type: string
+      responses:
+        "200":
+          $ref: '#/responses/SCIMv2SchemasResponse'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "412":
+          $ref: '#/responses/payloadTooLargeHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - system:
+        - identity
+      summary: List SCIM Schemas
+      tags:
+      - SCIMv2Configuration
+  /system/pools/{ipID}/scim/v2/Schemas/{schemaID}:
+    get:
+      description: Returns requested SCIM Schema for the specified identity pool.
+      operationId: systemSCIMv2GetSystemGetSCIMv2Schema
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
+      - in: path
+        name: ipID
+        required: true
+        type: string
+      - in: path
+        name: schemaID
+        required: true
+        type: string
+      responses:
+        "200":
+          $ref: '#/responses/SCIMv2SchemaResponse'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "412":
+          $ref: '#/responses/payloadTooLargeHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - system:
+        - identity
+      summary: Get SCIM Schemas
+      tags:
+      - SCIMv2Configuration
+  /system/pools/{ipID}/scim/v2/ServiceProviderConfig:
+    get:
+      description: Returns the SCIM Service Provider Configuration for the specified
+        identity pool.
+      operationId: systemSCIMv2GetServiceProviderConfig
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
+      - in: path
+        name: ipID
+        required: true
+        type: string
+      responses:
+        "200":
+          $ref: '#/responses/ServiceProviderConfigResponse'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "412":
+          $ref: '#/responses/payloadTooLargeHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - system:
+        - identity
+      summary: Get SCIM Service Provider Configuration
+      tags:
+      - SCIMv2Configuration
+  /system/pools/{ipID}/scim/v2/Users:
+    get:
+      description: |-
+        Returns a list of users in SCIM format from the specified identity pool.
+
+        The only supported filter is `<fieldName> eq <value>` which returns a single user or empty set.
+        Allowed field names (case-insensitive) are `id`, `externalId`, `userName`, `emails.value`, and `phoneNumbers.value`.
+        For emails and phone number subfilter [.*] is allowed but ignored.
+
+        Only verified emails and phone numbers are searchable.
+      operationId: systemSCIMv2ListUsers
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
+      - in: path
+        name: ipID
+        required: true
+        type: string
+      - description: SCIM filter expression
+        in: query
+        name: filter
+        type: string
+      - description: Comma-separated list of attributes to include
+        in: query
+        name: attributes
+        type: string
+      - description: Comma-separated list of attributes to exclude
+        in: query
+        name: excludedAttributes
+        type: string
+      - description: Attribute to sort by
+        in: query
+        name: sortBy
+        type: string
+      - description: Sort order (ascending or descending)
+        in: query
+        name: sortOrder
+        type: string
+      - description: Start index for pagination (1-based)
+        format: int64
+        in: query
+        name: startIndex
+        type: integer
+      - default: 10
+        description: Number of results to return
+        format: int64
+        in: query
+        name: count
+        type: integer
+      responses:
+        "200":
+          $ref: '#/responses/SCIMv2UsersResponse'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "412":
+          $ref: '#/responses/payloadTooLargeHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - system:
+        - identity
+      summary: List SCIM Users
+      tags:
+      - SCIMv2Users
+    post:
+      description: Creates a new user in SCIM format in the specified identity pool.
+      operationId: systemSCIMv2CreateUser
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
+      - in: path
+        name: ipID
+        required: true
+        type: string
+      - in: body
+        name: NewUser
+        schema:
+          $ref: '#/definitions/UserUpsertRequest'
+      responses:
+        "201":
+          $ref: '#/responses/SystemSCIMv2UserResponse'
+        "400":
+          $ref: '#/responses/badRequestSCIMv2HTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedSCIMv2HTTPError'
+        "403":
+          $ref: '#/responses/forbiddenSCIMv2HTTPError'
+        "409":
+          $ref: '#/responses/conflictSCIMv2HTTPError'
+        "412":
+          $ref: '#/responses/payloadTooLargeSCIMv2HTTPError'
+        "422":
+          $ref: '#/responses/unprocessableEntitySCIMv2HTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsSCIMv2HTTPError'
+      security:
+      - system:
+        - identity
+      summary: Create SCIM User
+      tags:
+      - SCIMv2Users
+  /system/pools/{ipID}/scim/v2/Users/{userID}:
+    delete:
+      description: Deletes a user using SCIM DELETE operations in the specified identity
+        pool.
+      operationId: systemSCIMv2DeleteUser
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
+      - in: path
+        name: ipID
+        required: true
+        type: string
+      - in: path
+        name: userID
+        required: true
+        type: string
+      responses:
+        "204":
+          $ref: '#/responses/SystemDeleteUserResponse'
+        "401":
+          $ref: '#/responses/unauthorizedSCIMv2HTTPError'
+        "403":
+          $ref: '#/responses/forbiddenSCIMv2HTTPError'
+        "404":
+          $ref: '#/responses/notFoundSCIMv2HTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsSCIMv2HTTPError'
+      security:
+      - system:
+        - identity
+      summary: Delete SCIM User
+      tags:
+      - SCIMv2Users
+    get:
+      description: Returns a specific user in SCIM format from the specified identity
+        pool.
+      operationId: systemSCIMv2GetUser
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
+      - in: path
+        name: ipID
+        required: true
+        type: string
+      - in: path
+        name: userID
+        required: true
+        type: string
+      - description: Comma-separated list of attributes to include
+        in: query
+        name: attributes
+        type: string
+      - description: Comma-separated list of attributes to exclude
+        in: query
+        name: excludedAttributes
+        type: string
+      produces:
+      - application/scim+json
+      responses:
+        "200":
+          $ref: '#/responses/SystemSCIMv2UserResponse'
+        "401":
+          $ref: '#/responses/unauthorizedSCIMv2HTTPError'
+        "403":
+          $ref: '#/responses/forbiddenSCIMv2HTTPError'
+        "404":
+          $ref: '#/responses/notFoundSCIMv2HTTPError'
+        "412":
+          $ref: '#/responses/payloadTooLargeSCIMv2HTTPError'
+        "422":
+          $ref: '#/responses/unprocessableEntitySCIMv2HTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsSCIMv2HTTPError'
+      security:
+      - system:
+        - identity
+      summary: Get SCIM User
+      tags:
+      - SCIMv2Users
+    patch:
+      description: |-
+        Updates a user using SCIM PATCH operations in the specified identity pool.
+
+        NOTE: this is very basic PATCH implementation that does not allow filtering in path and strictly follows RFC 6902 with some workarounds.
+      operationId: systemSCIMv2PatchUser
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
+      - in: path
+        name: ipID
+        required: true
+        type: string
+      - in: path
+        name: userID
+        required: true
+        type: string
+      - description: Patch spec in RFC 6902 format
+        in: body
+        name: patch
+        schema:
+          $ref: '#/definitions/SCIMv2Patch'
+      responses:
+        "200":
+          $ref: '#/responses/SystemSCIMv2UserResponse'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "412":
+          $ref: '#/responses/payloadTooLargeHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - system:
+        - identity
+      summary: Patch SCIM User
+      tags:
+      - SCIMv2Users
+    put:
+      description: Updates a user using SCIM format in the specified identity pool
+        (full replacement).
+      operationId: systemSCIMv2UpdateUser
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
+      - in: path
+        name: ipID
+        required: true
+        type: string
+      - in: path
+        name: userID
+        required: true
+        type: string
+      - in: body
+        name: User
+        schema:
+          $ref: '#/definitions/UserUpsertRequest'
+      responses:
+        "200":
+          $ref: '#/responses/SystemSCIMv2UserResponse'
+        "400":
+          $ref: '#/responses/badRequestSCIMv2HTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedSCIMv2HTTPError'
+        "403":
+          $ref: '#/responses/forbiddenSCIMv2HTTPError'
+        "404":
+          $ref: '#/responses/notFoundSCIMv2HTTPError'
+        "409":
+          $ref: '#/responses/conflictSCIMv2HTTPError'
+        "412":
+          $ref: '#/responses/payloadTooLargeSCIMv2HTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsSCIMv2HTTPError'
+      security:
+      - system:
+        - identity
+      summary: Update SCIM User
+      tags:
+      - SCIMv2Users
   /system/pools/{ipID}/user/activate:
     post:
       description: |-
@@ -3208,6 +4299,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: path
         name: ipID
@@ -3253,6 +4352,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: path
         name: ipID
@@ -3302,6 +4409,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - in: path
         name: ipID
         required: true
@@ -3345,6 +4460,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - in: path
         name: ipID
         required: true
@@ -3387,6 +4510,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: path
         name: ipID
@@ -3438,6 +4569,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - in: path
         name: ipID
         required: true
@@ -3477,6 +4616,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: path
         name: ipID
@@ -3518,6 +4665,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: path
         name: ipID
@@ -3563,6 +4718,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: path
         name: ipID
@@ -3621,6 +4784,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - in: path
         name: ipID
         required: true
@@ -3661,6 +4832,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: path
         name: ipID
@@ -3710,6 +4889,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: path
         name: ipID
@@ -3776,6 +4963,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - in: path
         name: ipID
         required: true
@@ -3818,6 +5013,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: path
         name: ipID
@@ -4049,6 +5252,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - in: path
         name: ipID
         required: true
@@ -4094,6 +5305,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - in: path
         name: ipID
         required: true
@@ -4135,6 +5354,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - in: path
         name: ipID
         required: true
@@ -4162,6 +5389,77 @@ paths:
       summary: Get User Details
       tags:
       - Users
+    patch:
+      description: |-
+        Patch operates on the same fields as the **Update User Record** endpoint.
+
+        example for RFC6902:
+        [{"op": "replace", "path": "/payload/first_name", "value": "John"}]
+
+        example for RFC7396:
+        {"payload": {"first_name": "John"}}
+      operationId: systemPatchUser
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
+      - in: path
+        name: ipID
+        required: true
+        type: string
+      - default: "7396"
+        description: RFC version
+        enum:
+        - "6902"
+        - "7396"
+        in: query
+        name: rfc_version
+        type: string
+      - in: path
+        name: userID
+        required: true
+        type: string
+      - description: Patch spec in format matching RFC Version
+        in: body
+        name: patch
+        schema:
+          type: object
+      responses:
+        "200":
+          $ref: '#/responses/SystemUserResponse'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "409":
+          $ref: '#/responses/conflictHTTPError'
+        "412":
+          $ref: '#/responses/payloadTooLargeHTTPError'
+        "422":
+          $ref: '#/responses/unprocessableEntityHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - system:
+        - identity
+      summary: Patches existing User (supports both RFC6902 and RFC7396 JSON Patch)
+      tags:
+      - Users
     put:
       description: |-
         Update the basic set of user data: payload, metadata, schemas, and status. Provide the required values for the fields
@@ -4182,6 +5480,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: path
         name: ipID
@@ -4241,6 +5547,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - in: path
         name: ipID
         required: true
@@ -4291,6 +5605,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: path
         name: ipID
@@ -4356,6 +5678,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: path
         name: ipID
@@ -4436,6 +5766,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - in: path
         name: ipID
         required: true
@@ -4487,6 +5825,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - in: path
         name: ipID
         required: true
@@ -4494,6 +5840,14 @@ paths:
       - in: path
         name: userID
         required: true
+        type: string
+      - default: code
+        description: Code type in message
+        enum:
+        - link
+        - code
+        in: query
+        name: code_type_in_message
         type: string
       - in: body
         name: RequestAddressVerification
@@ -4532,6 +5886,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: path
         name: ipID
@@ -4578,6 +5940,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - in: path
         name: ipID
         required: true
@@ -4619,6 +5989,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: path
         name: ipID
@@ -4666,6 +6044,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: path
         name: ipID
@@ -4716,6 +6102,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: path
         name: ipID
@@ -4774,6 +6168,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: path
         name: ipID
@@ -4933,6 +6335,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - in: path
         name: ipID
         required: true
@@ -4976,6 +6386,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: path
         name: ipID
@@ -5271,6 +6689,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - in: path
         name: ipID
         required: true
@@ -5309,6 +6735,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       responses:
         "200":
           description: Schemas
@@ -5336,6 +6770,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: body
         name: Schema
@@ -5377,6 +6819,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: path
         name: schID
@@ -5438,6 +6888,14 @@ paths:
         format: etag
         in: header
         name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
         type: string
       - in: path
         name: schID
@@ -5546,6 +7004,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - default: default
         description: Workspace id
         in: path
@@ -5582,6 +7048,18 @@ responses:
           in:header
         format: etag
         type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
   CodeIDResponse:
     description: Code ID
     headers:
@@ -5591,6 +7069,18 @@ responses:
 
           in:header
         format: etag
+        type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
         type: string
     schema:
       $ref: '#/definitions/CodeID'
@@ -5604,6 +7094,18 @@ responses:
           in:header
         format: etag
         type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
   CompleteResetPasswordResponse:
     description: Password reset
     headers:
@@ -5613,6 +7115,18 @@ responses:
 
           in:header
         format: etag
+        type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
         type: string
   ConfirmResetPasswordResponse:
     description: Request accepted
@@ -5624,6 +7138,18 @@ responses:
           in:header
         format: etag
         type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
   DeleteAddressResponse:
     description: Deletes a verifiable address from the user account
     headers:
@@ -5633,6 +7159,18 @@ responses:
 
           in:header
         format: etag
+        type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
         type: string
   DeleteIdentifierResponse:
     description: Deletes an identifier from the user account
@@ -5644,6 +7182,18 @@ responses:
           in:header
         format: etag
         type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
   GenerateCodeResponse:
     description: Code
     headers:
@@ -5653,6 +7203,18 @@ responses:
 
           in:header
         format: etag
+        type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
         type: string
     schema:
       $ref: '#/definitions/Codes'
@@ -5676,6 +7238,18 @@ responses:
           in:header
         format: etag
         type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
     schema:
       $ref: '#/definitions/InspectOTPUserOperationalData'
   PoolResponseParams:
@@ -5687,6 +7261,18 @@ responses:
 
           in:header
         format: etag
+        type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
         type: string
     schema:
       $ref: '#/definitions/PoolResponse'
@@ -5700,6 +7286,18 @@ responses:
           in:header
         format: etag
         type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
     schema:
       $ref: '#/definitions/Pools'
   RequestAddressVerificationResponse:
@@ -5712,6 +7310,18 @@ responses:
           in:header
         format: etag
         type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
   RequestOTPChallengeResponse:
     description: Request accepted
     headers:
@@ -5721,6 +7331,18 @@ responses:
 
           in:header
         format: etag
+        type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
         type: string
   RequestResetPasswordResponse:
     description: Request accepted
@@ -5732,6 +7354,118 @@ responses:
           in:header
         format: etag
         type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
+  ResourceTypeResponse:
+    description: SCIMv2 ResourceType
+    headers:
+      etag:
+        description: |-
+          The ETag HTTP header is an identifier for a specific version of a resource
+
+          in:header
+        format: etag
+        type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
+    schema:
+      $ref: '#/definitions/ResourceType'
+  ResourceTypesResponse:
+    description: SCIMv2 ResourceTypes
+    headers:
+      etag:
+        description: |-
+          The ETag HTTP header is an identifier for a specific version of a resource
+
+          in:header
+        format: etag
+        type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
+    schema:
+      $ref: '#/definitions/ResourceTypes'
+  SCIMv2SchemaResponse:
+    description: SCIMv2 SCIMv2SchemaResponse
+    headers:
+      etag:
+        description: |-
+          The ETag HTTP header is an identifier for a specific version of a resource
+
+          in:header
+        format: etag
+        type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
+    schema:
+      $ref: '#/definitions/SCIMv2Schema'
+  SCIMv2SchemasResponse:
+    description: SCIMv2 SCIMv2SchemasResponse
+    headers:
+      etag:
+        description: |-
+          The ETag HTTP header is an identifier for a specific version of a resource
+
+          in:header
+        format: etag
+        type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
+    schema:
+      $ref: '#/definitions/SCIMv2Schemas'
+  SCIMv2UsersResponse:
+    description: SCIMv2 Users
+    schema:
+      $ref: '#/definitions/ListUsersResponse'
   SchemaResponse:
     description: Identity Schema
     headers:
@@ -5741,6 +7475,18 @@ responses:
 
           in:header
         format: etag
+        type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
         type: string
     schema:
       $ref: '#/definitions/Schema'
@@ -5754,6 +7500,18 @@ responses:
           in:header
         format: etag
         type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
     schema:
       $ref: '#/definitions/Schemas'
   SelfSendActivationMessageResponse:
@@ -5766,6 +7524,42 @@ responses:
           in:header
         format: etag
         type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
+  ServiceProviderConfigResponse:
+    description: SCIMv2 ServiceProviderConfig
+    headers:
+      etag:
+        description: |-
+          The ETag HTTP header is an identifier for a specific version of a resource
+
+          in:header
+        format: etag
+        type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
+    schema:
+      $ref: '#/definitions/ServiceProviderConfig'
   SystemAddressResponse:
     description: Address
     headers:
@@ -5775,6 +7569,18 @@ responses:
 
           in:header
         format: etag
+        type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
         type: string
     schema:
       $ref: '#/definitions/UserVerifiableAddress'
@@ -5788,6 +7594,18 @@ responses:
           in:header
         format: etag
         type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
   SystemIdentifierResponse:
     description: Identifier
     headers:
@@ -5798,8 +7616,44 @@ responses:
           in:header
         format: etag
         type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
     schema:
       $ref: '#/definitions/UserIdentifier'
+  SystemSCIMv2UserResponse:
+    description: SCIMv2 User
+    headers:
+      etag:
+        description: |-
+          The ETag HTTP header is an identifier for a specific version of a resource
+
+          in:header
+        format: etag
+        type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
+    schema:
+      $ref: '#/definitions/UserGetResponse'
   SystemUserResponse:
     description: User
     headers:
@@ -5809,6 +7663,18 @@ responses:
 
           in:header
         format: etag
+        type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
         type: string
     schema:
       $ref: '#/definitions/UserWithData'
@@ -5826,6 +7692,18 @@ responses:
           in:header
         format: etag
         type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
     schema:
       $ref: '#/definitions/UserID'
   UserPoolsResponse:
@@ -5837,6 +7715,18 @@ responses:
 
           in:header
         format: etag
+        type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
         type: string
     schema:
       $ref: '#/definitions/UserPools'
@@ -5864,14 +7754,26 @@ responses:
     description: Bad request
     schema:
       $ref: '#/definitions/Error'
+  badRequestSCIMv2HTTPError:
+    description: Bad request
+    schema:
+      $ref: '#/definitions/SCIMv2ErrorResponse'
   conflictHTTPError:
     description: Conflict
     schema:
       $ref: '#/definitions/Error'
+  conflictSCIMv2HTTPError:
+    description: Conflict
+    schema:
+      $ref: '#/definitions/SCIMv2ErrorResponse'
   forbiddenHTTPError:
     description: Forbidden
     schema:
       $ref: '#/definitions/Error'
+  forbiddenSCIMv2HTTPError:
+    description: Forbidden
+    schema:
+      $ref: '#/definitions/SCIMv2ErrorResponse'
   internalServerErrorHTTPError:
     description: Internal server error
     schema:
@@ -5884,10 +7786,18 @@ responses:
     description: Not found
     schema:
       $ref: '#/definitions/Error'
+  notFoundSCIMv2HTTPError:
+    description: Not found
+    schema:
+      $ref: '#/definitions/SCIMv2ErrorResponse'
   payloadTooLargeHTTPError:
     description: Payload too large
     schema:
       $ref: '#/definitions/Error'
+  payloadTooLargeSCIMv2HTTPError:
+    description: Payload too large
+    schema:
+      $ref: '#/definitions/SCIMv2ErrorResponse'
   preconditionFailedHTTPError:
     description: Precondition failed
     schema:
@@ -5896,20 +7806,32 @@ responses:
     description: Too many requests
     schema:
       $ref: '#/definitions/Error'
+  tooManyRequestsSCIMv2HTTPError:
+    description: Too many requests
+    schema:
+      $ref: '#/definitions/SCIMv2ErrorResponse'
   unauthorizedHTTPError:
     description: Unauthorized
     schema:
       $ref: '#/definitions/Error'
+  unauthorizedSCIMv2HTTPError:
+    description: Unauthorized
+    schema:
+      $ref: '#/definitions/SCIMv2ErrorResponse'
   unprocessableEntityHTTPError:
     description: Unprocessable entity
     schema:
       $ref: '#/definitions/Error'
+  unprocessableEntitySCIMv2HTTPError:
+    description: Unprocessable entity
+    schema:
+      $ref: '#/definitions/SCIMv2ErrorResponse'
 schemes:
 - https
 securityDefinitions:
   system:
     authorizationUrl: /default/system/oauth2/authorize
-    flow: accessCode
+    flow: application
     scopes:
       identity: identity
       identity_self_registration: identity_self_registration

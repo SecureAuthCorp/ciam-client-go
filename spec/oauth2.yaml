@@ -1509,6 +1509,14 @@ definitions:
           type: string
         type: array
         x-nullable: false
+      authorization_details:
+        description: Granted authorization details
+        items:
+          additionalProperties:
+            type: object
+          type: object
+        type: array
+        x-nullable: false
       client_id:
         description: |-
           A client application identifier for the OAuth 2.0 client that
@@ -2922,6 +2930,14 @@ paths:
         in: header
         name: if-match
         type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
       - in: formData
         name: grant_type
         required: true
@@ -3276,6 +3292,18 @@ responses:
 
           in:header
         format: etag
+        type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
         type: string
     schema:
       $ref: '#/definitions/TokenResponse'
