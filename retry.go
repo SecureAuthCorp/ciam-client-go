@@ -32,15 +32,15 @@ func (t *Authenticator) RoundTrip(req *http.Request) (res *http.Response, err er
 	if res, err = t.transport.Do(req); err != nil {
 		return res, err
 	} else if res.StatusCode == http.StatusUnauthorized || res.StatusCode == http.StatusForbidden {
-		t.renew()
+		t.renew(req.Context())
 		return t.transport.Do(req)
 	}
 
 	return res, nil
 }
 
-func (t *Authenticator) renew() {
+func (t *Authenticator) renew(ctx context.Context) {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
-	t.transport = t.config.Client(context.WithValue(context.Background(), oauth2.HTTPClient, t.client))
+	t.transport = t.config.Client(context.WithValue(ctx, oauth2.HTTPClient, t.client))
 }
