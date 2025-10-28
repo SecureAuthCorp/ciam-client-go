@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"sync"
@@ -36,40 +37,47 @@ func NewAuthenticator(config clientcredentials.Config, client *http.Client) *htt
 	}
 }
 
-func (t *Authenticator) RoundTrip(req *http.Request) (res *http.Response, err error) {
+func (t *Authenticator) RoundTrip(req *http.Request) (*http.Response, error) {
+	// Store buffer outside the if scope so it's available for retry
+	var reqBuf bytes.Buffer
 
+	// Clone body using TeeReader for potential retry
 	if req.Body != nil {
-		var (
-			reqBuf bytes.Buffer
-			reqReader = io.TeeReader(req.Body, &reqBuf)
-		)
-	
+		reqReader := io.TeeReader(req.Body, &reqBuf)
 		defer req.Body.Close()
 		req.Body = io.NopCloser(reqReader)
 	}
-	
-	if res, err = t.transport.Do(req); err != nil {
-		return res, err
-	} 
 
+	// First attempt
+	res, err := t.transport.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("request failed: %w", err)
+	}
+
+	// Check if we need token renewal
 	if res.StatusCode == http.StatusUnauthorized && res.Body != nil {
 		var (
-			resBuf bytes.Buffer
+			resBuf    bytes.Buffer
 			resReader = io.TeeReader(res.Body, &resBuf)
-			decoder = json.NewDecoder(resReader)
-			merr = &models.Error{}
+			decoder   = json.NewDecoder(resReader)
+			merr      = models.Error{}
 		)
 
 		defer res.Body.Close()
 		res.Body = io.NopCloser(&resBuf)
 
-		if err = decoder.Decode(merr); err != nil {
-			return res, err
+		if err = decoder.Decode(&merr); err != nil {
+			return nil, fmt.Errorf("failed to parse error response: %w", err)
 		}
 
 		if merr.ErrorCode == ErrorInvalidAccessToken {
 			t.renew(req.Context())
-			return t.transport.Do(req)	
+
+			if req.Body != nil {
+				req.Body = io.NopCloser(&reqBuf)
+			}
+
+			return t.transport.Do(req)
 		}
 	}
 
@@ -79,5 +87,5 @@ func (t *Authenticator) RoundTrip(req *http.Request) (res *http.Response, err er
 func (t *Authenticator) renew(ctx context.Context) {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
-	t.transport = t.config.Client(ctx, oauth2.HTTPClient, t.client))
+	t.transport = t.config.Client(context.WithValue(ctx, oauth2.HTTPClient, t.client))
 }
