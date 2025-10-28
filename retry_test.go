@@ -59,9 +59,6 @@ func TestAuthenticatorRoundTrip_Success(t *testing.T) {
 }
 
 func TestAuthenticatorRoundTrip_UnauthorizedWithInvalidToken(t *testing.T) {
-	// Prepare error response body
-	// No need to prepare body, handled in sequenceTransport
-
 	seqTransport := &mocks.MockAuthTransport{}
 	client := &http.Client{Transport: seqTransport}
 	authClient := acpclient.NewAuthenticator(ccConfig, client)
