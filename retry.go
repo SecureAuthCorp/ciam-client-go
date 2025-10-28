@@ -77,5 +77,7 @@ func (t *Authenticator) RoundTrip(req *http.Request) (res *http.Response, err er
 }
 
 func (t *Authenticator) renew(ctx context.Context) {
-	t.transport = t.config.Client(context.WithValue(ctx, oauth2.HTTPClient, t.client))
+	t.mutex.Lock()
+	defer t.mutex.Unlock()
+	t.transport = t.config.Client(ctx, oauth2.HTTPClient, t.client))
 }
