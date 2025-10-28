@@ -49,6 +49,12 @@ func (t *Authenticator) RoundTrip(req *http.Request) (*http.Response, error) {
 
 	// First attempt
 	res, err := t.transport.Do(req)
+
+	// Restore request body
+	if req.Body != nil {
+		req.Body = io.NopCloser(&reqBuf)
+	}
+
 	if err != nil {
 		return nil, fmt.Errorf("request failed: %w", err)
 	}
@@ -63,18 +69,16 @@ func (t *Authenticator) RoundTrip(req *http.Request) (*http.Response, error) {
 		)
 
 		defer res.Body.Close()
-		res.Body = io.NopCloser(&resBuf)
 
 		if err = decoder.Decode(&merr); err != nil {
 			return nil, fmt.Errorf("failed to parse error response: %w", err)
 		}
 
+		// Restore response body
+		res.Body = io.NopCloser(&resBuf)
+
 		if merr.ErrorCode == ErrorInvalidAccessToken {
 			t.renew(req.Context())
-
-			if req.Body != nil {
-				req.Body = io.NopCloser(&reqBuf)
-			}
 
 			return t.transport.Do(req)
 		}
