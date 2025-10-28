@@ -38,7 +38,6 @@ func NewAuthenticator(config clientcredentials.Config, client *http.Client) *htt
 }
 
 func (t *Authenticator) RoundTrip(req *http.Request) (*http.Response, error) {
-	// Store buffer outside the if scope so it's available for retry
 	var reqBuf bytes.Buffer
 
 	// Clone body using TeeReader for potential retry
