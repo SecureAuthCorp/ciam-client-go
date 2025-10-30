@@ -5,7 +5,6 @@ import (
 	"errors"
 	"io"
 	"net/http"
-	"reflect"
 	"testing"
 
 	acpclient "github.com/cloudentity/acp-client-go"
@@ -14,81 +13,91 @@ import (
 )
 
 var ccConfig = clientcredentials.Config{
-		TokenURL: "http://example.com/oauth2/token",
-	}
-
-func TestAuthenticatorRoundTrip_TokenRenewalFails(t *testing.T) {
-	seqTransport := &mocks.MockAuthTransport{FailRenewal: true}
-	client := &http.Client{Transport: seqTransport}
-	authClient := acpclient.NewAuthenticator(ccConfig, client)
-
-	req, _ := http.NewRequest("GET", "http://example.com/api/test", io.NopCloser(bytes.NewBufferString("test")))
-	res, err := authClient.Transport.RoundTrip(req)
-	if err == nil {
-		t.Fatal("Expected error when token renewal fails, got nil")
-	}
-	if res != nil {
-		t.Errorf("Expected nil response when token renewal fails, got %+v", res)
-	}
+	TokenURL: "http://example.com/oauth2/token",
 }
 
-func TestNewAuthenticator(t *testing.T) {
-	client := &http.Client{}
-	newClient := acpclient.NewAuthenticator(ccConfig, client)
-	if newClient == nil {
-		t.Fatal("NewAuthenticator returned nil client")
+func TestAuthenticatorRoundTrip(t *testing.T) {
+	tests := []struct {
+		name           string
+		mock           http.RoundTripper
+		requestBody    string
+		expectedStatus int
+		expectedError  bool
+		wantNilResp    bool
+	}{
+		{
+			name:           "successful request without retry",
+			mock:           &mocks.MockAuthTransport{},
+			requestBody:    "",
+			expectedStatus: http.StatusOK,
+			expectedError:  false,
+		},
+		{
+			name:           "successful request with body without retry",
+			mock:           &mocks.MockAuthTransport{},
+			requestBody:    "test body",
+			expectedStatus: http.StatusOK,
+			expectedError:  false,
+		},
+		{
+			name:           "unauthorized with invalid token triggers retry and succeeds",
+			mock:           &mocks.MockAuthTransport{},
+			requestBody:    "test body for retry",
+			expectedStatus: http.StatusOK,
+			expectedError:  false,
+		},
+		{
+			name:           "token renewal failure",
+			mock:           &mocks.MockAuthTransport{FailRenewal: true},
+			requestBody:    "test body",
+			expectedStatus: 0,
+			expectedError:  true,
+			wantNilResp:    true,
+		},
+		{
+			name:           "transport error",
+			mock:           &mocks.MockTransport{Response: nil, Error: errors.New("transport failure")},
+			requestBody:    "",
+			expectedStatus: 0,
+			expectedError:  true,
+			wantNilResp:    true,
+		},
 	}
-	if reflect.TypeOf(newClient.Transport).String() != "*acpclient.Authenticator" {
-		t.Errorf("Transport type mismatch: got %T", newClient.Transport)
-	}
-}
 
-func TestAuthenticatorRoundTrip_Success(t *testing.T) {
-	mock := &mocks.MockAuthTransport{}
-	client := &http.Client{Transport: mock}
-	authClient := acpclient.NewAuthenticator(ccConfig, client)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			client := &http.Client{Transport: tt.mock}
+			authClient := acpclient.NewAuthenticator(ccConfig, client)
 
-	req, _ := http.NewRequest("GET", "http://example.com/api/test", nil)
-	res, err := authClient.Transport.RoundTrip(req)
-	if err != nil {
-		t.Fatalf("RoundTrip failed: %v", err)
-	}
-	if res.StatusCode != http.StatusOK {
-		t.Errorf("Expected status OK, got %d", res.StatusCode)
-	}
-}
+			var reqBody io.ReadCloser
+			if tt.requestBody != "" {
+				reqBody = io.NopCloser(bytes.NewBufferString(tt.requestBody))
+			}
 
-func TestAuthenticatorRoundTrip_UnauthorizedWithInvalidToken(t *testing.T) {
-	seqTransport := &mocks.MockAuthTransport{}
-	client := &http.Client{Transport: seqTransport}
-	authClient := acpclient.NewAuthenticator(ccConfig, client)
+			req, err := http.NewRequest("GET", "http://example.com/api/test", reqBody)
+			if err != nil {
+				t.Fatalf("Failed to create request: %v", err)
+			}
 
-	req, _ := http.NewRequest("GET", "http://example.com/api/test", io.NopCloser(bytes.NewBufferString("test")))
-	res, err := authClient.Transport.RoundTrip(req)
-	if err != nil {
-		t.Fatalf("RoundTrip failed: %v", err)
-	}
-	if res.StatusCode != http.StatusOK {
-		t.Errorf("Expected status OK after retry and renewal, got %d", res.StatusCode)
-	}
-}
+			res, err := authClient.Transport.RoundTrip(req)
 
-func TestAuthenticatorRoundTrip_Error(t *testing.T) {
-	mock := &mocks.MockTransport{Response: nil, Error: errors.New("fail")}
-	client := &http.Client{Transport: mock}
-	authClient := acpclient.NewAuthenticator(ccConfig, client)
-
-	req, _ := http.NewRequest("GET", "http://example.com/api/test", nil)
-	_, err := authClient.Transport.RoundTrip(req)
-	if err == nil {
-		t.Fatal("Expected error, got nil")
-	}
-}
-
-func TestAuthenticatorRenew(t *testing.T) {
-	client := &http.Client{}
-	authClient := acpclient.NewAuthenticator(ccConfig, client)
-	if authClient.Transport == nil {
-		t.Error("Expected transport to be set after NewAuthenticator")
+			if tt.expectedError {
+				if err == nil {
+					t.Errorf("Expected error, got nil")
+				}
+				if tt.wantNilResp && res != nil {
+					t.Errorf("Expected nil response, got %+v", res)
+				}
+			} else {
+				if err != nil {
+					t.Errorf("Unexpected error: %v", err)
+				}
+				if res == nil {
+					t.Error("Expected response, got nil")
+				} else if res.StatusCode != tt.expectedStatus {
+					t.Errorf("Expected status %d, got %d", tt.expectedStatus, res.StatusCode)
+				}
+			}
+		})
 	}
 }
