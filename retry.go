@@ -64,14 +64,14 @@ func (t *Authenticator) RoundTrip(req *http.Request) (*http.Response, error) {
 			req2.Body = io.NopCloser(&reqBuf)
 		}
 
-		// init next request which will start by minting a new refresh token
+		// init next request which will start by minting a new token
 		return t.transport.Do(req2)
 	}
 
 	return res, nil
 }
 
-// init new client to clear token cache and enforce refresh
+// init new client to clear token cache and enforce minting a new token
 // use singleflight to avoid concurrent renewals
 func (t *Authenticator) renew(ctx context.Context) {
 		_, _, _ = t.renewers.Do("renew", func() (interface{}, error) {
