@@ -38,7 +38,12 @@ func NewAuthenticator(config clientcredentials.Config, client *http.Client) *htt
 }
 
 func (t *Authenticator) RoundTrip(req *http.Request) (*http.Response, error) {
-	var reqBuf bytes.Buffer
+	var 
+	(
+		reqBuf bytes.Buffer
+		res    *http.Response
+		err		 error
+	)
 
 	// Clone body using TeeReader for potential retry
 	if req.Body != nil {
@@ -48,15 +53,20 @@ func (t *Authenticator) RoundTrip(req *http.Request) (*http.Response, error) {
 	}
 
 	// First attempt
-	res, err := t.transport.Do(req)
+	res, err = t.transport.Do(req)
 
 	if err != nil {
 		return nil, fmt.Errorf("request failed: %w", err)
 	}
 
 	// Check if we need token renewal
-	if t.shouldGetNewTokenAndRetry(res) {
-		t.renew(req.Context())
+	if ok, err := t.shouldGetNewTokenAndRetry(res); err != nil {
+		return nil, err
+	} else if ok {
+
+		if err := t.renew(req.Context()); err != nil {
+			return nil, fmt.Errorf("failed to renew token: %w", err)
+		}
 
 		req2 := req.Clone(req.Context())
 		// Restore request body
@@ -73,15 +83,15 @@ func (t *Authenticator) RoundTrip(req *http.Request) (*http.Response, error) {
 
 // init new client to clear token cache and enforce minting a new token
 // use singleflight to avoid concurrent renewals
-func (t *Authenticator) renew(ctx context.Context) {
-		_, _, _ = t.renewers.Do("renew", func() (interface{}, error) {
-			t.transport = t.config.Client(context.WithValue(ctx, oauth2.HTTPClient, t.client))
-
-			return nil, nil
-		})
+func (t *Authenticator) renew(ctx context.Context) error {
+	_, err, _ := t.renewers.Do("renew", func() (interface{}, error) {
+		t.transport = t.config.Client(context.WithValue(ctx, oauth2.HTTPClient, t.client))
+		return nil, nil
+	})
+	return err
 }
 
-func (t *Authenticator) shouldGetNewTokenAndRetry(res *http.Response) bool {
+func (t *Authenticator) shouldGetNewTokenAndRetry(res *http.Response) (bool, error) {
 	if res.StatusCode == http.StatusUnauthorized && res.Body != nil {
 		var (
 			resBuf    bytes.Buffer
@@ -91,18 +101,15 @@ func (t *Authenticator) shouldGetNewTokenAndRetry(res *http.Response) bool {
 			err       error
 		)
 
-		defer res.Body.Close()
-
 		// Restore response body
 		res.Body = io.NopCloser(&resBuf)
 
 		if err = decoder.Decode(&merr); err != nil {
-			// not propagating error as the payload may contain a logical error with a different format
-			return false
+			return false, err
 		}
 
-		return merr.ErrorCode == ErrorInvalidAccessToken
+		return merr.ErrorCode == ErrorInvalidAccessToken, nil
 	}
 
-	return false
+	return false, nil
 }
