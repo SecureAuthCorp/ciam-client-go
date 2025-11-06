@@ -60,6 +60,9 @@ type AuditEventMetadata struct {
 	// ID of the Group in Identity Pool
 	GroupID string `json:"group_id,omitempty" yaml:"group_id,omitempty"`
 
+	// High risk
+	HighRisk bool `json:"high_risk,omitempty" yaml:"high_risk,omitempty"`
+
 	// ID of the Identity Pool
 	IdentityPoolID string `json:"identity_pool_id,omitempty" yaml:"identity_pool_id,omitempty"`
 
@@ -122,6 +125,9 @@ type AuditEventMetadata struct {
 	//
 	// Signature of a token that was used to perform an action that has published an audit event.
 	TokenSignature string `json:"token_signature,omitempty" yaml:"token_signature,omitempty"`
+
+	// ID of the top-level parent organization for organization workspaces
+	TopLevelParentID string `json:"top_level_parent_id,omitempty" yaml:"top_level_parent_id,omitempty"`
 
 	// Trace ID
 	TraceID string `json:"trace_id,omitempty" yaml:"trace_id,omitempty"`

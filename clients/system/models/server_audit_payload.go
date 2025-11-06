@@ -230,13 +230,16 @@ type ServerAuditPayload struct {
 	// Optional ID of a parent server
 	ParentID string `json:"parent_id,omitempty" yaml:"parent_id,omitempty"`
 
+	// preferences
+	Preferences *ServerPreferences `json:"preferences,omitempty" yaml:"preferences,omitempty"`
+
 	// The profile of a server
 	//
 	// ACP is delivered with preconfigured workspace templates that enable quick and easy setup for
 	// specific configuration patterns. For example, you can instantly create an Open Banking
 	// compliant workspace that has all of the required mechanisms and settings already in place.
 	// Example: default
-	// Enum: ["default","demo","workforce","workforce_v2","consumer","partners","third_party","fapi_advanced","fapi_rw","fapi_ro","openbanking_uk_fapi_advanced","openbanking_uk","openbanking_br","openbanking_br_unico","cdr_australia","cdr_australia_fapi_rw","fdx","openbanking_ksa","fapi_20_security","fapi_20_message_signing","connect_id"]
+	// Enum: ["default","demo","workforce","workforce_v2","consumer","partners","third_party","fapi_advanced","fapi_rw","fapi_ro","openbanking_uk_fapi_advanced","openbanking_uk","openbanking_br","openbanking_br_unico","cdr_australia","cdr_australia_fapi_rw","fdx","openbanking_ksa","fapi_20_security","fapi_20_message_signing","connect_id","agentic_ai"]
 	Profile string `json:"profile,omitempty" yaml:"profile,omitempty"`
 
 	// Custom pushed authentication request TTL
@@ -422,6 +425,10 @@ func (m *ServerAuditPayload) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validatePreferences(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateProfile(formats); err != nil {
 		res = append(res, err)
 	}
@@ -592,7 +599,7 @@ var serverAuditPayloadAuthenticationMechanismsItemsEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["totp","password","otp","email_otp","sms_otp","webauthn"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["totp","password","otp","email_otp","sms_otp","webauthn","push"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -931,11 +938,30 @@ func (m *ServerAuditPayload) validateOrganization(formats strfmt.Registry) error
 	return nil
 }
 
+func (m *ServerAuditPayload) validatePreferences(formats strfmt.Registry) error {
+	if swag.IsZero(m.Preferences) { // not required
+		return nil
+	}
+
+	if m.Preferences != nil {
+		if err := m.Preferences.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("preferences")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("preferences")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
 var serverAuditPayloadTypeProfilePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["default","demo","workforce","workforce_v2","consumer","partners","third_party","fapi_advanced","fapi_rw","fapi_ro","openbanking_uk_fapi_advanced","openbanking_uk","openbanking_br","openbanking_br_unico","cdr_australia","cdr_australia_fapi_rw","fdx","openbanking_ksa","fapi_20_security","fapi_20_message_signing","connect_id"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["default","demo","workforce","workforce_v2","consumer","partners","third_party","fapi_advanced","fapi_rw","fapi_ro","openbanking_uk_fapi_advanced","openbanking_uk","openbanking_br","openbanking_br_unico","cdr_australia","cdr_australia_fapi_rw","fdx","openbanking_ksa","fapi_20_security","fapi_20_message_signing","connect_id","agentic_ai"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -1007,6 +1033,9 @@ const (
 
 	// ServerAuditPayloadProfileConnectID captures enum value "connect_id"
 	ServerAuditPayloadProfileConnectID string = "connect_id"
+
+	// ServerAuditPayloadProfileAgenticAi captures enum value "agentic_ai"
+	ServerAuditPayloadProfileAgenticAi string = "agentic_ai"
 )
 
 // prop value enum
@@ -1471,6 +1500,10 @@ func (m *ServerAuditPayload) ContextValidate(ctx context.Context, formats strfmt
 		res = append(res, err)
 	}
 
+	if err := m.contextValidatePreferences(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.contextValidateResponseTypes(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -1753,6 +1786,27 @@ func (m *ServerAuditPayload) contextValidateOrganization(ctx context.Context, fo
 				return ve.ValidateName("organization")
 			} else if ce, ok := err.(*errors.CompositeError); ok {
 				return ce.ValidateName("organization")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *ServerAuditPayload) contextValidatePreferences(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Preferences != nil {
+
+		if swag.IsZero(m.Preferences) { // not required
+			return nil
+		}
+
+		if err := m.Preferences.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("preferences")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("preferences")
 			}
 			return err
 		}

@@ -124,6 +124,13 @@ type ListAuditEventsParams struct {
 	*/
 	GroupID *string
 
+	/* HighRisk.
+
+	     optional list audit events with high risk
+	IP
+	*/
+	HighRisk *string
+
 	/* IdpID.
 
 	     optional list audit events with a given IDP id
@@ -182,6 +189,13 @@ type ListAuditEventsParams struct {
 	   optional organization id
 	*/
 	OrganizationID *string
+
+	/* Result.
+
+	     optional list audit events with a given result (success/failure)
+	IP
+	*/
+	Result *string
 
 	/* SessionID.
 
@@ -245,6 +259,18 @@ type ListAuditEventsParams struct {
 	   Default: "admin"
 	*/
 	Wid string
+
+	/* XCorrelationID.
+
+	   Unique identifier included in audit events for request tracking
+	*/
+	XCorrelationID *string
+
+	/* XIdempotencyKey.
+
+	   Key used to safely retry failed requests without duplicate processing
+	*/
+	XIdempotencyKey *string
 
 	timeout    time.Duration
 	Context    context.Context
@@ -412,6 +438,17 @@ func (o *ListAuditEventsParams) SetGroupID(groupID *string) {
 	o.GroupID = groupID
 }
 
+// WithHighRisk adds the highRisk to the list audit events params
+func (o *ListAuditEventsParams) WithHighRisk(highRisk *string) *ListAuditEventsParams {
+	o.SetHighRisk(highRisk)
+	return o
+}
+
+// SetHighRisk adds the highRisk to the list audit events params
+func (o *ListAuditEventsParams) SetHighRisk(highRisk *string) {
+	o.HighRisk = highRisk
+}
+
 // WithIdpID adds the idpID to the list audit events params
 func (o *ListAuditEventsParams) WithIdpID(idpID *string) *ListAuditEventsParams {
 	o.SetIdpID(idpID)
@@ -500,6 +537,17 @@ func (o *ListAuditEventsParams) SetOrganizationID(organizationID *string) {
 	o.OrganizationID = organizationID
 }
 
+// WithResult adds the result to the list audit events params
+func (o *ListAuditEventsParams) WithResult(result *string) *ListAuditEventsParams {
+	o.SetResult(result)
+	return o
+}
+
+// SetResult adds the result to the list audit events params
+func (o *ListAuditEventsParams) SetResult(result *string) {
+	o.Result = result
+}
+
 // WithSessionID adds the sessionID to the list audit events params
 func (o *ListAuditEventsParams) WithSessionID(sessionID *string) *ListAuditEventsParams {
 	o.SetSessionID(sessionID)
@@ -586,6 +634,28 @@ func (o *ListAuditEventsParams) WithWid(wid string) *ListAuditEventsParams {
 // SetWid adds the wid to the list audit events params
 func (o *ListAuditEventsParams) SetWid(wid string) {
 	o.Wid = wid
+}
+
+// WithXCorrelationID adds the xCorrelationID to the list audit events params
+func (o *ListAuditEventsParams) WithXCorrelationID(xCorrelationID *string) *ListAuditEventsParams {
+	o.SetXCorrelationID(xCorrelationID)
+	return o
+}
+
+// SetXCorrelationID adds the xCorrelationId to the list audit events params
+func (o *ListAuditEventsParams) SetXCorrelationID(xCorrelationID *string) {
+	o.XCorrelationID = xCorrelationID
+}
+
+// WithXIdempotencyKey adds the xIdempotencyKey to the list audit events params
+func (o *ListAuditEventsParams) WithXIdempotencyKey(xIdempotencyKey *string) *ListAuditEventsParams {
+	o.SetXIdempotencyKey(xIdempotencyKey)
+	return o
+}
+
+// SetXIdempotencyKey adds the xIdempotencyKey to the list audit events params
+func (o *ListAuditEventsParams) SetXIdempotencyKey(xIdempotencyKey *string) {
+	o.XIdempotencyKey = xIdempotencyKey
 }
 
 // WriteToRequest writes these params to a swagger request
@@ -737,6 +807,23 @@ func (o *ListAuditEventsParams) WriteToRequest(r runtime.ClientRequest, reg strf
 		}
 	}
 
+	if o.HighRisk != nil {
+
+		// query param high_risk
+		var qrHighRisk string
+
+		if o.HighRisk != nil {
+			qrHighRisk = *o.HighRisk
+		}
+		qHighRisk := qrHighRisk
+		if qHighRisk != "" {
+
+			if err := r.SetQueryParam("high_risk", qHighRisk); err != nil {
+				return err
+			}
+		}
+	}
+
 	if o.IdpID != nil {
 
 		// query param idp_id
@@ -864,6 +951,23 @@ func (o *ListAuditEventsParams) WriteToRequest(r runtime.ClientRequest, reg strf
 		}
 	}
 
+	if o.Result != nil {
+
+		// query param result
+		var qrResult string
+
+		if o.Result != nil {
+			qrResult = *o.Result
+		}
+		qResult := qrResult
+		if qResult != "" {
+
+			if err := r.SetQueryParam("result", qResult); err != nil {
+				return err
+			}
+		}
+	}
+
 	if o.SessionID != nil {
 
 		// query param session_id
@@ -986,6 +1090,22 @@ func (o *ListAuditEventsParams) WriteToRequest(r runtime.ClientRequest, reg strf
 	// path param wid
 	if err := r.SetPathParam("wid", o.Wid); err != nil {
 		return err
+	}
+
+	if o.XCorrelationID != nil {
+
+		// header param x-correlation-id
+		if err := r.SetHeaderParam("x-correlation-id", *o.XCorrelationID); err != nil {
+			return err
+		}
+	}
+
+	if o.XIdempotencyKey != nil {
+
+		// header param x-idempotency-key
+		if err := r.SetHeaderParam("x-idempotency-key", *o.XIdempotencyKey); err != nil {
+			return err
+		}
 	}
 
 	if len(res) > 0 {

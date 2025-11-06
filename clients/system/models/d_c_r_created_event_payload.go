@@ -27,7 +27,7 @@ type DCRCreatedEventPayload struct {
 	// The visitor's country
 	CountryCode string `json:"country_code,omitempty" yaml:"country_code,omitempty"`
 
-	// Arculix DBFP `jwt` cookie.
+	// DBFP `jwt` cookie.
 	Dbfp string `json:"dbfp,omitempty" yaml:"dbfp,omitempty"`
 
 	// The visitor's latitude

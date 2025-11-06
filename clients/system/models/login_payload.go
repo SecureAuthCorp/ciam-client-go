@@ -23,6 +23,12 @@ type LoginPayload struct {
 
 	// idp
 	Idp *IDPPayload `json:"idp,omitempty" yaml:"idp,omitempty"`
+
+	// idp input
+	IdpInput *IDPDebugInput `json:"idp_input,omitempty" yaml:"idp_input,omitempty"`
+
+	// idp mapping details
+	IdpMappingDetails MappingDetails `json:"idp_mapping_details,omitempty" yaml:"idp_mapping_details,omitempty"`
 }
 
 // Validate validates this login payload
@@ -30,6 +36,14 @@ func (m *LoginPayload) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateIdp(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateIdpInput(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateIdpMappingDetails(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -58,11 +72,55 @@ func (m *LoginPayload) validateIdp(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *LoginPayload) validateIdpInput(formats strfmt.Registry) error {
+	if swag.IsZero(m.IdpInput) { // not required
+		return nil
+	}
+
+	if m.IdpInput != nil {
+		if err := m.IdpInput.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("idp_input")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("idp_input")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *LoginPayload) validateIdpMappingDetails(formats strfmt.Registry) error {
+	if swag.IsZero(m.IdpMappingDetails) { // not required
+		return nil
+	}
+
+	if err := m.IdpMappingDetails.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("idp_mapping_details")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("idp_mapping_details")
+		}
+		return err
+	}
+
+	return nil
+}
+
 // ContextValidate validate this login payload based on the context it is used
 func (m *LoginPayload) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.contextValidateIdp(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateIdpInput(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateIdpMappingDetails(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -88,6 +146,41 @@ func (m *LoginPayload) contextValidateIdp(ctx context.Context, formats strfmt.Re
 			}
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (m *LoginPayload) contextValidateIdpInput(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.IdpInput != nil {
+
+		if swag.IsZero(m.IdpInput) { // not required
+			return nil
+		}
+
+		if err := m.IdpInput.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("idp_input")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("idp_input")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *LoginPayload) contextValidateIdpMappingDetails(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := m.IdpMappingDetails.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("idp_mapping_details")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("idp_mapping_details")
+		}
+		return err
 	}
 
 	return nil

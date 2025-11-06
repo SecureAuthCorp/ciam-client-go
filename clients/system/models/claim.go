@@ -34,6 +34,9 @@ type Claim struct {
 	// Example: email
 	Mapping string `json:"mapping,omitempty" yaml:"mapping,omitempty"`
 
+	// metadata
+	Metadata *ClaimMetadata `json:"metadata,omitempty" yaml:"metadata,omitempty"`
+
 	// claim name in outgoing id / access token
 	// Example: email
 	Name string `json:"name,omitempty" yaml:"name,omitempty"`
@@ -75,6 +78,10 @@ type Claim struct {
 func (m *Claim) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateMetadata(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateSourceType(formats); err != nil {
 		res = append(res, err)
 	}
@@ -86,6 +93,25 @@ func (m *Claim) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *Claim) validateMetadata(formats strfmt.Registry) error {
+	if swag.IsZero(m.Metadata) { // not required
+		return nil
+	}
+
+	if m.Metadata != nil {
+		if err := m.Metadata.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("metadata")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("metadata")
+			}
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -127,6 +153,10 @@ func (m *Claim) validateType(formats strfmt.Registry) error {
 func (m *Claim) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.contextValidateMetadata(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.contextValidateSourceType(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -138,6 +168,27 @@ func (m *Claim) ContextValidate(ctx context.Context, formats strfmt.Registry) er
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *Claim) contextValidateMetadata(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Metadata != nil {
+
+		if swag.IsZero(m.Metadata) { // not required
+			return nil
+		}
+
+		if err := m.Metadata.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("metadata")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("metadata")
+			}
+			return err
+		}
+	}
+
 	return nil
 }
 

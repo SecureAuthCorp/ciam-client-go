@@ -21,8 +21,16 @@ import (
 // swagger:model ClientAuditPayload
 type ClientAuditPayload struct {
 
+	// agent capability
+	AgentCapability AgentCapability `json:"agent_capability,omitempty" yaml:"agent_capability,omitempty"`
+
 	// Application URL
 	AppURL string `json:"app_url,omitempty" yaml:"app_url,omitempty"`
+
+	// Application purpose
+	// Example: signle_page
+	// Enum: ["single_page","server_web","mobile_desktop","service","legacy","custom","saml","ai_agent"]
+	ApplicationPurpose string `json:"application_purpose,omitempty" yaml:"application_purpose,omitempty"`
 
 	// The client application type.
 	//
@@ -202,7 +210,7 @@ type ClientAuditPayload struct {
 	//
 	// If empty, the `token_endpoint_auth_method` is used.
 	//
-	// Cloudentity supports the following client authentication methods:
+	// SecureAuth supports the following client authentication methods:
 	// `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
 	// `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 	//
@@ -214,7 +222,7 @@ type ClientAuditPayload struct {
 	// jwks
 	Jwks *ClientJWKs `json:"jwks,omitempty" yaml:"jwks,omitempty"`
 
-	// A URL of JSON Web Key Set with the public keys used by a client application to authenticate to Cloudentity.
+	// A URL of JSON Web Key Set with the public keys used by a client application to authenticate to SecureAuth.
 	JwksURI string `json:"jwks_uri,omitempty" yaml:"jwks_uri,omitempty"`
 
 	// Logo URI.
@@ -256,7 +264,7 @@ type ClientAuditPayload struct {
 
 	// Request object signing algorithm for the token endpoint
 	//
-	// Cloudentity supports signing tokens with the RS256, ES256, and PS256 algorithms. If you do not want
+	// SecureAuth supports signing tokens with the RS256, ES256, and PS256 algorithms. If you do not want
 	// to use a signing algorithm, set the value of this parameter to `none`.
 	// Example: none
 	// Enum: ["any","none","RS256","ES256","PS256"]
@@ -274,7 +282,7 @@ type ClientAuditPayload struct {
 	// A revocation endpoint authentication method configured for the client application (read-only).
 	// If empty, the `token_endpoint_auth_method` is used.
 	//
-	// Cloudentity supports the following client authentication methods:
+	// SecureAuth supports the following client authentication methods:
 	// `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
 	// `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 	//
@@ -363,7 +371,7 @@ type ClientAuditPayload struct {
 
 	// Token endpoint authentication method configured for a client application
 	//
-	// Cloudentity supports the following client authentication methods:
+	// SecureAuth supports the following client authentication methods:
 	// `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
 	// `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 	//
@@ -423,6 +431,14 @@ type ClientAuditPayload struct {
 // Validate validates this client audit payload
 func (m *ClientAuditPayload) Validate(formats strfmt.Registry) error {
 	var res []error
+
+	if err := m.validateAgentCapability(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateApplicationPurpose(formats); err != nil {
+		res = append(res, err)
+	}
 
 	if err := m.validateApplicationTypes(formats); err != nil {
 		res = append(res, err)
@@ -551,6 +567,83 @@ func (m *ClientAuditPayload) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *ClientAuditPayload) validateAgentCapability(formats strfmt.Registry) error {
+	if swag.IsZero(m.AgentCapability) { // not required
+		return nil
+	}
+
+	if err := m.AgentCapability.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("agent_capability")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("agent_capability")
+		}
+		return err
+	}
+
+	return nil
+}
+
+var clientAuditPayloadTypeApplicationPurposePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["single_page","server_web","mobile_desktop","service","legacy","custom","saml","ai_agent"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		clientAuditPayloadTypeApplicationPurposePropEnum = append(clientAuditPayloadTypeApplicationPurposePropEnum, v)
+	}
+}
+
+const (
+
+	// ClientAuditPayloadApplicationPurposeSinglePage captures enum value "single_page"
+	ClientAuditPayloadApplicationPurposeSinglePage string = "single_page"
+
+	// ClientAuditPayloadApplicationPurposeServerWeb captures enum value "server_web"
+	ClientAuditPayloadApplicationPurposeServerWeb string = "server_web"
+
+	// ClientAuditPayloadApplicationPurposeMobileDesktop captures enum value "mobile_desktop"
+	ClientAuditPayloadApplicationPurposeMobileDesktop string = "mobile_desktop"
+
+	// ClientAuditPayloadApplicationPurposeService captures enum value "service"
+	ClientAuditPayloadApplicationPurposeService string = "service"
+
+	// ClientAuditPayloadApplicationPurposeLegacy captures enum value "legacy"
+	ClientAuditPayloadApplicationPurposeLegacy string = "legacy"
+
+	// ClientAuditPayloadApplicationPurposeCustom captures enum value "custom"
+	ClientAuditPayloadApplicationPurposeCustom string = "custom"
+
+	// ClientAuditPayloadApplicationPurposeSaml captures enum value "saml"
+	ClientAuditPayloadApplicationPurposeSaml string = "saml"
+
+	// ClientAuditPayloadApplicationPurposeAiAgent captures enum value "ai_agent"
+	ClientAuditPayloadApplicationPurposeAiAgent string = "ai_agent"
+)
+
+// prop value enum
+func (m *ClientAuditPayload) validateApplicationPurposeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, clientAuditPayloadTypeApplicationPurposePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *ClientAuditPayload) validateApplicationPurpose(formats strfmt.Registry) error {
+	if swag.IsZero(m.ApplicationPurpose) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateApplicationPurposeEnum("application_purpose", "body", m.ApplicationPurpose); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -1562,6 +1655,10 @@ func (m *ClientAuditPayload) validateUserinfoSignedResponseAlg(formats strfmt.Re
 func (m *ClientAuditPayload) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.contextValidateAgentCapability(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.contextValidateApplicationTypes(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -1609,6 +1706,24 @@ func (m *ClientAuditPayload) ContextValidate(ctx context.Context, formats strfmt
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *ClientAuditPayload) contextValidateAgentCapability(ctx context.Context, formats strfmt.Registry) error {
+
+	if swag.IsZero(m.AgentCapability) { // not required
+		return nil
+	}
+
+	if err := m.AgentCapability.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("agent_capability")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("agent_capability")
+		}
+		return err
+	}
+
 	return nil
 }
 

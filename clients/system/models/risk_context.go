@@ -24,6 +24,9 @@ type RiskContext struct {
 	// dbfp fingerprint
 	DbfpFingerprint string `json:"dbfp_fingerprint,omitempty" yaml:"dbfp_fingerprint,omitempty"`
 
+	// high risk
+	HighRisk bool `json:"high_risk,omitempty" yaml:"high_risk,omitempty"`
+
 	// id
 	ID RiskID `json:"id,omitempty" yaml:"id,omitempty"`
 

@@ -30,6 +30,12 @@ type SAMLConfiguration struct {
 	// Organization URL
 	OrganizationURL string `json:"organization_url,omitempty" yaml:"organization_url,omitempty"`
 
+	// response binding mode
+	ResponseBindingMode SAMLResponseBindingMode `json:"response_binding_mode,omitempty" yaml:"response_binding_mode,omitempty"`
+
+	// service provider discovery mode
+	ServiceProviderDiscoveryMode ServiceProviderDiscoveryMode `json:"service_provider_discovery_mode,omitempty" yaml:"service_provider_discovery_mode,omitempty"`
+
 	// Allowed SAML Assertion signing hash algorithms.
 	// Example: ["sha-256"]
 	SigningHashAlgorithms []string `json:"signing_hash_algorithms" yaml:"signing_hash_algorithms"`
@@ -48,6 +54,14 @@ type SAMLConfiguration struct {
 func (m *SAMLConfiguration) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateResponseBindingMode(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateServiceProviderDiscoveryMode(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateSigningHashAlgorithms(formats); err != nil {
 		res = append(res, err)
 	}
@@ -59,6 +73,40 @@ func (m *SAMLConfiguration) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *SAMLConfiguration) validateResponseBindingMode(formats strfmt.Registry) error {
+	if swag.IsZero(m.ResponseBindingMode) { // not required
+		return nil
+	}
+
+	if err := m.ResponseBindingMode.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("response_binding_mode")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("response_binding_mode")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *SAMLConfiguration) validateServiceProviderDiscoveryMode(formats strfmt.Registry) error {
+	if swag.IsZero(m.ServiceProviderDiscoveryMode) { // not required
+		return nil
+	}
+
+	if err := m.ServiceProviderDiscoveryMode.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("service_provider_discovery_mode")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("service_provider_discovery_mode")
+		}
+		return err
+	}
+
 	return nil
 }
 
@@ -146,8 +194,57 @@ func (m *SAMLConfiguration) validateSubjectNameIDFormat(formats strfmt.Registry)
 	return nil
 }
 
-// ContextValidate validates this s a m l configuration based on context it is used
+// ContextValidate validate this s a m l configuration based on the context it is used
 func (m *SAMLConfiguration) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateResponseBindingMode(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateServiceProviderDiscoveryMode(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *SAMLConfiguration) contextValidateResponseBindingMode(ctx context.Context, formats strfmt.Registry) error {
+
+	if swag.IsZero(m.ResponseBindingMode) { // not required
+		return nil
+	}
+
+	if err := m.ResponseBindingMode.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("response_binding_mode")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("response_binding_mode")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *SAMLConfiguration) contextValidateServiceProviderDiscoveryMode(ctx context.Context, formats strfmt.Registry) error {
+
+	if swag.IsZero(m.ServiceProviderDiscoveryMode) { // not required
+		return nil
+	}
+
+	if err := m.ServiceProviderDiscoveryMode.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("service_provider_discovery_mode")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("service_provider_discovery_mode")
+		}
+		return err
+	}
+
 	return nil
 }
 

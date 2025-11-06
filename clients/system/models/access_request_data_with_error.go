@@ -48,7 +48,7 @@ type AccessRequestDataWithError struct {
 	// Stores information if the owner of the client application is a developer.
 	CreatedByDeveloper bool `json:"created_by_developer,omitempty" yaml:"created_by_developer,omitempty"`
 
-	// Arculix DBFP `jwt` cookie.
+	// DBFP `jwt` cookie.
 	Dbfp string `json:"dbfp,omitempty" yaml:"dbfp,omitempty"`
 
 	// High level error name (request_forbidden, access_denied, invalid_request).
@@ -69,6 +69,9 @@ type AccessRequestDataWithError struct {
 	// Stores the information which grant type was selected to perfom a given action.
 	// Matches one of allowed OAuth client grant types for a given client.
 	GrantType string `json:"grant_type,omitempty" yaml:"grant_type,omitempty"`
+
+	// Granted scopes
+	GrantedScopes []string `json:"granted_scopes" yaml:"granted_scopes"`
 
 	// ID of the Group in Identity Pool
 	GroupID string `json:"group_id,omitempty" yaml:"group_id,omitempty"`
@@ -179,7 +182,7 @@ var accessRequestDataWithErrorAuthenticationMechanismsItemsEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["totp","password","otp","email_otp","sms_otp","webauthn"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["totp","password","otp","email_otp","sms_otp","webauthn","push"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {

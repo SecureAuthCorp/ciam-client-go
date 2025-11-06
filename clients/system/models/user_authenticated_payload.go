@@ -21,8 +21,11 @@ import (
 type UserAuthenticatedPayload struct {
 
 	// authn method
-	// Enum: ["totp","password","otp","email_otp","sms_otp","webauthn"]
+	// Enum: ["totp","password","otp","email_otp","sms_otp","webauthn","push"]
 	AuthnMethod string `json:"authn_method,omitempty" yaml:"authn_method,omitempty"`
+
+	// brute force
+	BruteForce *BruteForceEventPayload `json:"brute_force,omitempty" yaml:"brute_force,omitempty"`
 
 	// failure reason
 	FailureReason string `json:"failure_reason,omitempty" yaml:"failure_reason,omitempty"`
@@ -31,7 +34,7 @@ type UserAuthenticatedPayload struct {
 	Identifier string `json:"identifier,omitempty" yaml:"identifier,omitempty"`
 
 	// mfa
-	// Enum: ["totp","password","otp","email_otp","sms_otp","webauthn"]
+	// Enum: ["totp","password","otp","email_otp","sms_otp","webauthn","push"]
 	Mfa string `json:"mfa,omitempty" yaml:"mfa,omitempty"`
 
 	// mfa skipped
@@ -53,6 +56,10 @@ func (m *UserAuthenticatedPayload) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateBruteForce(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateMfa(formats); err != nil {
 		res = append(res, err)
 	}
@@ -71,7 +78,7 @@ var userAuthenticatedPayloadTypeAuthnMethodPropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["totp","password","otp","email_otp","sms_otp","webauthn"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["totp","password","otp","email_otp","sms_otp","webauthn","push"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -98,6 +105,9 @@ const (
 
 	// UserAuthenticatedPayloadAuthnMethodWebauthn captures enum value "webauthn"
 	UserAuthenticatedPayloadAuthnMethodWebauthn string = "webauthn"
+
+	// UserAuthenticatedPayloadAuthnMethodPush captures enum value "push"
+	UserAuthenticatedPayloadAuthnMethodPush string = "push"
 )
 
 // prop value enum
@@ -121,11 +131,30 @@ func (m *UserAuthenticatedPayload) validateAuthnMethod(formats strfmt.Registry) 
 	return nil
 }
 
+func (m *UserAuthenticatedPayload) validateBruteForce(formats strfmt.Registry) error {
+	if swag.IsZero(m.BruteForce) { // not required
+		return nil
+	}
+
+	if m.BruteForce != nil {
+		if err := m.BruteForce.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("brute_force")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("brute_force")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
 var userAuthenticatedPayloadTypeMfaPropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["totp","password","otp","email_otp","sms_otp","webauthn"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["totp","password","otp","email_otp","sms_otp","webauthn","push"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -152,6 +181,9 @@ const (
 
 	// UserAuthenticatedPayloadMfaWebauthn captures enum value "webauthn"
 	UserAuthenticatedPayloadMfaWebauthn string = "webauthn"
+
+	// UserAuthenticatedPayloadMfaPush captures enum value "push"
+	UserAuthenticatedPayloadMfaPush string = "push"
 )
 
 // prop value enum
@@ -184,8 +216,38 @@ func (m *UserAuthenticatedPayload) validateSuccess(formats strfmt.Registry) erro
 	return nil
 }
 
-// ContextValidate validates this user authenticated payload based on context it is used
+// ContextValidate validate this user authenticated payload based on the context it is used
 func (m *UserAuthenticatedPayload) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateBruteForce(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *UserAuthenticatedPayload) contextValidateBruteForce(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.BruteForce != nil {
+
+		if swag.IsZero(m.BruteForce) { // not required
+			return nil
+		}
+
+		if err := m.BruteForce.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("brute_force")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("brute_force")
+			}
+			return err
+		}
+	}
+
 	return nil
 }
 

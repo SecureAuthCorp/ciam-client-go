@@ -149,7 +149,7 @@ type TenantDump struct {
 	Themes []*Theme `json:"themes" yaml:"themes"`
 
 	// translations
-	Translations []*Translation `json:"translations" yaml:"translations"`
+	Translations []*CustomTranslation `json:"translations" yaml:"translations"`
 
 	// vanity domains
 	VanityDomains []*VanityDomain `json:"vanity_domains" yaml:"vanity_domains"`

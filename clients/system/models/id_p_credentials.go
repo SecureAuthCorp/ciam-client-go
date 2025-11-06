@@ -18,6 +18,9 @@ import (
 // swagger:model IDPCredentials
 type IDPCredentials struct {
 
+	// active directory
+	ActiveDirectory ActiveDirectoryCredentials `json:"active_directory,omitempty" yaml:"active_directory,omitempty"`
+
 	// apple
 	Apple *AppleCredentials `json:"apple,omitempty" yaml:"apple,omitempty"`
 
@@ -80,6 +83,9 @@ type IDPCredentials struct {
 
 	// static
 	Static *StaticCredentials `json:"static,omitempty" yaml:"static,omitempty"`
+
+	// workforce
+	Workforce WorkforceCredentials `json:"workforce,omitempty" yaml:"workforce,omitempty"`
 
 	// x
 	X *XCredentials `json:"x,omitempty" yaml:"x,omitempty"`

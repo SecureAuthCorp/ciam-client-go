@@ -21,8 +21,16 @@ import (
 // swagger:model Client
 type Client struct {
 
+	// agent capability
+	AgentCapability AgentCapability `json:"agent_capability,omitempty" yaml:"agent_capability,omitempty"`
+
 	// Application URL
 	AppURL string `json:"app_url,omitempty" yaml:"app_url,omitempty"`
+
+	// Application purpose
+	// Example: signle_page
+	// Enum: ["single_page","server_web","mobile_desktop","service","legacy","custom","saml","ai_agent"]
+	ApplicationPurpose string `json:"application_purpose,omitempty" yaml:"application_purpose,omitempty"`
 
 	// The client application type.
 	//
@@ -227,7 +235,7 @@ type Client struct {
 	//
 	// If empty, the `token_endpoint_auth_method` is used.
 	//
-	// Cloudentity supports the following client authentication methods:
+	// SecureAuth supports the following client authentication methods:
 	// `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
 	// `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 	//
@@ -239,7 +247,7 @@ type Client struct {
 	// jwks
 	Jwks *ClientJWKs `json:"jwks,omitempty" yaml:"jwks,omitempty"`
 
-	// A URL of JSON Web Key Set with the public keys used by a client application to authenticate to Cloudentity.
+	// A URL of JSON Web Key Set with the public keys used by a client application to authenticate to SecureAuth.
 	JwksURI string `json:"jwks_uri,omitempty" yaml:"jwks_uri,omitempty"`
 
 	// Logo URI.
@@ -287,7 +295,7 @@ type Client struct {
 
 	// Request object signing algorithm for the token endpoint
 	//
-	// Cloudentity supports signing tokens with the RS256, ES256, and PS256 algorithms. If you do not want
+	// SecureAuth supports signing tokens with the RS256, ES256, and PS256 algorithms. If you do not want
 	// to use a signing algorithm, set the value of this parameter to `none`.
 	// Example: none
 	// Enum: ["any","none","RS256","ES256","PS256"]
@@ -305,7 +313,7 @@ type Client struct {
 	// A revocation endpoint authentication method configured for the client application (read-only).
 	// If empty, the `token_endpoint_auth_method` is used.
 	//
-	// Cloudentity supports the following client authentication methods:
+	// SecureAuth supports the following client authentication methods:
 	// `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
 	// `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 	//
@@ -319,6 +327,24 @@ type Client struct {
 
 	// Allowed SAML attributes
 	SamlAllowedAttributes []string `json:"saml_allowed_attributes" yaml:"saml_allowed_attributes"`
+
+	// accept ACS from SamlRequest even if it's not registered in the metadata
+	SamlIdpAcceptAcsFromRequest bool `json:"saml_idp_accept_acs_from_request,omitempty" yaml:"saml_idp_accept_acs_from_request,omitempty"`
+
+	// saml idp attributes override
+	SamlIdpAttributesOverride SAMLIDPAttributesOverride `json:"saml_idp_attributes_override,omitempty" yaml:"saml_idp_attributes_override,omitempty"`
+
+	// custom entity id
+	SamlIdpCustomEntityID string `json:"saml_idp_custom_entity_id,omitempty" yaml:"saml_idp_custom_entity_id,omitempty"`
+
+	// custom sso url
+	SamlIdpCustomSsoURL string `json:"saml_idp_custom_sso_url,omitempty" yaml:"saml_idp_custom_sso_url,omitempty"`
+
+	// enable flag
+	SamlIdpOverrideEnabled bool `json:"saml_idp_override_enabled,omitempty" yaml:"saml_idp_override_enabled,omitempty"`
+
+	// saml idp signing key
+	SamlIdpSigningKey *ServerJWK `json:"saml_idp_signing_key,omitempty" yaml:"saml_idp_signing_key,omitempty"`
 
 	// saml metadata
 	SamlMetadata *EntityDescriptor `json:"saml_metadata,omitempty" yaml:"saml_metadata,omitempty"`
@@ -443,7 +469,7 @@ type Client struct {
 
 	// Token endpoint authentication method configured for a client application
 	//
-	// Cloudentity supports the following client authentication methods:
+	// SecureAuth supports the following client authentication methods:
 	// `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
 	// `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 	//
@@ -503,6 +529,14 @@ type Client struct {
 // Validate validates this client
 func (m *Client) Validate(formats strfmt.Registry) error {
 	var res []error
+
+	if err := m.validateAgentCapability(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateApplicationPurpose(formats); err != nil {
+		res = append(res, err)
+	}
 
 	if err := m.validateApplicationTypes(formats); err != nil {
 		res = append(res, err)
@@ -616,6 +650,14 @@ func (m *Client) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateSamlIdpAttributesOverride(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateSamlIdpSigningKey(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateSamlMetadata(formats); err != nil {
 		res = append(res, err)
 	}
@@ -671,6 +713,83 @@ func (m *Client) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *Client) validateAgentCapability(formats strfmt.Registry) error {
+	if swag.IsZero(m.AgentCapability) { // not required
+		return nil
+	}
+
+	if err := m.AgentCapability.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("agent_capability")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("agent_capability")
+		}
+		return err
+	}
+
+	return nil
+}
+
+var clientTypeApplicationPurposePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["single_page","server_web","mobile_desktop","service","legacy","custom","saml","ai_agent"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		clientTypeApplicationPurposePropEnum = append(clientTypeApplicationPurposePropEnum, v)
+	}
+}
+
+const (
+
+	// ClientApplicationPurposeSinglePage captures enum value "single_page"
+	ClientApplicationPurposeSinglePage string = "single_page"
+
+	// ClientApplicationPurposeServerWeb captures enum value "server_web"
+	ClientApplicationPurposeServerWeb string = "server_web"
+
+	// ClientApplicationPurposeMobileDesktop captures enum value "mobile_desktop"
+	ClientApplicationPurposeMobileDesktop string = "mobile_desktop"
+
+	// ClientApplicationPurposeService captures enum value "service"
+	ClientApplicationPurposeService string = "service"
+
+	// ClientApplicationPurposeLegacy captures enum value "legacy"
+	ClientApplicationPurposeLegacy string = "legacy"
+
+	// ClientApplicationPurposeCustom captures enum value "custom"
+	ClientApplicationPurposeCustom string = "custom"
+
+	// ClientApplicationPurposeSaml captures enum value "saml"
+	ClientApplicationPurposeSaml string = "saml"
+
+	// ClientApplicationPurposeAiAgent captures enum value "ai_agent"
+	ClientApplicationPurposeAiAgent string = "ai_agent"
+)
+
+// prop value enum
+func (m *Client) validateApplicationPurposeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, clientTypeApplicationPurposePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *Client) validateApplicationPurpose(formats strfmt.Registry) error {
+	if swag.IsZero(m.ApplicationPurpose) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateApplicationPurposeEnum("application_purpose", "body", m.ApplicationPurpose); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -1532,6 +1651,42 @@ func (m *Client) validateRevocationEndpointAuthMethod(formats strfmt.Registry) e
 	return nil
 }
 
+func (m *Client) validateSamlIdpAttributesOverride(formats strfmt.Registry) error {
+	if swag.IsZero(m.SamlIdpAttributesOverride) { // not required
+		return nil
+	}
+
+	if err := m.SamlIdpAttributesOverride.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("saml_idp_attributes_override")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("saml_idp_attributes_override")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *Client) validateSamlIdpSigningKey(formats strfmt.Registry) error {
+	if swag.IsZero(m.SamlIdpSigningKey) { // not required
+		return nil
+	}
+
+	if m.SamlIdpSigningKey != nil {
+		if err := m.SamlIdpSigningKey.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("saml_idp_signing_key")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("saml_idp_signing_key")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (m *Client) validateSamlMetadata(formats strfmt.Registry) error {
 	if swag.IsZero(m.SamlMetadata) { // not required
 		return nil
@@ -1936,6 +2091,10 @@ func (m *Client) validateUserinfoSignedResponseAlg(formats strfmt.Registry) erro
 func (m *Client) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.contextValidateAgentCapability(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.contextValidateApplicationTypes(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -1984,6 +2143,14 @@ func (m *Client) ContextValidate(ctx context.Context, formats strfmt.Registry) e
 		res = append(res, err)
 	}
 
+	if err := m.contextValidateSamlIdpAttributesOverride(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateSamlIdpSigningKey(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.contextValidateSamlMetadata(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -2003,6 +2170,24 @@ func (m *Client) ContextValidate(ctx context.Context, formats strfmt.Registry) e
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *Client) contextValidateAgentCapability(ctx context.Context, formats strfmt.Registry) error {
+
+	if swag.IsZero(m.AgentCapability) { // not required
+		return nil
+	}
+
+	if err := m.AgentCapability.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("agent_capability")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("agent_capability")
+		}
+		return err
+	}
+
 	return nil
 }
 
@@ -2222,6 +2407,41 @@ func (m *Client) contextValidateResponseTypes(ctx context.Context, formats strfm
 			return ce.ValidateName("response_types")
 		}
 		return err
+	}
+
+	return nil
+}
+
+func (m *Client) contextValidateSamlIdpAttributesOverride(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := m.SamlIdpAttributesOverride.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("saml_idp_attributes_override")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("saml_idp_attributes_override")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *Client) contextValidateSamlIdpSigningKey(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.SamlIdpSigningKey != nil {
+
+		if swag.IsZero(m.SamlIdpSigningKey) { // not required
+			return nil
+		}
+
+		if err := m.SamlIdpSigningKey.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("saml_idp_signing_key")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("saml_idp_signing_key")
+			}
+			return err
+		}
 	}
 
 	return nil

@@ -41,6 +41,9 @@ type IntrospectResponse struct {
 	// Audience contains the list of the audiences the token is intended for.
 	Aud []string `json:"aud" yaml:"aud"`
 
+	// Granted authorization details
+	AuthorizationDetails []map[string]interface{} `json:"authorization_details" yaml:"authorization_details"`
+
 	// A client application identifier for the OAuth 2.0 client that
 	// requested this token.
 	ClientID string `json:"client_id,omitempty" yaml:"client_id,omitempty"`

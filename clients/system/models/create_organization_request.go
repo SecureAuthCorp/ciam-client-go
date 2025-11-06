@@ -28,6 +28,9 @@ type CreateOrganizationRequest struct {
 	// Example: #007FFF
 	Color string `json:"color,omitempty" yaml:"color,omitempty"`
 
+	// deactivated
+	Deactivated bool `json:"deactivated,omitempty" yaml:"deactivated,omitempty"`
+
 	// Display description of the organization
 	// Example: Organization description
 	Description string `json:"description,omitempty" yaml:"description,omitempty"`
@@ -80,7 +83,7 @@ var createOrganizationRequestAuthenticationMechanismsItemsEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["totp","password","otp","email_otp","sms_otp","webauthn"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["totp","password","otp","email_otp","sms_otp","webauthn","push"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {

@@ -17,6 +17,9 @@ import (
 // swagger:model ServerSettings
 type ServerSettings struct {
 
+	// deactivated
+	Deactivated bool `json:"deactivated,omitempty" yaml:"deactivated,omitempty"`
+
 	// default client id
 	DefaultClientID string `json:"default_client_id,omitempty" yaml:"default_client_id,omitempty"`
 

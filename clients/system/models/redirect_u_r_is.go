@@ -13,7 +13,7 @@ import (
 
 // RedirectURIs OAuth-allowed redirect URIs
 //
-// Cloudentity uses redirect URIs to redirect users back to the application after they authorized the application. Along
+// SecureAuth uses redirect URIs to redirect users back to the application after they authorized the application. Along
 // with the redirection, an authorization code or access token is added to the URL.
 //
 // For backward compatibility reasons, it's also acceptable to pass `redirect_uris` as a string, for example:

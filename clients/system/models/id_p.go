@@ -74,8 +74,8 @@ type IDP struct {
 
 	// Defines the type of an IDP
 	//
-	// Cloudentity is designed to make it possible for you to bring any of your own IDPs and integrate it
-	// with Cloudentity as it delivers enterprise connectors for major Cloud IDPs and a possibility for
+	// SecureAuth is designed to make it possible for you to bring any of your own IDPs and integrate it
+	// with SecureAuth as it delivers enterprise connectors for major Cloud IDPs and a possibility for
 	// custom integration DKS for home-built solutions. You can also use built-in Sandbox IDP, which
 	// is a static IDP, to create an IDP for testing purposes.
 	Method string `json:"method,omitempty" yaml:"method,omitempty"`

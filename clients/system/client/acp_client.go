@@ -14,10 +14,13 @@ import (
 	"github.com/cloudentity/acp-client-go/clients/system/client/clients"
 	"github.com/cloudentity/acp-client-go/clients/system/client/consents"
 	"github.com/cloudentity/acp-client-go/clients/system/client/gateways"
+	"github.com/cloudentity/acp-client-go/clients/system/client/idps"
 	"github.com/cloudentity/acp-client-go/clients/system/client/logins"
 	"github.com/cloudentity/acp-client-go/clients/system/client/organizations"
 	"github.com/cloudentity/acp-client-go/clients/system/client/post_authn"
+	"github.com/cloudentity/acp-client-go/clients/system/client/recovery"
 	"github.com/cloudentity/acp-client-go/clients/system/client/scopes"
+	"github.com/cloudentity/acp-client-go/clients/system/client/scripts"
 	"github.com/cloudentity/acp-client-go/clients/system/client/secrets"
 	"github.com/cloudentity/acp-client-go/clients/system/client/servers"
 	"github.com/cloudentity/acp-client-go/clients/system/client/system"
@@ -71,10 +74,13 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *Acp {
 	cli.Clients = clients.New(transport, formats)
 	cli.Consents = consents.New(transport, formats)
 	cli.Gateways = gateways.New(transport, formats)
+	cli.Idps = idps.New(transport, formats)
 	cli.Logins = logins.New(transport, formats)
 	cli.Organizations = organizations.New(transport, formats)
 	cli.PostAuthn = post_authn.New(transport, formats)
+	cli.Recovery = recovery.New(transport, formats)
 	cli.Scopes = scopes.New(transport, formats)
+	cli.Scripts = scripts.New(transport, formats)
 	cli.Secrets = secrets.New(transport, formats)
 	cli.Servers = servers.New(transport, formats)
 	cli.System = system.New(transport, formats)
@@ -132,13 +138,19 @@ type Acp struct {
 
 	Gateways gateways.ClientService
 
+	Idps idps.ClientService
+
 	Logins logins.ClientService
 
 	Organizations organizations.ClientService
 
 	PostAuthn post_authn.ClientService
 
+	Recovery recovery.ClientService
+
 	Scopes scopes.ClientService
+
+	Scripts scripts.ClientService
 
 	Secrets secrets.ClientService
 
@@ -160,10 +172,13 @@ func (c *Acp) SetTransport(transport runtime.ClientTransport) {
 	c.Clients.SetTransport(transport)
 	c.Consents.SetTransport(transport)
 	c.Gateways.SetTransport(transport)
+	c.Idps.SetTransport(transport)
 	c.Logins.SetTransport(transport)
 	c.Organizations.SetTransport(transport)
 	c.PostAuthn.SetTransport(transport)
+	c.Recovery.SetTransport(transport)
 	c.Scopes.SetTransport(transport)
+	c.Scripts.SetTransport(transport)
 	c.Secrets.SetTransport(transport)
 	c.Servers.SetTransport(transport)
 	c.System.SetTransport(transport)

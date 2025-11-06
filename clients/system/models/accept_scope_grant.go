@@ -21,6 +21,9 @@ type AcceptScopeGrant struct {
 	// optional consent identifier
 	ConsentID string `json:"consent_id,omitempty" yaml:"consent_id,omitempty"`
 
+	// granted authorization details
+	GrantedAuthorizationDetails []map[string]interface{} `json:"granted_authorization_details" yaml:"granted_authorization_details"`
+
 	// granted claims
 	GrantedClaims GrantedClaims `json:"granted_claims,omitempty" yaml:"granted_claims,omitempty"`
 

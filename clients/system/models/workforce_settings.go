@@ -17,14 +17,11 @@ import (
 // swagger:model WorkforceSettings
 type WorkforceSettings struct {
 
-	// faye url
-	FayeURL string `json:"faye_url,omitempty" yaml:"faye_url,omitempty"`
+	// issuer url
+	IssuerURL string `json:"issuer_url,omitempty" yaml:"issuer_url,omitempty"`
 
-	// manifest url
-	ManifestURL string `json:"manifest_url,omitempty" yaml:"manifest_url,omitempty"`
-
-	// url
-	URL string `json:"url,omitempty" yaml:"url,omitempty"`
+	// scopes
+	Scopes []string `json:"scopes" yaml:"scopes"`
 }
 
 // Validate validates this workforce settings

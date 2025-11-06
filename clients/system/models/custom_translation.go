@@ -14,13 +14,10 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// Translation Translation
+// CustomTranslation custom translation
 //
-// swagger:model Translation
-type Translation struct {
-
-	// built-in exists
-	BuiltInExists bool `json:"built_in_exists,omitempty" yaml:"built_in_exists,omitempty"`
+// swagger:model CustomTranslation
+type CustomTranslation struct {
 
 	// content of the translation
 	Content map[string]interface{} `json:"content,omitempty" yaml:"content,omitempty"`
@@ -32,36 +29,22 @@ type Translation struct {
 	// enabled
 	Enabled bool `json:"enabled,omitempty" yaml:"enabled,omitempty"`
 
-	// Is built-in translation
-	IsBuiltIn bool `json:"is_built_in,omitempty" yaml:"is_built_in,omitempty"`
+	// locale
+	Locale string `json:"locale,omitempty" yaml:"locale,omitempty"`
 
-	// translation locale
-	// Required: true
-	Locale string `json:"locale" yaml:"locale"`
-
-	// ID of the tenant
-	// Example: default
-	// Required: true
-	TenantID string `json:"tenant_id" yaml:"tenant_id"`
+	// tenant id
+	TenantID string `json:"tenant_id,omitempty" yaml:"tenant_id,omitempty"`
 
 	// timestamp when the translation was last updated
 	// Format: date-time
 	UpdatedAt strfmt.DateTime `json:"updated_at,omitempty" yaml:"updated_at,omitempty"`
 }
 
-// Validate validates this translation
-func (m *Translation) Validate(formats strfmt.Registry) error {
+// Validate validates this custom translation
+func (m *CustomTranslation) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateCreatedAt(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateLocale(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateTenantID(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -75,7 +58,7 @@ func (m *Translation) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *Translation) validateCreatedAt(formats strfmt.Registry) error {
+func (m *CustomTranslation) validateCreatedAt(formats strfmt.Registry) error {
 	if swag.IsZero(m.CreatedAt) { // not required
 		return nil
 	}
@@ -87,25 +70,7 @@ func (m *Translation) validateCreatedAt(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *Translation) validateLocale(formats strfmt.Registry) error {
-
-	if err := validate.RequiredString("locale", "body", m.Locale); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *Translation) validateTenantID(formats strfmt.Registry) error {
-
-	if err := validate.RequiredString("tenant_id", "body", m.TenantID); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *Translation) validateUpdatedAt(formats strfmt.Registry) error {
+func (m *CustomTranslation) validateUpdatedAt(formats strfmt.Registry) error {
 	if swag.IsZero(m.UpdatedAt) { // not required
 		return nil
 	}
@@ -117,13 +82,13 @@ func (m *Translation) validateUpdatedAt(formats strfmt.Registry) error {
 	return nil
 }
 
-// ContextValidate validates this translation based on context it is used
-func (m *Translation) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+// ContextValidate validates this custom translation based on context it is used
+func (m *CustomTranslation) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 
 // MarshalBinary interface implementation
-func (m *Translation) MarshalBinary() ([]byte, error) {
+func (m *CustomTranslation) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -131,8 +96,8 @@ func (m *Translation) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *Translation) UnmarshalBinary(b []byte) error {
-	var res Translation
+func (m *CustomTranslation) UnmarshalBinary(b []byte) error {
+	var res CustomTranslation
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

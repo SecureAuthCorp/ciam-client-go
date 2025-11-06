@@ -45,6 +45,9 @@ type Mapping struct {
 	// Example: false
 	AllowWeakDecoding bool `json:"allow_weak_decoding,omitempty" yaml:"allow_weak_decoding,omitempty"`
 
+	// Default value used when source value is missing in dynamic mode.
+	Default interface{} `json:"default,omitempty" yaml:"default,omitempty"`
+
 	// mode
 	Mode MappingMode `json:"mode,omitempty" yaml:"mode,omitempty"`
 

@@ -79,6 +79,18 @@ type GetOrganizationOK struct {
 	*/
 	Etag string
 
+	/* Indicates that a 5xx error was caused by tenant-provided code
+
+	in:header
+	*/
+	XExternalError string
+
+	/* OpenTelemetry trace identifier
+
+	in:header
+	*/
+	XTraceID string
+
 	Payload *models.OrganizationResponse
 }
 
@@ -133,6 +145,20 @@ func (o *GetOrganizationOK) readResponse(response runtime.ClientResponse, consum
 
 	if hdrEtag != "" {
 		o.Etag = hdrEtag
+	}
+
+	// hydrates response header x-external-error
+	hdrXExternalError := response.GetHeader("x-external-error")
+
+	if hdrXExternalError != "" {
+		o.XExternalError = hdrXExternalError
+	}
+
+	// hydrates response header x-trace-id
+	hdrXTraceID := response.GetHeader("x-trace-id")
+
+	if hdrXTraceID != "" {
+		o.XTraceID = hdrXTraceID
 	}
 
 	o.Payload = new(models.OrganizationResponse)

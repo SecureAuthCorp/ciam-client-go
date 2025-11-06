@@ -208,10 +208,10 @@ type AuditEventPayloads struct {
 	RoleRevoked *RoleGrantAuditPayload `json:"role_revoked,omitempty" yaml:"role_revoked,omitempty"`
 
 	// saml assertion denied
-	SamlAssertionDenied *AccessRequestDataWithError `json:"saml_assertion_denied,omitempty" yaml:"saml_assertion_denied,omitempty"`
+	SamlAssertionDenied *SAMLAssertionDeniedPayload `json:"saml_assertion_denied,omitempty" yaml:"saml_assertion_denied,omitempty"`
 
 	// saml assertion issued
-	SamlAssertionIssued *AccessRequestData `json:"saml_assertion_issued,omitempty" yaml:"saml_assertion_issued,omitempty"`
+	SamlAssertionIssued *SAMLAssertionIssuedPayload `json:"saml_assertion_issued,omitempty" yaml:"saml_assertion_issued,omitempty"`
 
 	// schema created
 	SchemaCreated *SchemaAuditPayload `json:"schema_created,omitempty" yaml:"schema_created,omitempty"`

@@ -21,6 +21,9 @@ type ExternalCIBAAuthenticationService struct {
 	// credentials
 	Credentials *ExternalServiceCredentials `json:"credentials,omitempty" yaml:"credentials,omitempty"`
 
+	// Do not validate cert when calling authenticator service
+	Insecure bool `json:"insecure,omitempty" yaml:"insecure,omitempty"`
+
 	// url to the ciba authenticator service
 	URL string `json:"url,omitempty" yaml:"url,omitempty"`
 }

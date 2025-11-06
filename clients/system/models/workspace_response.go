@@ -61,13 +61,16 @@ type WorkspaceResponse struct {
 	// number of child organizations
 	NumberOfChildOrganizations int64 `json:"number_of_child_organizations,omitempty" yaml:"number_of_child_organizations,omitempty"`
 
+	// preferences
+	Preferences *ServerPreferences `json:"preferences,omitempty" yaml:"preferences,omitempty"`
+
 	// The profile of a server
 	//
 	// ACP is delivered with preconfigured workspace templates that enable quick and easy setup for
 	// specific configuration patterns. For example, you can instantly create an Open Banking
 	// compliant workspace that has all of the required mechanisms and settings already in place.
 	// Example: default
-	// Enum: ["default","demo","workforce","workforce_v2","consumer","partners","third_party","fapi_advanced","fapi_rw","fapi_ro","openbanking_uk_fapi_advanced","openbanking_uk","openbanking_br","openbanking_br_unico","cdr_australia","cdr_australia_fapi_rw","fdx","openbanking_ksa","fapi_20_security","fapi_20_message_signing","connect_id"]
+	// Enum: ["default","demo","workforce","workforce_v2","consumer","partners","third_party","fapi_advanced","fapi_rw","fapi_ro","openbanking_uk_fapi_advanced","openbanking_uk","openbanking_br","openbanking_br_unico","cdr_australia","cdr_australia_fapi_rw","fdx","openbanking_ksa","fapi_20_security","fapi_20_message_signing","connect_id","agentic_ai"]
 	Profile string `json:"profile,omitempty" yaml:"profile,omitempty"`
 
 	// settings
@@ -118,6 +121,10 @@ func (m *WorkspaceResponse) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateMetadata(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validatePreferences(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -174,7 +181,7 @@ var workspaceResponseAuthenticationMechanismsItemsEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["totp","password","otp","email_otp","sms_otp","webauthn"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["totp","password","otp","email_otp","sms_otp","webauthn","push"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -244,11 +251,30 @@ func (m *WorkspaceResponse) validateMetadata(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *WorkspaceResponse) validatePreferences(formats strfmt.Registry) error {
+	if swag.IsZero(m.Preferences) { // not required
+		return nil
+	}
+
+	if m.Preferences != nil {
+		if err := m.Preferences.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("preferences")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("preferences")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
 var workspaceResponseTypeProfilePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["default","demo","workforce","workforce_v2","consumer","partners","third_party","fapi_advanced","fapi_rw","fapi_ro","openbanking_uk_fapi_advanced","openbanking_uk","openbanking_br","openbanking_br_unico","cdr_australia","cdr_australia_fapi_rw","fdx","openbanking_ksa","fapi_20_security","fapi_20_message_signing","connect_id"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["default","demo","workforce","workforce_v2","consumer","partners","third_party","fapi_advanced","fapi_rw","fapi_ro","openbanking_uk_fapi_advanced","openbanking_uk","openbanking_br","openbanking_br_unico","cdr_australia","cdr_australia_fapi_rw","fdx","openbanking_ksa","fapi_20_security","fapi_20_message_signing","connect_id","agentic_ai"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -320,6 +346,9 @@ const (
 
 	// WorkspaceResponseProfileConnectID captures enum value "connect_id"
 	WorkspaceResponseProfileConnectID string = "connect_id"
+
+	// WorkspaceResponseProfileAgenticAi captures enum value "agentic_ai"
+	WorkspaceResponseProfileAgenticAi string = "agentic_ai"
 )
 
 // prop value enum
@@ -512,6 +541,10 @@ func (m *WorkspaceResponse) ContextValidate(ctx context.Context, formats strfmt.
 		res = append(res, err)
 	}
 
+	if err := m.contextValidatePreferences(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.contextValidateSettings(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -585,6 +618,27 @@ func (m *WorkspaceResponse) contextValidateMetadata(ctx context.Context, formats
 				return ve.ValidateName("metadata")
 			} else if ce, ok := err.(*errors.CompositeError); ok {
 				return ce.ValidateName("metadata")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *WorkspaceResponse) contextValidatePreferences(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Preferences != nil {
+
+		if swag.IsZero(m.Preferences) { // not required
+			return nil
+		}
+
+		if err := m.Preferences.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("preferences")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("preferences")
 			}
 			return err
 		}
