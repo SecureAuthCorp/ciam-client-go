@@ -23,6 +23,9 @@ type Environment struct {
 	// ACR support
 	Acr bool `json:"acr,omitempty" yaml:"acr,omitempty"`
 
+	// Active Directory IDP
+	ActiveDirectoryIdp bool `json:"active_directory_idp,omitempty" yaml:"active_directory_idp,omitempty"`
+
 	// add fake tenantUrl to query params for routing other than default (needed for backward compatibility with CIP for vanity domains)
 	AddFakeTenantURLToLoginRequestForNonDefaultRouting bool `json:"add_fake_tenant_url_to_login_request_for_non_default_routing,omitempty" yaml:"add_fake_tenant_url_to_login_request_for_non_default_routing,omitempty"`
 
@@ -35,7 +38,7 @@ type Environment struct {
 	// allow Identity Pool OTP Challenge confirmation via web page
 	AllowIdentityPoolOtpChallengeConfirmationViaWebPage bool `json:"allow_identity_pool_otp_challenge_confirmation_via_web_page,omitempty" yaml:"allow_identity_pool_otp_challenge_confirmation_via_web_page,omitempty"`
 
-	// allow to skip 2FA if user does not have any authn methods configured
+	// Allow to skip 2FA if user does not have any authn methods configured
 	AllowSkip2faIfNoneSetUp bool `json:"allow_skip_2fa_if_none_set_up,omitempty" yaml:"allow_skip_2fa_if_none_set_up,omitempty"`
 
 	// analytics duration
@@ -73,20 +76,20 @@ type Environment struct {
 	// generate random ids for scripts in the new workspace when using clone workspace feature
 	CloneWorkspaceScriptsFix bool `json:"clone_workspace_scripts_fix,omitempty" yaml:"clone_workspace_scripts_fix,omitempty"`
 
-	// Cloudentity IDP
+	// SecureAuth IDP
 	CloudentityIdp bool `json:"cloudentity_idp,omitempty" yaml:"cloudentity_idp,omitempty"`
 
 	// commit
 	Commit string `json:"commit,omitempty" yaml:"commit,omitempty"`
-
-	// common idps
-	CommonIdps bool `json:"common_idps,omitempty" yaml:"common_idps,omitempty"`
 
 	// connectID profile
 	ConnectID bool `json:"connect_id,omitempty" yaml:"connect_id,omitempty"`
 
 	// connect ID consent page facelifting
 	ConnectIDConsentPageFaceLifting bool `json:"connect_id_consent_page_face_lifting,omitempty" yaml:"connect_id_consent_page_face_lifting,omitempty"`
+
+	// Custom recovery
+	CustomRecovery bool `json:"custom_recovery,omitempty" yaml:"custom_recovery,omitempty"`
 
 	// enable additional debug logs
 	Debug bool `json:"debug,omitempty" yaml:"debug,omitempty"`
@@ -115,6 +118,9 @@ type Environment struct {
 	// disable self user Identity API to complete address verification
 	DisableSelfUserIdentityAPICompleteAddressVerification bool `json:"disable_self_user_identity_api_complete_address_verification,omitempty" yaml:"disable_self_user_identity_api_complete_address_verification,omitempty"`
 
+	// disable failing with server error on script user error instead of redirecting to the client app
+	DisableServerErrorOnScriptUserError bool `json:"disable_server_error_on_script_user_error,omitempty" yaml:"disable_server_error_on_script_user_error,omitempty"`
+
 	// display workspace wizard
 	DisplayWorkspaceWizard bool `json:"display_workspace_wizard,omitempty" yaml:"display_workspace_wizard,omitempty"`
 
@@ -124,14 +130,14 @@ type Environment struct {
 	// drop tokens on password reset
 	DropTokensOnPasswordReset bool `json:"drop_tokens_on_password_reset,omitempty" yaml:"drop_tokens_on_password_reset,omitempty"`
 
+	// embedded idps enabled
+	EmbeddedIdpsEnabled bool `json:"embedded_idps_enabled,omitempty" yaml:"embedded_idps_enabled,omitempty"`
+
 	// use fake data (such as ips) - needed for qa testing
 	FakeData bool `json:"fake_data,omitempty" yaml:"fake_data,omitempty"`
 
 	// faye url
 	FayeURL string `json:"faye_url,omitempty" yaml:"faye_url,omitempty"`
-
-	// Groups
-	Groups bool `json:"groups,omitempty" yaml:"groups,omitempty"`
 
 	// grpc url
 	GrpcURL string `json:"grpc_url,omitempty" yaml:"grpc_url,omitempty"`
@@ -148,9 +154,6 @@ type Environment struct {
 	// image proxy url
 	ImageProxyURL string `json:"image_proxy_url,omitempty" yaml:"image_proxy_url,omitempty"`
 
-	// when enabled and the display_workspace_wizard feature flag is set to true, a demo workspace with a set of preconfigured IDPs is created and no welcome screen is displayed
-	InitializeDemoWorkspace bool `json:"initialize_demo_workspace,omitempty" yaml:"initialize_demo_workspace,omitempty"`
-
 	// disable csrf
 	InsecureDisableCsrf bool `json:"insecure_disable_csrf,omitempty" yaml:"insecure_disable_csrf,omitempty"`
 
@@ -163,10 +166,8 @@ type Environment struct {
 	// mark address as verified on any proof of possession of the address
 	MarkAddressAsVerifiedOnAnyProofOfPossession bool `json:"mark_address_as_verified_on_any_proof_of_possession,omitempty" yaml:"mark_address_as_verified_on_any_proof_of_possession,omitempty"`
 
-	// New SAML configuration views
-	//
-	// Enable new SAML views to enhance the configuration experience.
-	NewSamlViews bool `json:"new_saml_views,omitempty" yaml:"new_saml_views,omitempty"`
+	// publish events to NATS
+	Nats bool `json:"nats,omitempty" yaml:"nats,omitempty"`
 
 	// openbanking brasil
 	Obbr bool `json:"obbr,omitempty" yaml:"obbr,omitempty"`
@@ -174,19 +175,35 @@ type Environment struct {
 	// openbanking ksa workspace and security profile
 	OpenbankingKsa bool `json:"openbanking_ksa,omitempty" yaml:"openbanking_ksa,omitempty"`
 
-	// Organizations
-	//
-	// Delineate a structured and hierarchical separation among your business customers' companies or partners. Enable Delegated Admin Portal.
-	Organizations bool `json:"organizations,omitempty" yaml:"organizations,omitempty"`
+	// Push
+	Push bool `json:"push,omitempty" yaml:"push,omitempty"`
 
 	// rich authorization requests
 	Rar bool `json:"rar,omitempty" yaml:"rar,omitempty"`
 
-	// Risk engine
-	RiskEngine bool `json:"risk_engine,omitempty" yaml:"risk_engine,omitempty"`
+	// Remote risk dashboard
+	RemoteRiskDashboard bool `json:"remote_risk_dashboard,omitempty" yaml:"remote_risk_dashboard,omitempty"`
 
 	// Enable risk_engine and risk_engine_ab for risk engine a/b testing
 	RiskEngineAb bool `json:"risk_engine_ab,omitempty" yaml:"risk_engine_ab,omitempty"`
+
+	// risk insights
+	RiskInsights map[string]Insight `json:"risk_insights,omitempty" yaml:"risk_insights,omitempty"`
+
+	// risk manifest url
+	RiskManifestURL string `json:"risk_manifest_url,omitempty" yaml:"risk_manifest_url,omitempty"`
+
+	// risk public url
+	RiskPublicURL string `json:"risk_public_url,omitempty" yaml:"risk_public_url,omitempty"`
+
+	// risk tenant id
+	RiskTenantID string `json:"risk_tenant_id,omitempty" yaml:"risk_tenant_id,omitempty"`
+
+	// SAML IDP overrides per SP
+	SamlIdpOverridesPerSp bool `json:"saml_idp_overrides_per_sp,omitempty" yaml:"saml_idp_overrides_per_sp,omitempty"`
+
+	// SCIMv2 support
+	ScimV2 bool `json:"scim_v2,omitempty" yaml:"scim_v2,omitempty"`
 
 	// scope transient_otp
 	ScopeTransientOtp bool `json:"scope_transient_otp,omitempty" yaml:"scope_transient_otp,omitempty"`
@@ -206,14 +223,26 @@ type Environment struct {
 	// tenant flags
 	TenantFlags []string `json:"tenant_flags" yaml:"tenant_flags"`
 
+	// use tenant level identity pool
+	TenantLevelIdentityPool bool `json:"tenant_level_identity_pool,omitempty" yaml:"tenant_level_identity_pool,omitempty"`
+
 	// tenant settings
 	TenantSettings *TenantSettings `json:"tenant_settings,omitempty" yaml:"tenant_settings,omitempty"`
 
 	// hierarchical dumps tenant APIs
 	TreeDumpTenant bool `json:"tree_dump_tenant,omitempty" yaml:"tree_dump_tenant,omitempty"`
 
+	// Two-step activation flow to prevent email scanner auto-activation
+	TwoStepActivation bool `json:"two_step_activation,omitempty" yaml:"two_step_activation,omitempty"`
+
 	// Use new DN format
 	UseNewDnFormat bool `json:"use_new_dn_format,omitempty" yaml:"use_new_dn_format,omitempty"`
+
+	// User cross-organization role assignment
+	UserCrossOrganizationRoleAssignment bool `json:"user_cross_organization_role_assignment,omitempty" yaml:"user_cross_organization_role_assignment,omitempty"`
+
+	// User-friendly credentials setup
+	UserFriendlyCredentialsSetup bool `json:"user_friendly_credentials_setup,omitempty" yaml:"user_friendly_credentials_setup,omitempty"`
 
 	// version
 	Version string `json:"version,omitempty" yaml:"version,omitempty"`
@@ -253,6 +282,10 @@ func (m *Environment) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateBruteForceLimits(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateRiskInsights(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -313,6 +346,32 @@ func (m *Environment) validateBruteForceLimits(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *Environment) validateRiskInsights(formats strfmt.Registry) error {
+	if swag.IsZero(m.RiskInsights) { // not required
+		return nil
+	}
+
+	for k := range m.RiskInsights {
+
+		if err := validate.Required("risk_insights"+"."+k, "body", m.RiskInsights[k]); err != nil {
+			return err
+		}
+		if val, ok := m.RiskInsights[k]; ok {
+			if err := val.Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("risk_insights" + "." + k)
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("risk_insights" + "." + k)
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
 func (m *Environment) validateScriptRuntimes(formats strfmt.Registry) error {
 	if swag.IsZero(m.ScriptRuntimes) { // not required
 		return nil
@@ -366,6 +425,10 @@ func (m *Environment) ContextValidate(ctx context.Context, formats strfmt.Regist
 		res = append(res, err)
 	}
 
+	if err := m.contextValidateRiskInsights(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.contextValidateScriptRuntimes(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -396,6 +459,21 @@ func (m *Environment) contextValidateBruteForceLimits(ctx context.Context, forma
 			}
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (m *Environment) contextValidateRiskInsights(ctx context.Context, formats strfmt.Registry) error {
+
+	for k := range m.RiskInsights {
+
+		if val, ok := m.RiskInsights[k]; ok {
+			if err := val.ContextValidate(ctx, formats); err != nil {
+				return err
+			}
+		}
+
 	}
 
 	return nil

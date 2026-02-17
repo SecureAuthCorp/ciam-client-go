@@ -27,6 +27,16 @@ type CustomAppsResponse struct {
 	//
 	// in:header
 	Etag string `json:"etag,omitempty" yaml:"etag,omitempty"`
+
+	// Indicates that a 5xx error was caused by tenant-provided code
+	//
+	// in:header
+	XExternalError string `json:"x-external-error,omitempty" yaml:"x-external-error,omitempty"`
+
+	// OpenTelemetry trace identifier
+	//
+	// in:header
+	XTraceID string `json:"x-trace-id,omitempty" yaml:"x-trace-id,omitempty"`
 }
 
 // Validate validates this custom apps response

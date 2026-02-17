@@ -8,8 +8,10 @@ package models
 import (
 	"context"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // ResetCredentialsSettings reset credentials settings
@@ -19,10 +21,75 @@ type ResetCredentialsSettings struct {
 
 	// do not allow users to self reset credentials
 	DoNotAllowUsersToSelfResetCredentials bool `json:"do_not_allow_users_to_self_reset_credentials,omitempty" yaml:"do_not_allow_users_to_self_reset_credentials,omitempty"`
+
+	// reset password older than
+	// Format: date-time
+	ResetPasswordOlderThan strfmt.DateTime `json:"reset_password_older_than,omitempty" yaml:"reset_password_older_than,omitempty"`
+
+	// reset totp older than
+	// Format: date-time
+	ResetTotpOlderThan strfmt.DateTime `json:"reset_totp_older_than,omitempty" yaml:"reset_totp_older_than,omitempty"`
+
+	// reset webauthn older than
+	// Format: date-time
+	ResetWebauthnOlderThan strfmt.DateTime `json:"reset_webauthn_older_than,omitempty" yaml:"reset_webauthn_older_than,omitempty"`
 }
 
 // Validate validates this reset credentials settings
 func (m *ResetCredentialsSettings) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateResetPasswordOlderThan(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateResetTotpOlderThan(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateResetWebauthnOlderThan(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *ResetCredentialsSettings) validateResetPasswordOlderThan(formats strfmt.Registry) error {
+	if swag.IsZero(m.ResetPasswordOlderThan) { // not required
+		return nil
+	}
+
+	if err := validate.FormatOf("reset_password_older_than", "body", "date-time", m.ResetPasswordOlderThan.String(), formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *ResetCredentialsSettings) validateResetTotpOlderThan(formats strfmt.Registry) error {
+	if swag.IsZero(m.ResetTotpOlderThan) { // not required
+		return nil
+	}
+
+	if err := validate.FormatOf("reset_totp_older_than", "body", "date-time", m.ResetTotpOlderThan.String(), formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *ResetCredentialsSettings) validateResetWebauthnOlderThan(formats strfmt.Registry) error {
+	if swag.IsZero(m.ResetWebauthnOlderThan) { // not required
+		return nil
+	}
+
+	if err := validate.FormatOf("reset_webauthn_older_than", "body", "date-time", m.ResetWebauthnOlderThan.String(), formats); err != nil {
+		return err
+	}
+
 	return nil
 }
 

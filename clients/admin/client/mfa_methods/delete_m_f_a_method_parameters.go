@@ -72,6 +72,18 @@ type DeleteMFAMethodParams struct {
 	// MfaID.
 	MfaID string
 
+	/* XCorrelationID.
+
+	   Unique identifier included in audit events for request tracking
+	*/
+	XCorrelationID *string
+
+	/* XIdempotencyKey.
+
+	   Key used to safely retry failed requests without duplicate processing
+	*/
+	XIdempotencyKey *string
+
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
@@ -147,6 +159,28 @@ func (o *DeleteMFAMethodParams) SetMfaID(mfaID string) {
 	o.MfaID = mfaID
 }
 
+// WithXCorrelationID adds the xCorrelationID to the delete m f a method params
+func (o *DeleteMFAMethodParams) WithXCorrelationID(xCorrelationID *string) *DeleteMFAMethodParams {
+	o.SetXCorrelationID(xCorrelationID)
+	return o
+}
+
+// SetXCorrelationID adds the xCorrelationId to the delete m f a method params
+func (o *DeleteMFAMethodParams) SetXCorrelationID(xCorrelationID *string) {
+	o.XCorrelationID = xCorrelationID
+}
+
+// WithXIdempotencyKey adds the xIdempotencyKey to the delete m f a method params
+func (o *DeleteMFAMethodParams) WithXIdempotencyKey(xIdempotencyKey *string) *DeleteMFAMethodParams {
+	o.SetXIdempotencyKey(xIdempotencyKey)
+	return o
+}
+
+// SetXIdempotencyKey adds the xIdempotencyKey to the delete m f a method params
+func (o *DeleteMFAMethodParams) SetXIdempotencyKey(xIdempotencyKey *string) {
+	o.XIdempotencyKey = xIdempotencyKey
+}
+
 // WriteToRequest writes these params to a swagger request
 func (o *DeleteMFAMethodParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Registry) error {
 
@@ -166,6 +200,22 @@ func (o *DeleteMFAMethodParams) WriteToRequest(r runtime.ClientRequest, reg strf
 	// path param mfaID
 	if err := r.SetPathParam("mfaID", o.MfaID); err != nil {
 		return err
+	}
+
+	if o.XCorrelationID != nil {
+
+		// header param x-correlation-id
+		if err := r.SetHeaderParam("x-correlation-id", *o.XCorrelationID); err != nil {
+			return err
+		}
+	}
+
+	if o.XIdempotencyKey != nil {
+
+		// header param x-idempotency-key
+		if err := r.SetHeaderParam("x-idempotency-key", *o.XIdempotencyKey); err != nil {
+			return err
+		}
 	}
 
 	if len(res) > 0 {

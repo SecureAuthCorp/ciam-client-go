@@ -19,9 +19,6 @@ import (
 // swagger:model TreeTranslation
 type TreeTranslation struct {
 
-	// built-in exists
-	BuiltInExists bool `json:"built_in_exists,omitempty" yaml:"built_in_exists,omitempty"`
-
 	// content of the translation
 	Content map[string]interface{} `json:"content,omitempty" yaml:"content,omitempty"`
 
@@ -31,9 +28,6 @@ type TreeTranslation struct {
 
 	// enabled
 	Enabled bool `json:"enabled,omitempty" yaml:"enabled,omitempty"`
-
-	// Is built-in translation
-	IsBuiltIn bool `json:"is_built_in,omitempty" yaml:"is_built_in,omitempty"`
 
 	// timestamp when the translation was last updated
 	// Format: date-time

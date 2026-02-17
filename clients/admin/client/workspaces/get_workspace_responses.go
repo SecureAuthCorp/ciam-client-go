@@ -67,7 +67,7 @@ func NewGetWorkspaceOK() *GetWorkspaceOK {
 /*
 GetWorkspaceOK describes a response with status code 200, with default header values.
 
-Server
+Workspace
 */
 type GetWorkspaceOK struct {
 
@@ -79,7 +79,19 @@ type GetWorkspaceOK struct {
 	*/
 	Etag string
 
-	Payload *models.ServerResponse
+	/* Indicates that a 5xx error was caused by tenant-provided code
+
+	in:header
+	*/
+	XExternalError string
+
+	/* OpenTelemetry trace identifier
+
+	in:header
+	*/
+	XTraceID string
+
+	Payload *models.WorkspaceResponse
 }
 
 // IsSuccess returns true when this get workspace o k response has a 2xx status code
@@ -122,7 +134,7 @@ func (o *GetWorkspaceOK) String() string {
 	return fmt.Sprintf("[GET /workspaces/{wid}][%d] getWorkspaceOK %s", 200, payload)
 }
 
-func (o *GetWorkspaceOK) GetPayload() *models.ServerResponse {
+func (o *GetWorkspaceOK) GetPayload() *models.WorkspaceResponse {
 	return o.Payload
 }
 
@@ -135,7 +147,21 @@ func (o *GetWorkspaceOK) readResponse(response runtime.ClientResponse, consumer 
 		o.Etag = hdrEtag
 	}
 
-	o.Payload = new(models.ServerResponse)
+	// hydrates response header x-external-error
+	hdrXExternalError := response.GetHeader("x-external-error")
+
+	if hdrXExternalError != "" {
+		o.XExternalError = hdrXExternalError
+	}
+
+	// hydrates response header x-trace-id
+	hdrXTraceID := response.GetHeader("x-trace-id")
+
+	if hdrXTraceID != "" {
+		o.XTraceID = hdrXTraceID
+	}
+
+	o.Payload = new(models.WorkspaceResponse)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

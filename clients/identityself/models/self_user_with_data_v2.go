@@ -51,6 +51,9 @@ type SelfUserWithDataV2 struct {
 	// payload schema
 	PayloadSchema *SupportedJSONSchema `json:"payload_schema,omitempty" yaml:"payload_schema,omitempty"`
 
+	// preferences
+	Preferences *UserPreferences `json:"preferences,omitempty" yaml:"preferences,omitempty"`
+
 	// preferred authentication mechanism
 	// Example: password
 	// Enum: ["totp","password","otp","email_otp","sms_otp","webauthn"]
@@ -96,6 +99,10 @@ func (m *SelfUserWithDataV2) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validatePayloadSchema(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validatePreferences(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -263,6 +270,25 @@ func (m *SelfUserWithDataV2) validatePayloadSchema(formats strfmt.Registry) erro
 				return ve.ValidateName("payload_schema")
 			} else if ce, ok := err.(*errors.CompositeError); ok {
 				return ce.ValidateName("payload_schema")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *SelfUserWithDataV2) validatePreferences(formats strfmt.Registry) error {
+	if swag.IsZero(m.Preferences) { // not required
+		return nil
+	}
+
+	if m.Preferences != nil {
+		if err := m.Preferences.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("preferences")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("preferences")
 			}
 			return err
 		}
@@ -446,6 +472,10 @@ func (m *SelfUserWithDataV2) ContextValidate(ctx context.Context, formats strfmt
 		res = append(res, err)
 	}
 
+	if err := m.contextValidatePreferences(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.contextValidateSecondFactorAuthenticationMechanisms(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -562,6 +592,27 @@ func (m *SelfUserWithDataV2) contextValidatePayloadSchema(ctx context.Context, f
 				return ve.ValidateName("payload_schema")
 			} else if ce, ok := err.(*errors.CompositeError); ok {
 				return ce.ValidateName("payload_schema")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *SelfUserWithDataV2) contextValidatePreferences(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Preferences != nil {
+
+		if swag.IsZero(m.Preferences) { // not required
+			return nil
+		}
+
+		if err := m.Preferences.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("preferences")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("preferences")
 			}
 			return err
 		}

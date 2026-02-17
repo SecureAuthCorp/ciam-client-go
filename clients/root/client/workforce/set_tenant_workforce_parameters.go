@@ -64,7 +64,7 @@ SetTenantWorkforceParams contains all the parameters to send to the API endpoint
 type SetTenantWorkforceParams struct {
 
 	// SetTenantWorkforce.
-	SetTenantWorkforce *models.WorkforceSettings
+	SetTenantWorkforce *models.TenantWorkforceSettings
 
 	/* Tid.
 
@@ -139,13 +139,13 @@ func (o *SetTenantWorkforceParams) SetHTTPClient(client *http.Client) {
 }
 
 // WithSetTenantWorkforce adds the setTenantWorkforce to the set tenant workforce params
-func (o *SetTenantWorkforceParams) WithSetTenantWorkforce(setTenantWorkforce *models.WorkforceSettings) *SetTenantWorkforceParams {
+func (o *SetTenantWorkforceParams) WithSetTenantWorkforce(setTenantWorkforce *models.TenantWorkforceSettings) *SetTenantWorkforceParams {
 	o.SetSetTenantWorkforce(setTenantWorkforce)
 	return o
 }
 
 // SetSetTenantWorkforce adds the setTenantWorkforce to the set tenant workforce params
-func (o *SetTenantWorkforceParams) SetSetTenantWorkforce(setTenantWorkforce *models.WorkforceSettings) {
+func (o *SetTenantWorkforceParams) SetSetTenantWorkforce(setTenantWorkforce *models.TenantWorkforceSettings) {
 	o.SetTenantWorkforce = setTenantWorkforce
 }
 

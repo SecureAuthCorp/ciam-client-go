@@ -16,56 +16,40 @@ import (
 
 // Translation Translation
 //
+// Returns translations for a specific locale.
+// It might include built-in translation, custom translation, and whether the locale is enabled.
+//
 // swagger:model Translation
 type Translation struct {
 
-	// built-in exists
-	BuiltInExists bool `json:"built_in_exists,omitempty" yaml:"built_in_exists,omitempty"`
+	// built in translation
+	BuiltInTranslation *BuiltInTranslation `json:"built_in_translation,omitempty" yaml:"built_in_translation,omitempty"`
 
-	// content of the translation
-	Content map[string]interface{} `json:"content,omitempty" yaml:"content,omitempty"`
+	// custom translation
+	CustomTranslation *CustomTranslation `json:"custom_translation,omitempty" yaml:"custom_translation,omitempty"`
 
-	// timestamp when the translation was created
-	// Format: date-time
-	CreatedAt strfmt.DateTime `json:"created_at,omitempty" yaml:"created_at,omitempty"`
-
-	// enabled
+	// When enabled, trnslations for this locale are available, when disabled the whole locale is disabled and no translations are available.
+	// In case there is no built-in translation for this locale and the overwritten translation is not set, the locale is not active.
 	Enabled bool `json:"enabled,omitempty" yaml:"enabled,omitempty"`
 
-	// Is built-in translation
-	IsBuiltIn bool `json:"is_built_in,omitempty" yaml:"is_built_in,omitempty"`
-
-	// translation locale
+	// Locale for which the translations are provided.
 	// Required: true
 	Locale string `json:"locale" yaml:"locale"`
-
-	// ID of the tenant
-	// Example: default
-	// Required: true
-	TenantID string `json:"tenant_id" yaml:"tenant_id"`
-
-	// timestamp when the translation was last updated
-	// Format: date-time
-	UpdatedAt strfmt.DateTime `json:"updated_at,omitempty" yaml:"updated_at,omitempty"`
 }
 
 // Validate validates this translation
 func (m *Translation) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateCreatedAt(formats); err != nil {
+	if err := m.validateBuiltInTranslation(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateCustomTranslation(formats); err != nil {
 		res = append(res, err)
 	}
 
 	if err := m.validateLocale(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateTenantID(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateUpdatedAt(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -75,13 +59,39 @@ func (m *Translation) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *Translation) validateCreatedAt(formats strfmt.Registry) error {
-	if swag.IsZero(m.CreatedAt) { // not required
+func (m *Translation) validateBuiltInTranslation(formats strfmt.Registry) error {
+	if swag.IsZero(m.BuiltInTranslation) { // not required
 		return nil
 	}
 
-	if err := validate.FormatOf("created_at", "body", "date-time", m.CreatedAt.String(), formats); err != nil {
-		return err
+	if m.BuiltInTranslation != nil {
+		if err := m.BuiltInTranslation.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("built_in_translation")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("built_in_translation")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *Translation) validateCustomTranslation(formats strfmt.Registry) error {
+	if swag.IsZero(m.CustomTranslation) { // not required
+		return nil
+	}
+
+	if m.CustomTranslation != nil {
+		if err := m.CustomTranslation.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("custom_translation")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("custom_translation")
+			}
+			return err
+		}
 	}
 
 	return nil
@@ -96,29 +106,63 @@ func (m *Translation) validateLocale(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *Translation) validateTenantID(formats strfmt.Registry) error {
-
-	if err := validate.RequiredString("tenant_id", "body", m.TenantID); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *Translation) validateUpdatedAt(formats strfmt.Registry) error {
-	if swag.IsZero(m.UpdatedAt) { // not required
-		return nil
-	}
-
-	if err := validate.FormatOf("updated_at", "body", "date-time", m.UpdatedAt.String(), formats); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// ContextValidate validates this translation based on context it is used
+// ContextValidate validate this translation based on the context it is used
 func (m *Translation) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateBuiltInTranslation(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateCustomTranslation(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *Translation) contextValidateBuiltInTranslation(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.BuiltInTranslation != nil {
+
+		if swag.IsZero(m.BuiltInTranslation) { // not required
+			return nil
+		}
+
+		if err := m.BuiltInTranslation.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("built_in_translation")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("built_in_translation")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *Translation) contextValidateCustomTranslation(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.CustomTranslation != nil {
+
+		if swag.IsZero(m.CustomTranslation) { // not required
+			return nil
+		}
+
+		if err := m.CustomTranslation.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("custom_translation")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("custom_translation")
+			}
+			return err
+		}
+	}
+
 	return nil
 }
 

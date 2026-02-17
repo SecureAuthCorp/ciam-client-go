@@ -7831,7 +7831,7 @@ schemes:
 securityDefinitions:
   system:
     authorizationUrl: /default/system/oauth2/authorize
-    flow: application
+    flow: accessCode
     scopes:
       identity: identity
       identity_self_registration: identity_self_registration

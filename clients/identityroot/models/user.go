@@ -45,6 +45,9 @@ type User struct {
 	// payload schema id
 	PayloadSchemaID string `json:"payload_schema_id,omitempty" yaml:"payload_schema_id,omitempty"`
 
+	// preferences
+	Preferences *UserPreferences `json:"preferences,omitempty" yaml:"preferences,omitempty"`
+
 	// status
 	// Example: active
 	// Required: true
@@ -81,6 +84,10 @@ func (m *User) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validatePreferences(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateStatus(formats); err != nil {
 		res = append(res, err)
 	}
@@ -114,6 +121,25 @@ func (m *User) validateCreatedAt(formats strfmt.Registry) error {
 
 	if err := validate.FormatOf("created_at", "body", "date-time", m.CreatedAt.String(), formats); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (m *User) validatePreferences(formats strfmt.Registry) error {
+	if swag.IsZero(m.Preferences) { // not required
+		return nil
+	}
+
+	if m.Preferences != nil {
+		if err := m.Preferences.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("preferences")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("preferences")
+			}
+			return err
+		}
 	}
 
 	return nil
@@ -210,8 +236,38 @@ func (m *User) validateUserPoolID(formats strfmt.Registry) error {
 	return nil
 }
 
-// ContextValidate validates this user based on context it is used
+// ContextValidate validate this user based on the context it is used
 func (m *User) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidatePreferences(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *User) contextValidatePreferences(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Preferences != nil {
+
+		if swag.IsZero(m.Preferences) { // not required
+			return nil
+		}
+
+		if err := m.Preferences.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("preferences")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("preferences")
+			}
+			return err
+		}
+	}
+
 	return nil
 }
 

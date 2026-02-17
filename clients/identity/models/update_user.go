@@ -38,6 +38,9 @@ type UpdateUser struct {
 	// payload schema id
 	PayloadSchemaID string `json:"payload_schema_id,omitempty" yaml:"payload_schema_id,omitempty"`
 
+	// preferences
+	Preferences *UserPreferences `json:"preferences,omitempty" yaml:"preferences,omitempty"`
+
 	// status
 	// Enum: ["active","inactive","deleted","new"]
 	Status string `json:"status,omitempty" yaml:"status,omitempty"`
@@ -47,6 +50,10 @@ type UpdateUser struct {
 func (m *UpdateUser) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validatePreferences(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateStatus(formats); err != nil {
 		res = append(res, err)
 	}
@@ -54,6 +61,25 @@ func (m *UpdateUser) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *UpdateUser) validatePreferences(formats strfmt.Registry) error {
+	if swag.IsZero(m.Preferences) { // not required
+		return nil
+	}
+
+	if m.Preferences != nil {
+		if err := m.Preferences.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("preferences")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("preferences")
+			}
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -105,8 +131,38 @@ func (m *UpdateUser) validateStatus(formats strfmt.Registry) error {
 	return nil
 }
 
-// ContextValidate validates this update user based on context it is used
+// ContextValidate validate this update user based on the context it is used
 func (m *UpdateUser) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidatePreferences(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *UpdateUser) contextValidatePreferences(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Preferences != nil {
+
+		if swag.IsZero(m.Preferences) { // not required
+			return nil
+		}
+
+		if err := m.Preferences.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("preferences")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("preferences")
+			}
+			return err
+		}
+	}
+
 	return nil
 }
 

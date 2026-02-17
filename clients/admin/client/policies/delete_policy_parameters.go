@@ -72,6 +72,18 @@ type DeletePolicyParams struct {
 	// Pid.
 	Pid string
 
+	/* XCorrelationID.
+
+	   Unique identifier included in audit events for request tracking
+	*/
+	XCorrelationID *string
+
+	/* XIdempotencyKey.
+
+	   Key used to safely retry failed requests without duplicate processing
+	*/
+	XIdempotencyKey *string
+
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
@@ -147,6 +159,28 @@ func (o *DeletePolicyParams) SetPid(pid string) {
 	o.Pid = pid
 }
 
+// WithXCorrelationID adds the xCorrelationID to the delete policy params
+func (o *DeletePolicyParams) WithXCorrelationID(xCorrelationID *string) *DeletePolicyParams {
+	o.SetXCorrelationID(xCorrelationID)
+	return o
+}
+
+// SetXCorrelationID adds the xCorrelationId to the delete policy params
+func (o *DeletePolicyParams) SetXCorrelationID(xCorrelationID *string) {
+	o.XCorrelationID = xCorrelationID
+}
+
+// WithXIdempotencyKey adds the xIdempotencyKey to the delete policy params
+func (o *DeletePolicyParams) WithXIdempotencyKey(xIdempotencyKey *string) *DeletePolicyParams {
+	o.SetXIdempotencyKey(xIdempotencyKey)
+	return o
+}
+
+// SetXIdempotencyKey adds the xIdempotencyKey to the delete policy params
+func (o *DeletePolicyParams) SetXIdempotencyKey(xIdempotencyKey *string) {
+	o.XIdempotencyKey = xIdempotencyKey
+}
+
 // WriteToRequest writes these params to a swagger request
 func (o *DeletePolicyParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Registry) error {
 
@@ -166,6 +200,22 @@ func (o *DeletePolicyParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.
 	// path param pid
 	if err := r.SetPathParam("pid", o.Pid); err != nil {
 		return err
+	}
+
+	if o.XCorrelationID != nil {
+
+		// header param x-correlation-id
+		if err := r.SetHeaderParam("x-correlation-id", *o.XCorrelationID); err != nil {
+			return err
+		}
+	}
+
+	if o.XIdempotencyKey != nil {
+
+		// header param x-idempotency-key
+		if err := r.SetHeaderParam("x-idempotency-key", *o.XIdempotencyKey); err != nil {
+			return err
+		}
 	}
 
 	if len(res) > 0 {

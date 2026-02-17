@@ -118,6 +118,8 @@ type ClientService interface {
 
 	SystemListUsers(params *SystemListUsersParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*SystemListUsersOK, error)
 
+	SystemPatchUser(params *SystemPatchUserParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*SystemPatchUserOK, error)
+
 	SystemUpdateUser(params *SystemUpdateUserParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*SystemUpdateUserOK, error)
 
 	SystemUpdateVerifiableAddress(params *SystemUpdateVerifiableAddressParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*SystemUpdateVerifiableAddressOK, error)
@@ -1579,6 +1581,53 @@ func (a *Client) SystemListUsers(params *SystemListUsersParams, authInfo runtime
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for systemListUsers: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+	SystemPatchUser patches existing user supports both r f c6902 and r f c7396 JSON patch
+
+	Patch operates on the same fields as the **Update User Record** endpoint.
+
+example for RFC6902:
+[{"op": "replace", "path": "/payload/first_name", "value": "John"}]
+
+example for RFC7396:
+{"payload": {"first_name": "John"}}
+*/
+func (a *Client) SystemPatchUser(params *SystemPatchUserParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*SystemPatchUserOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewSystemPatchUserParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "systemPatchUser",
+		Method:             "PATCH",
+		PathPattern:        "/system/pools/{ipID}/users/{userID}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &SystemPatchUserReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*SystemPatchUserOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for systemPatchUser: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

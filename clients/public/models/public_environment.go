@@ -7,9 +7,12 @@ package models
 
 import (
 	"context"
+	"encoding/json"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // PublicEnvironment public environment
@@ -22,10 +25,149 @@ type PublicEnvironment struct {
 
 	// If b2b_orgs_client_side_search is enabled
 	B2bOrgsClientSideSearch bool `json:"b2b_orgs_client_side_search,omitempty" yaml:"b2b_orgs_client_side_search,omitempty"`
+
+	// faye url
+	FayeURL string `json:"faye_url,omitempty" yaml:"faye_url,omitempty"`
+
+	// Image proxy URL
+	ImageProxyURL string `json:"image_proxy_url,omitempty" yaml:"image_proxy_url,omitempty"`
+
+	// server profile
+	// Enum: ["default","demo","workforce","workforce_v2","consumer","partners","third_party","fapi_advanced","fapi_rw","fapi_ro","openbanking_uk_fapi_advanced","openbanking_uk","openbanking_br","openbanking_br_unico","cdr_australia","cdr_australia_fapi_rw","fdx","openbanking_ksa","fapi_20_security","fapi_20_message_signing","connect_id","agentic_ai"]
+	ServerProfile string `json:"server_profile,omitempty" yaml:"server_profile,omitempty"`
+
+	// workforce integration
+	Workforce bool `json:"workforce,omitempty" yaml:"workforce,omitempty"`
+
+	// workforce logout url
+	WorkforceLogoutURL string `json:"workforce_logout_url,omitempty" yaml:"workforce_logout_url,omitempty"`
+
+	// workforce manifest url
+	WorkforceManifestURL string `json:"workforce_manifest_url,omitempty" yaml:"workforce_manifest_url,omitempty"`
+
+	// workforce tenant slug
+	WorkforceTenantSlug string `json:"workforce_tenant_slug,omitempty" yaml:"workforce_tenant_slug,omitempty"`
+
+	// workforce url
+	WorkforceURL string `json:"workforce_url,omitempty" yaml:"workforce_url,omitempty"`
+
+	// Workspace Issuer URL
+	WorkspaceIssuerURL string `json:"workspace_issuer_url,omitempty" yaml:"workspace_issuer_url,omitempty"`
 }
 
 // Validate validates this public environment
 func (m *PublicEnvironment) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateServerProfile(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+var publicEnvironmentTypeServerProfilePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["default","demo","workforce","workforce_v2","consumer","partners","third_party","fapi_advanced","fapi_rw","fapi_ro","openbanking_uk_fapi_advanced","openbanking_uk","openbanking_br","openbanking_br_unico","cdr_australia","cdr_australia_fapi_rw","fdx","openbanking_ksa","fapi_20_security","fapi_20_message_signing","connect_id","agentic_ai"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		publicEnvironmentTypeServerProfilePropEnum = append(publicEnvironmentTypeServerProfilePropEnum, v)
+	}
+}
+
+const (
+
+	// PublicEnvironmentServerProfileDefault captures enum value "default"
+	PublicEnvironmentServerProfileDefault string = "default"
+
+	// PublicEnvironmentServerProfileDemo captures enum value "demo"
+	PublicEnvironmentServerProfileDemo string = "demo"
+
+	// PublicEnvironmentServerProfileWorkforce captures enum value "workforce"
+	PublicEnvironmentServerProfileWorkforce string = "workforce"
+
+	// PublicEnvironmentServerProfileWorkforceV2 captures enum value "workforce_v2"
+	PublicEnvironmentServerProfileWorkforceV2 string = "workforce_v2"
+
+	// PublicEnvironmentServerProfileConsumer captures enum value "consumer"
+	PublicEnvironmentServerProfileConsumer string = "consumer"
+
+	// PublicEnvironmentServerProfilePartners captures enum value "partners"
+	PublicEnvironmentServerProfilePartners string = "partners"
+
+	// PublicEnvironmentServerProfileThirdParty captures enum value "third_party"
+	PublicEnvironmentServerProfileThirdParty string = "third_party"
+
+	// PublicEnvironmentServerProfileFapiAdvanced captures enum value "fapi_advanced"
+	PublicEnvironmentServerProfileFapiAdvanced string = "fapi_advanced"
+
+	// PublicEnvironmentServerProfileFapiRw captures enum value "fapi_rw"
+	PublicEnvironmentServerProfileFapiRw string = "fapi_rw"
+
+	// PublicEnvironmentServerProfileFapiRo captures enum value "fapi_ro"
+	PublicEnvironmentServerProfileFapiRo string = "fapi_ro"
+
+	// PublicEnvironmentServerProfileOpenbankingUkFapiAdvanced captures enum value "openbanking_uk_fapi_advanced"
+	PublicEnvironmentServerProfileOpenbankingUkFapiAdvanced string = "openbanking_uk_fapi_advanced"
+
+	// PublicEnvironmentServerProfileOpenbankingUk captures enum value "openbanking_uk"
+	PublicEnvironmentServerProfileOpenbankingUk string = "openbanking_uk"
+
+	// PublicEnvironmentServerProfileOpenbankingBr captures enum value "openbanking_br"
+	PublicEnvironmentServerProfileOpenbankingBr string = "openbanking_br"
+
+	// PublicEnvironmentServerProfileOpenbankingBrUnico captures enum value "openbanking_br_unico"
+	PublicEnvironmentServerProfileOpenbankingBrUnico string = "openbanking_br_unico"
+
+	// PublicEnvironmentServerProfileCdrAustralia captures enum value "cdr_australia"
+	PublicEnvironmentServerProfileCdrAustralia string = "cdr_australia"
+
+	// PublicEnvironmentServerProfileCdrAustraliaFapiRw captures enum value "cdr_australia_fapi_rw"
+	PublicEnvironmentServerProfileCdrAustraliaFapiRw string = "cdr_australia_fapi_rw"
+
+	// PublicEnvironmentServerProfileFdx captures enum value "fdx"
+	PublicEnvironmentServerProfileFdx string = "fdx"
+
+	// PublicEnvironmentServerProfileOpenbankingKsa captures enum value "openbanking_ksa"
+	PublicEnvironmentServerProfileOpenbankingKsa string = "openbanking_ksa"
+
+	// PublicEnvironmentServerProfileFapi20Security captures enum value "fapi_20_security"
+	PublicEnvironmentServerProfileFapi20Security string = "fapi_20_security"
+
+	// PublicEnvironmentServerProfileFapi20MessageSigning captures enum value "fapi_20_message_signing"
+	PublicEnvironmentServerProfileFapi20MessageSigning string = "fapi_20_message_signing"
+
+	// PublicEnvironmentServerProfileConnectID captures enum value "connect_id"
+	PublicEnvironmentServerProfileConnectID string = "connect_id"
+
+	// PublicEnvironmentServerProfileAgenticAi captures enum value "agentic_ai"
+	PublicEnvironmentServerProfileAgenticAi string = "agentic_ai"
+)
+
+// prop value enum
+func (m *PublicEnvironment) validateServerProfileEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, publicEnvironmentTypeServerProfilePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *PublicEnvironment) validateServerProfile(formats strfmt.Registry) error {
+	if swag.IsZero(m.ServerProfile) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateServerProfileEnum("server_profile", "body", m.ServerProfile); err != nil {
+		return err
+	}
+
 	return nil
 }
 

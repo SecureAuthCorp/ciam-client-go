@@ -75,6 +75,18 @@ type ImportSpecificationFromTextParams struct {
 	// Text.
 	Text string
 
+	/* XCorrelationID.
+
+	   Unique identifier included in audit events for request tracking
+	*/
+	XCorrelationID *string
+
+	/* XIdempotencyKey.
+
+	   Key used to safely retry failed requests without duplicate processing
+	*/
+	XIdempotencyKey *string
+
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
@@ -161,6 +173,28 @@ func (o *ImportSpecificationFromTextParams) SetText(text string) {
 	o.Text = text
 }
 
+// WithXCorrelationID adds the xCorrelationID to the import specification from text params
+func (o *ImportSpecificationFromTextParams) WithXCorrelationID(xCorrelationID *string) *ImportSpecificationFromTextParams {
+	o.SetXCorrelationID(xCorrelationID)
+	return o
+}
+
+// SetXCorrelationID adds the xCorrelationId to the import specification from text params
+func (o *ImportSpecificationFromTextParams) SetXCorrelationID(xCorrelationID *string) {
+	o.XCorrelationID = xCorrelationID
+}
+
+// WithXIdempotencyKey adds the xIdempotencyKey to the import specification from text params
+func (o *ImportSpecificationFromTextParams) WithXIdempotencyKey(xIdempotencyKey *string) *ImportSpecificationFromTextParams {
+	o.SetXIdempotencyKey(xIdempotencyKey)
+	return o
+}
+
+// SetXIdempotencyKey adds the xIdempotencyKey to the import specification from text params
+func (o *ImportSpecificationFromTextParams) SetXIdempotencyKey(xIdempotencyKey *string) {
+	o.XIdempotencyKey = xIdempotencyKey
+}
+
 // WriteToRequest writes these params to a swagger request
 func (o *ImportSpecificationFromTextParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Registry) error {
 
@@ -183,6 +217,22 @@ func (o *ImportSpecificationFromTextParams) WriteToRequest(r runtime.ClientReque
 	}
 	if err := r.SetBodyParam(o.Text); err != nil {
 		return err
+	}
+
+	if o.XCorrelationID != nil {
+
+		// header param x-correlation-id
+		if err := r.SetHeaderParam("x-correlation-id", *o.XCorrelationID); err != nil {
+			return err
+		}
+	}
+
+	if o.XIdempotencyKey != nil {
+
+		// header param x-idempotency-key
+		if err := r.SetHeaderParam("x-idempotency-key", *o.XIdempotencyKey); err != nil {
+			return err
+		}
 	}
 
 	if len(res) > 0 {

@@ -72,6 +72,18 @@ type GetScopeParams struct {
 	// Scp.
 	Scp string
 
+	/* XCorrelationID.
+
+	   Unique identifier included in audit events for request tracking
+	*/
+	XCorrelationID *string
+
+	/* XIdempotencyKey.
+
+	   Key used to safely retry failed requests without duplicate processing
+	*/
+	XIdempotencyKey *string
+
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
@@ -147,6 +159,28 @@ func (o *GetScopeParams) SetScp(scp string) {
 	o.Scp = scp
 }
 
+// WithXCorrelationID adds the xCorrelationID to the get scope params
+func (o *GetScopeParams) WithXCorrelationID(xCorrelationID *string) *GetScopeParams {
+	o.SetXCorrelationID(xCorrelationID)
+	return o
+}
+
+// SetXCorrelationID adds the xCorrelationId to the get scope params
+func (o *GetScopeParams) SetXCorrelationID(xCorrelationID *string) {
+	o.XCorrelationID = xCorrelationID
+}
+
+// WithXIdempotencyKey adds the xIdempotencyKey to the get scope params
+func (o *GetScopeParams) WithXIdempotencyKey(xIdempotencyKey *string) *GetScopeParams {
+	o.SetXIdempotencyKey(xIdempotencyKey)
+	return o
+}
+
+// SetXIdempotencyKey adds the xIdempotencyKey to the get scope params
+func (o *GetScopeParams) SetXIdempotencyKey(xIdempotencyKey *string) {
+	o.XIdempotencyKey = xIdempotencyKey
+}
+
 // WriteToRequest writes these params to a swagger request
 func (o *GetScopeParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Registry) error {
 
@@ -166,6 +200,22 @@ func (o *GetScopeParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Regi
 	// path param scp
 	if err := r.SetPathParam("scp", o.Scp); err != nil {
 		return err
+	}
+
+	if o.XCorrelationID != nil {
+
+		// header param x-correlation-id
+		if err := r.SetHeaderParam("x-correlation-id", *o.XCorrelationID); err != nil {
+			return err
+		}
+	}
+
+	if o.XIdempotencyKey != nil {
+
+		// header param x-idempotency-key
+		if err := r.SetHeaderParam("x-idempotency-key", *o.XIdempotencyKey); err != nil {
+			return err
+		}
 	}
 
 	if len(res) > 0 {

@@ -48,6 +48,9 @@ type NewUserPayload struct {
 	// payload schema id
 	PayloadSchemaID string `json:"payload_schema_id,omitempty" yaml:"payload_schema_id,omitempty"`
 
+	// preferences
+	Preferences *UserPreferences `json:"preferences,omitempty" yaml:"preferences,omitempty"`
+
 	// status
 	// Required: true
 	// Enum: ["active","inactive","deleted","new"]
@@ -66,6 +69,10 @@ func (m *NewUserPayload) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateIdentifiers(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validatePreferences(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -130,6 +137,25 @@ func (m *NewUserPayload) validateIdentifiers(formats strfmt.Registry) error {
 			}
 		}
 
+	}
+
+	return nil
+}
+
+func (m *NewUserPayload) validatePreferences(formats strfmt.Registry) error {
+	if swag.IsZero(m.Preferences) { // not required
+		return nil
+	}
+
+	if m.Preferences != nil {
+		if err := m.Preferences.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("preferences")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("preferences")
+			}
+			return err
+		}
 	}
 
 	return nil
@@ -222,6 +248,10 @@ func (m *NewUserPayload) ContextValidate(ctx context.Context, formats strfmt.Reg
 		res = append(res, err)
 	}
 
+	if err := m.contextValidatePreferences(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.contextValidateVerifiableAddresses(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -277,6 +307,27 @@ func (m *NewUserPayload) contextValidateIdentifiers(ctx context.Context, formats
 			}
 		}
 
+	}
+
+	return nil
+}
+
+func (m *NewUserPayload) contextValidatePreferences(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Preferences != nil {
+
+		if swag.IsZero(m.Preferences) { // not required
+			return nil
+		}
+
+		if err := m.Preferences.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("preferences")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("preferences")
+			}
+			return err
+		}
 	}
 
 	return nil

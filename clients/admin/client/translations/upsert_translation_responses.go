@@ -82,6 +82,27 @@ UpsertTranslationOK describes a response with status code 200, with default head
 Translation
 */
 type UpsertTranslationOK struct {
+
+	/* A server will only return requested resources if the resource matches one of the listed ETag value
+
+	in:header
+
+	     Format: etag
+	*/
+	IfMatch string
+
+	/* Unique identifier included in audit events for request tracking
+
+	in:header
+	*/
+	XCorrelationID string
+
+	/* Key used to safely retry failed requests without duplicate processing
+
+	in:header
+	*/
+	XIdempotencyKey string
+
 	Payload *models.Translation
 }
 
@@ -130,6 +151,27 @@ func (o *UpsertTranslationOK) GetPayload() *models.Translation {
 }
 
 func (o *UpsertTranslationOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	// hydrates response header if-match
+	hdrIfMatch := response.GetHeader("if-match")
+
+	if hdrIfMatch != "" {
+		o.IfMatch = hdrIfMatch
+	}
+
+	// hydrates response header x-correlation-id
+	hdrXCorrelationID := response.GetHeader("x-correlation-id")
+
+	if hdrXCorrelationID != "" {
+		o.XCorrelationID = hdrXCorrelationID
+	}
+
+	// hydrates response header x-idempotency-key
+	hdrXIdempotencyKey := response.GetHeader("x-idempotency-key")
+
+	if hdrXIdempotencyKey != "" {
+		o.XIdempotencyKey = hdrXIdempotencyKey
+	}
 
 	o.Payload = new(models.Translation)
 

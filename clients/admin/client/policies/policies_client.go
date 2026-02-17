@@ -78,7 +78,7 @@ type ClientService interface {
 /*
 	CreatePolicy creates policy
 
-	ACP supports creating Cloudentity policies (using a visual editor or defined using JSON or
+	ACP supports creating SecureAuth policies (using a visual editor or defined using JSON or
 
 YAML) and policies defined using REGO (language used by Open Policy Agent (OPA)).
 

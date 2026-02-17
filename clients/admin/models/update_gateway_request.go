@@ -25,7 +25,7 @@ type UpdateGatewayRequest struct {
 	Description string `json:"description,omitempty" yaml:"description,omitempty"`
 
 	// gateway name
-	// Example: Cloudentity Pyron
+	// Example: SecureAuth Pyron
 	Name string `json:"name,omitempty" yaml:"name,omitempty"`
 
 	// token exchange

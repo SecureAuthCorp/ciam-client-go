@@ -93,6 +93,18 @@ type UpdateStaticIDPParams struct {
 	*/
 	Wid string
 
+	/* XCorrelationID.
+
+	   Unique identifier included in audit events for request tracking
+	*/
+	XCorrelationID *string
+
+	/* XIdempotencyKey.
+
+	   Key used to safely retry failed requests without duplicate processing
+	*/
+	XIdempotencyKey *string
+
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
@@ -204,6 +216,28 @@ func (o *UpdateStaticIDPParams) SetWid(wid string) {
 	o.Wid = wid
 }
 
+// WithXCorrelationID adds the xCorrelationID to the update static ID p params
+func (o *UpdateStaticIDPParams) WithXCorrelationID(xCorrelationID *string) *UpdateStaticIDPParams {
+	o.SetXCorrelationID(xCorrelationID)
+	return o
+}
+
+// SetXCorrelationID adds the xCorrelationId to the update static ID p params
+func (o *UpdateStaticIDPParams) SetXCorrelationID(xCorrelationID *string) {
+	o.XCorrelationID = xCorrelationID
+}
+
+// WithXIdempotencyKey adds the xIdempotencyKey to the update static ID p params
+func (o *UpdateStaticIDPParams) WithXIdempotencyKey(xIdempotencyKey *string) *UpdateStaticIDPParams {
+	o.SetXIdempotencyKey(xIdempotencyKey)
+	return o
+}
+
+// SetXIdempotencyKey adds the xIdempotencyKey to the update static ID p params
+func (o *UpdateStaticIDPParams) SetXIdempotencyKey(xIdempotencyKey *string) {
+	o.XIdempotencyKey = xIdempotencyKey
+}
+
 // WriteToRequest writes these params to a swagger request
 func (o *UpdateStaticIDPParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Registry) error {
 
@@ -233,6 +267,22 @@ func (o *UpdateStaticIDPParams) WriteToRequest(r runtime.ClientRequest, reg strf
 	// path param wid
 	if err := r.SetPathParam("wid", o.Wid); err != nil {
 		return err
+	}
+
+	if o.XCorrelationID != nil {
+
+		// header param x-correlation-id
+		if err := r.SetHeaderParam("x-correlation-id", *o.XCorrelationID); err != nil {
+			return err
+		}
+	}
+
+	if o.XIdempotencyKey != nil {
+
+		// header param x-idempotency-key
+		if err := r.SetHeaderParam("x-idempotency-key", *o.XIdempotencyKey); err != nil {
+			return err
+		}
 	}
 
 	if len(res) > 0 {

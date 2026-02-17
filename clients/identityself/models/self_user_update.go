@@ -8,6 +8,7 @@ package models
 import (
 	"context"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 )
@@ -19,15 +20,76 @@ type SelfUserUpdate struct {
 
 	// payload
 	Payload map[string]interface{} `json:"payload,omitempty" yaml:"payload,omitempty"`
+
+	// preferences
+	Preferences *UserPreferences `json:"preferences,omitempty" yaml:"preferences,omitempty"`
 }
 
 // Validate validates this self user update
 func (m *SelfUserUpdate) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validatePreferences(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
 	return nil
 }
 
-// ContextValidate validates this self user update based on context it is used
+func (m *SelfUserUpdate) validatePreferences(formats strfmt.Registry) error {
+	if swag.IsZero(m.Preferences) { // not required
+		return nil
+	}
+
+	if m.Preferences != nil {
+		if err := m.Preferences.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("preferences")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("preferences")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ContextValidate validate this self user update based on the context it is used
 func (m *SelfUserUpdate) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidatePreferences(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *SelfUserUpdate) contextValidatePreferences(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Preferences != nil {
+
+		if swag.IsZero(m.Preferences) { // not required
+			return nil
+		}
+
+		if err := m.Preferences.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("preferences")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("preferences")
+			}
+			return err
+		}
+	}
+
 	return nil
 }
 

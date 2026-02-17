@@ -30,6 +30,9 @@ type AuditEventPayloads struct {
 	// authorization code issued
 	AuthorizationCodeIssued *AccessRequestData `json:"authorization_code_issued,omitempty" yaml:"authorization_code_issued,omitempty"`
 
+	// authorization details granted
+	AuthorizationDetailsGranted *AuthorizationDetailsGrantedPayload `json:"authorization_details_granted,omitempty" yaml:"authorization_details_granted,omitempty"`
+
 	// bruteforce deleted
 	BruteforceDeleted *BruteForceLimit `json:"bruteforce_deleted,omitempty" yaml:"bruteforce_deleted,omitempty"`
 
@@ -83,6 +86,12 @@ type AuditEventPayloads struct {
 
 	// dcr rejected
 	DcrRejected *DCRRejectedEventPayload `json:"dcr_rejected,omitempty" yaml:"dcr_rejected,omitempty"`
+
+	// device add completed
+	DeviceAddCompleted *UserIDAndIdentifierPayload `json:"device_add_completed,omitempty" yaml:"device_add_completed,omitempty"`
+
+	// device add requested
+	DeviceAddRequested *UserIDAndIdentifierPayload `json:"device_add_requested,omitempty" yaml:"device_add_requested,omitempty"`
 
 	// gateway policy authorized
 	GatewayPolicyAuthorized *RequestValidatedPayload `json:"gateway_policy_authorized,omitempty" yaml:"gateway_policy_authorized,omitempty"`
@@ -208,10 +217,10 @@ type AuditEventPayloads struct {
 	RoleRevoked *RoleGrantAuditPayload `json:"role_revoked,omitempty" yaml:"role_revoked,omitempty"`
 
 	// saml assertion denied
-	SamlAssertionDenied *AccessRequestDataWithError `json:"saml_assertion_denied,omitempty" yaml:"saml_assertion_denied,omitempty"`
+	SamlAssertionDenied *SAMLAssertionDeniedPayload `json:"saml_assertion_denied,omitempty" yaml:"saml_assertion_denied,omitempty"`
 
 	// saml assertion issued
-	SamlAssertionIssued *AccessRequestData `json:"saml_assertion_issued,omitempty" yaml:"saml_assertion_issued,omitempty"`
+	SamlAssertionIssued *SAMLAssertionIssuedPayload `json:"saml_assertion_issued,omitempty" yaml:"saml_assertion_issued,omitempty"`
 
 	// schema created
 	SchemaCreated *SchemaAuditPayload `json:"schema_created,omitempty" yaml:"schema_created,omitempty"`
@@ -309,6 +318,10 @@ func (m *AuditEventPayloads) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateAuthorizationDetailsGranted(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateBruteforceDeleted(formats); err != nil {
 		res = append(res, err)
 	}
@@ -378,6 +391,14 @@ func (m *AuditEventPayloads) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateDcrRejected(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateDeviceAddCompleted(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateDeviceAddRequested(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -735,6 +756,25 @@ func (m *AuditEventPayloads) validateAuthorizationCodeIssued(formats strfmt.Regi
 	return nil
 }
 
+func (m *AuditEventPayloads) validateAuthorizationDetailsGranted(formats strfmt.Registry) error {
+	if swag.IsZero(m.AuthorizationDetailsGranted) { // not required
+		return nil
+	}
+
+	if m.AuthorizationDetailsGranted != nil {
+		if err := m.AuthorizationDetailsGranted.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("authorization_details_granted")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("authorization_details_granted")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (m *AuditEventPayloads) validateBruteforceDeleted(formats strfmt.Registry) error {
 	if swag.IsZero(m.BruteforceDeleted) { // not required
 		return nil
@@ -1069,6 +1109,44 @@ func (m *AuditEventPayloads) validateDcrRejected(formats strfmt.Registry) error 
 				return ve.ValidateName("dcr_rejected")
 			} else if ce, ok := err.(*errors.CompositeError); ok {
 				return ce.ValidateName("dcr_rejected")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *AuditEventPayloads) validateDeviceAddCompleted(formats strfmt.Registry) error {
+	if swag.IsZero(m.DeviceAddCompleted) { // not required
+		return nil
+	}
+
+	if m.DeviceAddCompleted != nil {
+		if err := m.DeviceAddCompleted.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("device_add_completed")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("device_add_completed")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *AuditEventPayloads) validateDeviceAddRequested(formats strfmt.Registry) error {
+	if swag.IsZero(m.DeviceAddRequested) { // not required
+		return nil
+	}
+
+	if m.DeviceAddRequested != nil {
+		if err := m.DeviceAddRequested.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("device_add_requested")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("device_add_requested")
 			}
 			return err
 		}
@@ -2389,6 +2467,10 @@ func (m *AuditEventPayloads) ContextValidate(ctx context.Context, formats strfmt
 		res = append(res, err)
 	}
 
+	if err := m.contextValidateAuthorizationDetailsGranted(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.contextValidateBruteforceDeleted(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -2458,6 +2540,14 @@ func (m *AuditEventPayloads) ContextValidate(ctx context.Context, formats strfmt
 	}
 
 	if err := m.contextValidateDcrRejected(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateDeviceAddCompleted(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateDeviceAddRequested(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -2815,6 +2905,27 @@ func (m *AuditEventPayloads) contextValidateAuthorizationCodeIssued(ctx context.
 				return ve.ValidateName("authorization_code_issued")
 			} else if ce, ok := err.(*errors.CompositeError); ok {
 				return ce.ValidateName("authorization_code_issued")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *AuditEventPayloads) contextValidateAuthorizationDetailsGranted(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.AuthorizationDetailsGranted != nil {
+
+		if swag.IsZero(m.AuthorizationDetailsGranted) { // not required
+			return nil
+		}
+
+		if err := m.AuthorizationDetailsGranted.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("authorization_details_granted")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("authorization_details_granted")
 			}
 			return err
 		}
@@ -3193,6 +3304,48 @@ func (m *AuditEventPayloads) contextValidateDcrRejected(ctx context.Context, for
 				return ve.ValidateName("dcr_rejected")
 			} else if ce, ok := err.(*errors.CompositeError); ok {
 				return ce.ValidateName("dcr_rejected")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *AuditEventPayloads) contextValidateDeviceAddCompleted(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.DeviceAddCompleted != nil {
+
+		if swag.IsZero(m.DeviceAddCompleted) { // not required
+			return nil
+		}
+
+		if err := m.DeviceAddCompleted.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("device_add_completed")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("device_add_completed")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *AuditEventPayloads) contextValidateDeviceAddRequested(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.DeviceAddRequested != nil {
+
+		if swag.IsZero(m.DeviceAddRequested) { // not required
+			return nil
+		}
+
+		if err := m.DeviceAddRequested.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("device_add_requested")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("device_add_requested")
 			}
 			return err
 		}

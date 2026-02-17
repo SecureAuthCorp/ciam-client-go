@@ -81,6 +81,30 @@ type CreateAuthorizationServerParams struct {
 	*/
 	WithDemoClient *bool
 
+	/* WithIdentityPool.
+
+	   With identity pool
+	*/
+	WithIdentityPool *bool
+
+	/* WithIdentityPoolIdp.
+
+	   With identity pool idp
+	*/
+	WithIdentityPoolIdp *bool
+
+	/* XCorrelationID.
+
+	   Unique identifier included in audit events for request tracking
+	*/
+	XCorrelationID *string
+
+	/* XIdempotencyKey.
+
+	   Key used to safely retry failed requests without duplicate processing
+	*/
+	XIdempotencyKey *string
+
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
@@ -167,6 +191,50 @@ func (o *CreateAuthorizationServerParams) SetWithDemoClient(withDemoClient *bool
 	o.WithDemoClient = withDemoClient
 }
 
+// WithWithIdentityPool adds the withIdentityPool to the create authorization server params
+func (o *CreateAuthorizationServerParams) WithWithIdentityPool(withIdentityPool *bool) *CreateAuthorizationServerParams {
+	o.SetWithIdentityPool(withIdentityPool)
+	return o
+}
+
+// SetWithIdentityPool adds the withIdentityPool to the create authorization server params
+func (o *CreateAuthorizationServerParams) SetWithIdentityPool(withIdentityPool *bool) {
+	o.WithIdentityPool = withIdentityPool
+}
+
+// WithWithIdentityPoolIdp adds the withIdentityPoolIdp to the create authorization server params
+func (o *CreateAuthorizationServerParams) WithWithIdentityPoolIdp(withIdentityPoolIdp *bool) *CreateAuthorizationServerParams {
+	o.SetWithIdentityPoolIdp(withIdentityPoolIdp)
+	return o
+}
+
+// SetWithIdentityPoolIdp adds the withIdentityPoolIdp to the create authorization server params
+func (o *CreateAuthorizationServerParams) SetWithIdentityPoolIdp(withIdentityPoolIdp *bool) {
+	o.WithIdentityPoolIdp = withIdentityPoolIdp
+}
+
+// WithXCorrelationID adds the xCorrelationID to the create authorization server params
+func (o *CreateAuthorizationServerParams) WithXCorrelationID(xCorrelationID *string) *CreateAuthorizationServerParams {
+	o.SetXCorrelationID(xCorrelationID)
+	return o
+}
+
+// SetXCorrelationID adds the xCorrelationId to the create authorization server params
+func (o *CreateAuthorizationServerParams) SetXCorrelationID(xCorrelationID *string) {
+	o.XCorrelationID = xCorrelationID
+}
+
+// WithXIdempotencyKey adds the xIdempotencyKey to the create authorization server params
+func (o *CreateAuthorizationServerParams) WithXIdempotencyKey(xIdempotencyKey *string) *CreateAuthorizationServerParams {
+	o.SetXIdempotencyKey(xIdempotencyKey)
+	return o
+}
+
+// SetXIdempotencyKey adds the xIdempotencyKey to the create authorization server params
+func (o *CreateAuthorizationServerParams) SetXIdempotencyKey(xIdempotencyKey *string) {
+	o.XIdempotencyKey = xIdempotencyKey
+}
+
 // WriteToRequest writes these params to a swagger request
 func (o *CreateAuthorizationServerParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Registry) error {
 
@@ -202,6 +270,56 @@ func (o *CreateAuthorizationServerParams) WriteToRequest(r runtime.ClientRequest
 			if err := r.SetQueryParam("with_demo_client", qWithDemoClient); err != nil {
 				return err
 			}
+		}
+	}
+
+	if o.WithIdentityPool != nil {
+
+		// query param with_identity_pool
+		var qrWithIdentityPool bool
+
+		if o.WithIdentityPool != nil {
+			qrWithIdentityPool = *o.WithIdentityPool
+		}
+		qWithIdentityPool := swag.FormatBool(qrWithIdentityPool)
+		if qWithIdentityPool != "" {
+
+			if err := r.SetQueryParam("with_identity_pool", qWithIdentityPool); err != nil {
+				return err
+			}
+		}
+	}
+
+	if o.WithIdentityPoolIdp != nil {
+
+		// query param with_identity_pool_idp
+		var qrWithIdentityPoolIdp bool
+
+		if o.WithIdentityPoolIdp != nil {
+			qrWithIdentityPoolIdp = *o.WithIdentityPoolIdp
+		}
+		qWithIdentityPoolIdp := swag.FormatBool(qrWithIdentityPoolIdp)
+		if qWithIdentityPoolIdp != "" {
+
+			if err := r.SetQueryParam("with_identity_pool_idp", qWithIdentityPoolIdp); err != nil {
+				return err
+			}
+		}
+	}
+
+	if o.XCorrelationID != nil {
+
+		// header param x-correlation-id
+		if err := r.SetHeaderParam("x-correlation-id", *o.XCorrelationID); err != nil {
+			return err
+		}
+	}
+
+	if o.XIdempotencyKey != nil {
+
+		// header param x-idempotency-key
+		if err := r.SetHeaderParam("x-idempotency-key", *o.XIdempotencyKey); err != nil {
+			return err
 		}
 	}
 

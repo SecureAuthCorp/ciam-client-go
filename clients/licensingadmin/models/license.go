@@ -30,6 +30,9 @@ type License struct {
 	// Is enterprise IDPs capability enabled
 	HasEnterpriseIdpsCapability bool `json:"has_enterprise_idps_capability,omitempty" yaml:"has_enterprise_idps_capability,omitempty"`
 
+	// Is risk engine capability enabled
+	HasRiskEngineCapability bool `json:"has_risk_engine_capability,omitempty" yaml:"has_risk_engine_capability,omitempty"`
+
 	// License start date
 	// Example: 2023-03-01T09:02:27.127932Z
 	// Format: date-time

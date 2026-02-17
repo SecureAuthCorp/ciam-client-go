@@ -21,11 +21,14 @@ type CustomSettings struct {
 	// Example: https://example.com/login
 	LoginURL string `json:"login_url,omitempty" yaml:"login_url,omitempty"`
 
+	// List of supported recovery methods by this custom idp
+	RecoveryMethods []interface{} `json:"recovery_methods" yaml:"recovery_methods"`
+
 	// Type metadata
 	//
 	// There are two type metadatas: `generic` and `cloudentity`. If you choose `cloudentity` and do
 	// not provide authentication context attributes, it defaults to using the attributes from
-	// Cloudentity Cloud Identity Plane (CIP).
+	// SecureAuth Cloud Identity Plane (CIP).
 	//
 	// If not provided, the `generic` type is set.
 	Type string `json:"type,omitempty" yaml:"type,omitempty"`

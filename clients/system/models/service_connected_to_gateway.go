@@ -8,6 +8,7 @@ package models
 import (
 	"context"
 	"encoding/json"
+	"strconv"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
@@ -29,6 +30,9 @@ type ServiceConnectedToGateway struct {
 	// Authorization server identifier
 	// Example: my-server
 	AuthorizationServerID string `json:"authorization_server_id,omitempty" yaml:"authorization_server_id,omitempty"`
+
+	// Service capabilities
+	Capabilities []ServiceCapability `json:"capabilities" yaml:"capabilities"`
 
 	// Custom service audience
 	// Example: https://api.example.com
@@ -78,6 +82,10 @@ func (m *ServiceConnectedToGateway) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateCapabilities(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateType(formats); err != nil {
 		res = append(res, err)
 	}
@@ -106,6 +114,27 @@ func (m *ServiceConnectedToGateway) validateAPIGroupMetadata(formats strfmt.Regi
 			}
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (m *ServiceConnectedToGateway) validateCapabilities(formats strfmt.Registry) error {
+	if swag.IsZero(m.Capabilities) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(m.Capabilities); i++ {
+
+		if err := m.Capabilities[i].Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("capabilities" + "." + strconv.Itoa(i))
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("capabilities" + "." + strconv.Itoa(i))
+			}
+			return err
+		}
+
 	}
 
 	return nil
@@ -182,6 +211,10 @@ func (m *ServiceConnectedToGateway) ContextValidate(ctx context.Context, formats
 		res = append(res, err)
 	}
 
+	if err := m.contextValidateCapabilities(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
@@ -204,6 +237,28 @@ func (m *ServiceConnectedToGateway) contextValidateAPIGroupMetadata(ctx context.
 			}
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (m *ServiceConnectedToGateway) contextValidateCapabilities(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(m.Capabilities); i++ {
+
+		if swag.IsZero(m.Capabilities[i]) { // not required
+			return nil
+		}
+
+		if err := m.Capabilities[i].ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("capabilities" + "." + strconv.Itoa(i))
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("capabilities" + "." + strconv.Itoa(i))
+			}
+			return err
+		}
+
 	}
 
 	return nil

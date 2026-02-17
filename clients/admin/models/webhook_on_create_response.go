@@ -26,6 +26,9 @@ type WebhookOnCreateResponse struct {
 	// events
 	Events map[string][]string `json:"events,omitempty" yaml:"events,omitempty"`
 
+	// IncludeChildEvents indicates whether to receive events from child organizations
+	IncludeChildEvents bool `json:"include_child_events,omitempty" yaml:"include_child_events,omitempty"`
+
 	// Insecure
 	Insecure bool `json:"insecure,omitempty" yaml:"insecure,omitempty"`
 

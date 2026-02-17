@@ -83,6 +83,18 @@ type GetKeyParams struct {
 	*/
 	Wid string
 
+	/* XCorrelationID.
+
+	   Unique identifier included in audit events for request tracking
+	*/
+	XCorrelationID *string
+
+	/* XIdempotencyKey.
+
+	   Key used to safely retry failed requests without duplicate processing
+	*/
+	XIdempotencyKey *string
+
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
@@ -180,6 +192,28 @@ func (o *GetKeyParams) SetWid(wid string) {
 	o.Wid = wid
 }
 
+// WithXCorrelationID adds the xCorrelationID to the get key params
+func (o *GetKeyParams) WithXCorrelationID(xCorrelationID *string) *GetKeyParams {
+	o.SetXCorrelationID(xCorrelationID)
+	return o
+}
+
+// SetXCorrelationID adds the xCorrelationId to the get key params
+func (o *GetKeyParams) SetXCorrelationID(xCorrelationID *string) {
+	o.XCorrelationID = xCorrelationID
+}
+
+// WithXIdempotencyKey adds the xIdempotencyKey to the get key params
+func (o *GetKeyParams) WithXIdempotencyKey(xIdempotencyKey *string) *GetKeyParams {
+	o.SetXIdempotencyKey(xIdempotencyKey)
+	return o
+}
+
+// SetXIdempotencyKey adds the xIdempotencyKey to the get key params
+func (o *GetKeyParams) SetXIdempotencyKey(xIdempotencyKey *string) {
+	o.XIdempotencyKey = xIdempotencyKey
+}
+
 // WriteToRequest writes these params to a swagger request
 func (o *GetKeyParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Registry) error {
 
@@ -204,6 +238,22 @@ func (o *GetKeyParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Regist
 	// path param wid
 	if err := r.SetPathParam("wid", o.Wid); err != nil {
 		return err
+	}
+
+	if o.XCorrelationID != nil {
+
+		// header param x-correlation-id
+		if err := r.SetHeaderParam("x-correlation-id", *o.XCorrelationID); err != nil {
+			return err
+		}
+	}
+
+	if o.XIdempotencyKey != nil {
+
+		// header param x-idempotency-key
+		if err := r.SetHeaderParam("x-idempotency-key", *o.XIdempotencyKey); err != nil {
+			return err
+		}
 	}
 
 	if len(res) > 0 {

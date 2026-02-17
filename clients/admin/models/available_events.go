@@ -27,6 +27,16 @@ type AvailableEvents struct {
 	// List of the events
 	// in:body
 	Subjects []*EventSubject `json:"subjects" yaml:"subjects"`
+
+	// Indicates that a 5xx error was caused by tenant-provided code
+	//
+	// in:header
+	XExternalError string `json:"x-external-error,omitempty" yaml:"x-external-error,omitempty"`
+
+	// OpenTelemetry trace identifier
+	//
+	// in:header
+	XTraceID string `json:"x-trace-id,omitempty" yaml:"x-trace-id,omitempty"`
 }
 
 // Validate validates this available events

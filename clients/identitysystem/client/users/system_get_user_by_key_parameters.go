@@ -77,6 +77,18 @@ type SystemGetUserByKeyParams struct {
 	// IPID.
 	IPID string
 
+	/* XCorrelationID.
+
+	   Unique identifier included in audit events for request tracking
+	*/
+	XCorrelationID *string
+
+	/* XIdempotencyKey.
+
+	   Key used to safely retry failed requests without duplicate processing
+	*/
+	XIdempotencyKey *string
+
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
@@ -163,6 +175,28 @@ func (o *SystemGetUserByKeyParams) SetIPID(iPID string) {
 	o.IPID = iPID
 }
 
+// WithXCorrelationID adds the xCorrelationID to the system get user by key params
+func (o *SystemGetUserByKeyParams) WithXCorrelationID(xCorrelationID *string) *SystemGetUserByKeyParams {
+	o.SetXCorrelationID(xCorrelationID)
+	return o
+}
+
+// SetXCorrelationID adds the xCorrelationId to the system get user by key params
+func (o *SystemGetUserByKeyParams) SetXCorrelationID(xCorrelationID *string) {
+	o.XCorrelationID = xCorrelationID
+}
+
+// WithXIdempotencyKey adds the xIdempotencyKey to the system get user by key params
+func (o *SystemGetUserByKeyParams) WithXIdempotencyKey(xIdempotencyKey *string) *SystemGetUserByKeyParams {
+	o.SetXIdempotencyKey(xIdempotencyKey)
+	return o
+}
+
+// SetXIdempotencyKey adds the xIdempotencyKey to the system get user by key params
+func (o *SystemGetUserByKeyParams) SetXIdempotencyKey(xIdempotencyKey *string) {
+	o.XIdempotencyKey = xIdempotencyKey
+}
+
 // WriteToRequest writes these params to a swagger request
 func (o *SystemGetUserByKeyParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Registry) error {
 
@@ -187,6 +221,22 @@ func (o *SystemGetUserByKeyParams) WriteToRequest(r runtime.ClientRequest, reg s
 	// path param ipID
 	if err := r.SetPathParam("ipID", o.IPID); err != nil {
 		return err
+	}
+
+	if o.XCorrelationID != nil {
+
+		// header param x-correlation-id
+		if err := r.SetHeaderParam("x-correlation-id", *o.XCorrelationID); err != nil {
+			return err
+		}
+	}
+
+	if o.XIdempotencyKey != nil {
+
+		// header param x-idempotency-key
+		if err := r.SetHeaderParam("x-idempotency-key", *o.XIdempotencyKey); err != nil {
+			return err
+		}
 	}
 
 	if len(res) > 0 {

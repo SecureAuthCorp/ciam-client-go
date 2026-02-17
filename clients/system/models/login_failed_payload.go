@@ -33,6 +33,9 @@ type LoginFailedPayload struct {
 	// error hint
 	ErrorHint string `json:"error_hint,omitempty" yaml:"error_hint,omitempty"`
 
+	// error uri
+	ErrorURI string `json:"error_uri,omitempty" yaml:"error_uri,omitempty"`
+
 	// idp
 	Idp *IDPPayload `json:"idp,omitempty" yaml:"idp,omitempty"`
 

@@ -77,6 +77,18 @@ type UpdateScopeParams struct {
 	// Scp.
 	Scp string
 
+	/* XCorrelationID.
+
+	   Unique identifier included in audit events for request tracking
+	*/
+	XCorrelationID *string
+
+	/* XIdempotencyKey.
+
+	   Key used to safely retry failed requests without duplicate processing
+	*/
+	XIdempotencyKey *string
+
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
@@ -163,6 +175,28 @@ func (o *UpdateScopeParams) SetScp(scp string) {
 	o.Scp = scp
 }
 
+// WithXCorrelationID adds the xCorrelationID to the update scope params
+func (o *UpdateScopeParams) WithXCorrelationID(xCorrelationID *string) *UpdateScopeParams {
+	o.SetXCorrelationID(xCorrelationID)
+	return o
+}
+
+// SetXCorrelationID adds the xCorrelationId to the update scope params
+func (o *UpdateScopeParams) SetXCorrelationID(xCorrelationID *string) {
+	o.XCorrelationID = xCorrelationID
+}
+
+// WithXIdempotencyKey adds the xIdempotencyKey to the update scope params
+func (o *UpdateScopeParams) WithXIdempotencyKey(xIdempotencyKey *string) *UpdateScopeParams {
+	o.SetXIdempotencyKey(xIdempotencyKey)
+	return o
+}
+
+// SetXIdempotencyKey adds the xIdempotencyKey to the update scope params
+func (o *UpdateScopeParams) SetXIdempotencyKey(xIdempotencyKey *string) {
+	o.XIdempotencyKey = xIdempotencyKey
+}
+
 // WriteToRequest writes these params to a swagger request
 func (o *UpdateScopeParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Registry) error {
 
@@ -187,6 +221,22 @@ func (o *UpdateScopeParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.R
 	// path param scp
 	if err := r.SetPathParam("scp", o.Scp); err != nil {
 		return err
+	}
+
+	if o.XCorrelationID != nil {
+
+		// header param x-correlation-id
+		if err := r.SetHeaderParam("x-correlation-id", *o.XCorrelationID); err != nil {
+			return err
+		}
+	}
+
+	if o.XIdempotencyKey != nil {
+
+		// header param x-idempotency-key
+		if err := r.SetHeaderParam("x-idempotency-key", *o.XIdempotencyKey); err != nil {
+			return err
+		}
 	}
 
 	if len(res) > 0 {

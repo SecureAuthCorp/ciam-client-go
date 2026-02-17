@@ -24,7 +24,7 @@ type CredentialPayload struct {
 	CredentialID string `json:"credential_id,omitempty" yaml:"credential_id,omitempty"`
 
 	// credential type
-	// Enum: ["password","webauthn","totp"]
+	// Enum: ["password","webauthn","totp","device"]
 	CredentialType string `json:"credential_type,omitempty" yaml:"credential_type,omitempty"`
 
 	// operation type
@@ -52,7 +52,7 @@ var credentialPayloadTypeCredentialTypePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["password","webauthn","totp"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["password","webauthn","totp","device"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -70,6 +70,9 @@ const (
 
 	// CredentialPayloadCredentialTypeTotp captures enum value "totp"
 	CredentialPayloadCredentialTypeTotp string = "totp"
+
+	// CredentialPayloadCredentialTypeDevice captures enum value "device"
+	CredentialPayloadCredentialTypeDevice string = "device"
 )
 
 // prop value enum

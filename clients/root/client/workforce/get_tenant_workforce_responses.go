@@ -70,7 +70,7 @@ GetTenantWorkforceOK describes a response with status code 200, with default hea
 Get tenant workforce settings
 */
 type GetTenantWorkforceOK struct {
-	Payload *models.WorkforceSettings
+	Payload *models.TenantWorkforceSettings
 }
 
 // IsSuccess returns true when this get tenant workforce o k response has a 2xx status code
@@ -113,13 +113,13 @@ func (o *GetTenantWorkforceOK) String() string {
 	return fmt.Sprintf("[GET /api/admin/tenants/{tid}/workforce][%d] getTenantWorkforceOK %s", 200, payload)
 }
 
-func (o *GetTenantWorkforceOK) GetPayload() *models.WorkforceSettings {
+func (o *GetTenantWorkforceOK) GetPayload() *models.TenantWorkforceSettings {
 	return o.Payload
 }
 
 func (o *GetTenantWorkforceOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.WorkforceSettings)
+	o.Payload = new(models.TenantWorkforceSettings)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

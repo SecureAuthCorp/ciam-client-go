@@ -10,6 +10,7 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 
+	"github.com/cloudentity/acp-client-go/clients/root/client/audit_events"
 	"github.com/cloudentity/acp-client-go/clients/root/client/configuration"
 	"github.com/cloudentity/acp-client-go/clients/root/client/features"
 	"github.com/cloudentity/acp-client-go/clients/root/client/limits"
@@ -61,6 +62,7 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *Acp {
 
 	cli := new(Acp)
 	cli.Transport = transport
+	cli.AuditEvents = audit_events.New(transport, formats)
 	cli.Configuration = configuration.New(transport, formats)
 	cli.Features = features.New(transport, formats)
 	cli.Limits = limits.New(transport, formats)
@@ -112,6 +114,8 @@ func (cfg *TransportConfig) WithSchemes(schemes []string) *TransportConfig {
 
 // Acp is a client for acp
 type Acp struct {
+	AuditEvents audit_events.ClientService
+
 	Configuration configuration.ClientService
 
 	Features features.ClientService
@@ -132,6 +136,7 @@ type Acp struct {
 // SetTransport changes the transport on the client and all its subresources
 func (c *Acp) SetTransport(transport runtime.ClientTransport) {
 	c.Transport = transport
+	c.AuditEvents.SetTransport(transport)
 	c.Configuration.SetTransport(transport)
 	c.Features.SetTransport(transport)
 	c.Limits.SetTransport(transport)

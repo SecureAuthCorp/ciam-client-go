@@ -27,6 +27,10 @@ type CustomApp struct {
 	// Required: true
 	ID string `json:"id" yaml:"id"`
 
+	// IdentityPoolID associated with the CustomApp.
+	// Required for type 'scim'. Not allowed for type 'post-authn'.
+	IdentityPoolID string `json:"identity_pool_id,omitempty" yaml:"identity_pool_id,omitempty"`
+
 	// Name of the CustomApp
 	Name string `json:"name,omitempty" yaml:"name,omitempty"`
 
@@ -41,12 +45,12 @@ type CustomApp struct {
 
 	// Type of the custom app
 	// Example: post-authn
-	// Enum: ["post-authn"]
+	// Enum: ["post-authn","scim"]
 	Type string `json:"type,omitempty" yaml:"type,omitempty"`
 
-	// url of the CustomApp
-	// Required: true
-	URL string `json:"url" yaml:"url"`
+	// URL of the CustomApp.
+	// Required for type 'post-authn'. Not allowed for type 'scim'.
+	URL string `json:"url,omitempty" yaml:"url,omitempty"`
 }
 
 // Validate validates this custom app
@@ -66,10 +70,6 @@ func (m *CustomApp) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateType(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateURL(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -110,7 +110,7 @@ var customAppTypeTypePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["post-authn"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["post-authn","scim"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -122,6 +122,9 @@ const (
 
 	// CustomAppTypePostDashAuthn captures enum value "post-authn"
 	CustomAppTypePostDashAuthn string = "post-authn"
+
+	// CustomAppTypeScim captures enum value "scim"
+	CustomAppTypeScim string = "scim"
 )
 
 // prop value enum
@@ -139,15 +142,6 @@ func (m *CustomApp) validateType(formats strfmt.Registry) error {
 
 	// value enum
 	if err := m.validateTypeEnum("type", "body", m.Type); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *CustomApp) validateURL(formats strfmt.Registry) error {
-
-	if err := validate.RequiredString("url", "body", m.URL); err != nil {
 		return err
 	}
 
