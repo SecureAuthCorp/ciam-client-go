@@ -23,6 +23,9 @@ type TenantInternalSettings struct {
 	// saidp
 	Saidp *SAIDPSettings `json:"saidp,omitempty" yaml:"saidp,omitempty"`
 
+	// tenant identifier
+	TenantID string `json:"tenant_id,omitempty" yaml:"tenant_id,omitempty"`
+
 	// Source of tenant provisioning
 	// Example: saidp
 	// Enum: ["saidp","aws","internal_signup","marketing"]

@@ -10671,6 +10671,7 @@ definitions:
         - fapi_20_message_signing
         - connect_id
         - agentic_ai
+        - saidp_legacy
         example: default
         type: string
         x-nullable: false
@@ -11231,6 +11232,7 @@ definitions:
         - fapi_20_message_signing
         - connect_id
         - agentic_ai
+        - saidp_legacy
         example: default
         type: string
         x-nullable: false
@@ -11478,6 +11480,7 @@ definitions:
         - fapi_20_message_signing
         - connect_id
         - agentic_ai
+        - saidp_legacy
         example: default
         type: string
         x-nullable: false
@@ -11885,6 +11888,7 @@ definitions:
         - fapi_20_message_signing
         - connect_id
         - agentic_ai
+        - saidp_legacy
         example: default
         type: string
         x-nullable: false
@@ -12163,6 +12167,7 @@ definitions:
         - fapi_20_message_signing
         - connect_id
         - agentic_ai
+        - saidp_legacy
         example: default
         type: string
         x-nullable: false
@@ -12731,6 +12736,7 @@ definitions:
         - fapi_20_message_signing
         - connect_id
         - agentic_ai
+        - saidp_legacy
         example: default
         type: string
         x-nullable: false
@@ -13593,8 +13599,6 @@ definitions:
         format: tenantID
         type: string
         x-nullable: false
-      internal_settings:
-        $ref: '#/definitions/TenantInternalSettings'
       jwks:
         $ref: '#/definitions/ServerJWKs'
       metadata:
@@ -13642,6 +13646,11 @@ definitions:
     properties:
       saidp:
         $ref: '#/definitions/SAIDPSettings'
+      tenant_id:
+        description: tenant identifier
+        format: tenantID
+        type: string
+        x-nullable: false
       tenant_source:
         description: Source of tenant provisioning
         enum:
@@ -14432,6 +14441,7 @@ definitions:
         - fapi_20_message_signing
         - connect_id
         - agentic_ai
+        - saidp_legacy
         example: default
         type: string
         x-nullable: false
@@ -15158,6 +15168,32 @@ paths:
       summary: Import global tenants configuration
       tags:
       - configuration
+  /api/system/tenant-internal-settings:
+    get:
+      description: List tenant internal settings with optional tenant source filter.
+      operationId: listTenantInternalSettings
+      parameters:
+      - description: Filter by tenant source
+        in: query
+        items:
+          type: string
+        name: tenant_source
+        type: array
+      responses:
+        "200":
+          $ref: '#/responses/TenantInternalSettingsListResponse'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - setup:
+        - manage_configuration
+      summary: List tenant internal settings
+      tags:
+      - tenants
   /api/system/tenants:
     get:
       description: List tenants.
@@ -15318,6 +15354,69 @@ paths:
       - setup:
         - manage_configuration
       summary: Update tenant
+      tags:
+      - tenants
+  /api/system/tenants/{tid}/internal-settings:
+    get:
+      description: Get tenant internal settings.
+      operationId: getTenantInternalSettings
+      parameters:
+      - default: default
+        description: Tenant id
+        in: path
+        name: tid
+        required: true
+        type: string
+      responses:
+        "200":
+          $ref: '#/responses/TenantInternalSettingsResponse'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - setup:
+        - manage_configuration
+      summary: Get tenant internal settings
+      tags:
+      - tenants
+    put:
+      description: Set tenant internal settings.
+      operationId: setTenantInternalSettings
+      parameters:
+      - default: default
+        description: Tenant id
+        in: path
+        name: tid
+        required: true
+        type: string
+      - in: body
+        name: TenantInternalSettings
+        schema:
+          $ref: '#/definitions/TenantInternalSettings'
+      responses:
+        "200":
+          $ref: '#/responses/TenantInternalSettingsResponse'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "422":
+          $ref: '#/responses/unprocessableEntityHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - setup:
+        - manage_configuration
+      summary: Set tenant internal settings
       tags:
       - tenants
 produces:
@@ -15591,6 +15690,16 @@ responses:
     description: Tenant created
     schema:
       $ref: '#/definitions/TenantCreated'
+  TenantInternalSettingsListResponse:
+    description: List of tenant internal settings
+    schema:
+      items:
+        $ref: '#/definitions/TenantInternalSettings'
+      type: array
+  TenantInternalSettingsResponse:
+    description: Tenant internal settings
+    schema:
+      $ref: '#/definitions/TenantInternalSettings'
   TenantResponse:
     description: Tenant
     schema:

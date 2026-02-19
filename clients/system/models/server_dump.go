@@ -248,7 +248,7 @@ type ServerDump struct {
 	// specific configuration patterns. For example, you can instantly create an Open Banking
 	// compliant workspace that has all of the required mechanisms and settings already in place.
 	// Example: default
-	// Enum: ["default","demo","workforce","workforce_v2","consumer","partners","third_party","fapi_advanced","fapi_rw","fapi_ro","openbanking_uk_fapi_advanced","openbanking_uk","openbanking_br","openbanking_br_unico","cdr_australia","cdr_australia_fapi_rw","fdx","openbanking_ksa","fapi_20_security","fapi_20_message_signing","connect_id","agentic_ai"]
+	// Enum: ["default","demo","workforce","workforce_v2","consumer","partners","third_party","fapi_advanced","fapi_rw","fapi_ro","openbanking_uk_fapi_advanced","openbanking_uk","openbanking_br","openbanking_br_unico","cdr_australia","cdr_australia_fapi_rw","fdx","openbanking_ksa","fapi_20_security","fapi_20_message_signing","connect_id","agentic_ai","saidp_legacy"]
 	Profile string `json:"profile,omitempty" yaml:"profile,omitempty"`
 
 	// Custom pushed authentication request TTL
@@ -1022,7 +1022,7 @@ var serverDumpTypeProfilePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["default","demo","workforce","workforce_v2","consumer","partners","third_party","fapi_advanced","fapi_rw","fapi_ro","openbanking_uk_fapi_advanced","openbanking_uk","openbanking_br","openbanking_br_unico","cdr_australia","cdr_australia_fapi_rw","fdx","openbanking_ksa","fapi_20_security","fapi_20_message_signing","connect_id","agentic_ai"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["default","demo","workforce","workforce_v2","consumer","partners","third_party","fapi_advanced","fapi_rw","fapi_ro","openbanking_uk_fapi_advanced","openbanking_uk","openbanking_br","openbanking_br_unico","cdr_australia","cdr_australia_fapi_rw","fdx","openbanking_ksa","fapi_20_security","fapi_20_message_signing","connect_id","agentic_ai","saidp_legacy"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -1097,6 +1097,9 @@ const (
 
 	// ServerDumpProfileAgenticAi captures enum value "agentic_ai"
 	ServerDumpProfileAgenticAi string = "agentic_ai"
+
+	// ServerDumpProfileSaidpLegacy captures enum value "saidp_legacy"
+	ServerDumpProfileSaidpLegacy string = "saidp_legacy"
 )
 
 // prop value enum

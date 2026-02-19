@@ -7859,10 +7859,6 @@ definitions:
         description: allow Identity Pool OTP Challenge confirmation via web page
         type: boolean
         x-nullable: false
-      allow_skip_2fa_if_none_set_up:
-        description: Allow to skip 2FA if user does not have any authn methods configured
-        type: boolean
-        x-nullable: false
       analytics_duration:
         format: duration
         type: string
@@ -14094,12 +14090,6 @@ definitions:
         type: string
         x-nullable: false
     type: object
-  SAIDPSettings:
-    properties:
-      organization:
-        type: string
-        x-nullable: false
-    type: object
   SAMLAssertionDeniedPayload:
     properties:
       actor_claims:
@@ -16266,6 +16256,7 @@ definitions:
         - fapi_20_message_signing
         - connect_id
         - agentic_ai
+        - saidp_legacy
         example: default
         type: string
         x-nullable: false
@@ -16836,6 +16827,7 @@ definitions:
         - fapi_20_message_signing
         - connect_id
         - agentic_ai
+        - saidp_legacy
         example: default
         type: string
         x-nullable: false
@@ -17083,6 +17075,7 @@ definitions:
         - fapi_20_message_signing
         - connect_id
         - agentic_ai
+        - saidp_legacy
         example: default
         type: string
         x-nullable: false
@@ -17223,6 +17216,7 @@ definitions:
         - fapi_20_message_signing
         - connect_id
         - agentic_ai
+        - saidp_legacy
         example: default
         type: string
         x-nullable: false
@@ -17791,6 +17785,7 @@ definitions:
         - fapi_20_message_signing
         - connect_id
         - agentic_ai
+        - saidp_legacy
         example: default
         type: string
         x-nullable: false
@@ -18951,8 +18946,6 @@ definitions:
         format: tenantID
         type: string
         x-nullable: false
-      internal_settings:
-        $ref: '#/definitions/TenantInternalSettings'
       jwks:
         $ref: '#/definitions/ServerJWKs'
       metadata:
@@ -18970,21 +18963,6 @@ definitions:
         description: optional custom tenant url. If not provided the server url is
           used instead
         example: https://example.com/default
-        type: string
-        x-nullable: false
-    type: object
-  TenantInternalSettings:
-    properties:
-      saidp:
-        $ref: '#/definitions/SAIDPSettings'
-      tenant_source:
-        description: Source of tenant provisioning
-        enum:
-        - saidp
-        - aws
-        - internal_signup
-        - marketing
-        example: saidp
         type: string
         x-nullable: false
     type: object
@@ -21471,6 +21449,7 @@ definitions:
         - fapi_20_message_signing
         - connect_id
         - agentic_ai
+        - saidp_legacy
         example: default
         type: string
         x-nullable: false

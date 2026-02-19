@@ -38,9 +38,6 @@ type Environment struct {
 	// allow Identity Pool OTP Challenge confirmation via web page
 	AllowIdentityPoolOtpChallengeConfirmationViaWebPage bool `json:"allow_identity_pool_otp_challenge_confirmation_via_web_page,omitempty" yaml:"allow_identity_pool_otp_challenge_confirmation_via_web_page,omitempty"`
 
-	// Allow to skip 2FA if user does not have any authn methods configured
-	AllowSkip2faIfNoneSetUp bool `json:"allow_skip_2fa_if_none_set_up,omitempty" yaml:"allow_skip_2fa_if_none_set_up,omitempty"`
-
 	// analytics duration
 	// Format: duration
 	AnalyticsDuration strfmt.Duration `json:"analytics_duration,omitempty" yaml:"analytics_duration,omitempty"`

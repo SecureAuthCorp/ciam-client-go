@@ -22,9 +22,6 @@ type Tenant struct {
 	// exampe: default
 	ID string `json:"id,omitempty" yaml:"id,omitempty"`
 
-	// internal settings
-	InternalSettings *TenantInternalSettings `json:"internal_settings,omitempty" yaml:"internal_settings,omitempty"`
-
 	// jwks
 	Jwks *ServerJWKs `json:"jwks,omitempty" yaml:"jwks,omitempty"`
 
@@ -50,10 +47,6 @@ type Tenant struct {
 func (m *Tenant) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateInternalSettings(formats); err != nil {
-		res = append(res, err)
-	}
-
 	if err := m.validateJwks(formats); err != nil {
 		res = append(res, err)
 	}
@@ -73,25 +66,6 @@ func (m *Tenant) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
-	return nil
-}
-
-func (m *Tenant) validateInternalSettings(formats strfmt.Registry) error {
-	if swag.IsZero(m.InternalSettings) { // not required
-		return nil
-	}
-
-	if m.InternalSettings != nil {
-		if err := m.InternalSettings.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("internal_settings")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("internal_settings")
-			}
-			return err
-		}
-	}
-
 	return nil
 }
 
@@ -175,10 +149,6 @@ func (m *Tenant) validateStyling(formats strfmt.Registry) error {
 func (m *Tenant) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.contextValidateInternalSettings(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
 	if err := m.contextValidateJwks(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -198,27 +168,6 @@ func (m *Tenant) ContextValidate(ctx context.Context, formats strfmt.Registry) e
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
-	return nil
-}
-
-func (m *Tenant) contextValidateInternalSettings(ctx context.Context, formats strfmt.Registry) error {
-
-	if m.InternalSettings != nil {
-
-		if swag.IsZero(m.InternalSettings) { // not required
-			return nil
-		}
-
-		if err := m.InternalSettings.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("internal_settings")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("internal_settings")
-			}
-			return err
-		}
-	}
-
 	return nil
 }
 
