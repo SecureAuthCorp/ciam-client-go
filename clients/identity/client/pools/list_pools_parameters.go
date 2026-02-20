@@ -134,6 +134,18 @@ type ListPoolsParams struct {
 	*/
 	Sort *string
 
+	/* XCorrelationID.
+
+	   Unique identifier included in audit events for request tracking
+	*/
+	XCorrelationID *string
+
+	/* XIdempotencyKey.
+
+	   Key used to safely retry failed requests without duplicate processing
+	*/
+	XIdempotencyKey *string
+
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
@@ -275,6 +287,28 @@ func (o *ListPoolsParams) SetSort(sort *string) {
 	o.Sort = sort
 }
 
+// WithXCorrelationID adds the xCorrelationID to the list pools params
+func (o *ListPoolsParams) WithXCorrelationID(xCorrelationID *string) *ListPoolsParams {
+	o.SetXCorrelationID(xCorrelationID)
+	return o
+}
+
+// SetXCorrelationID adds the xCorrelationId to the list pools params
+func (o *ListPoolsParams) SetXCorrelationID(xCorrelationID *string) {
+	o.XCorrelationID = xCorrelationID
+}
+
+// WithXIdempotencyKey adds the xIdempotencyKey to the list pools params
+func (o *ListPoolsParams) WithXIdempotencyKey(xIdempotencyKey *string) *ListPoolsParams {
+	o.SetXIdempotencyKey(xIdempotencyKey)
+	return o
+}
+
+// SetXIdempotencyKey adds the xIdempotencyKey to the list pools params
+func (o *ListPoolsParams) SetXIdempotencyKey(xIdempotencyKey *string) {
+	o.XIdempotencyKey = xIdempotencyKey
+}
+
 // WriteToRequest writes these params to a swagger request
 func (o *ListPoolsParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Registry) error {
 
@@ -390,6 +424,22 @@ func (o *ListPoolsParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Reg
 			if err := r.SetQueryParam("sort", qSort); err != nil {
 				return err
 			}
+		}
+	}
+
+	if o.XCorrelationID != nil {
+
+		// header param x-correlation-id
+		if err := r.SetHeaderParam("x-correlation-id", *o.XCorrelationID); err != nil {
+			return err
+		}
+	}
+
+	if o.XIdempotencyKey != nil {
+
+		// header param x-idempotency-key
+		if err := r.SetHeaderParam("x-idempotency-key", *o.XIdempotencyKey); err != nil {
+			return err
 		}
 	}
 

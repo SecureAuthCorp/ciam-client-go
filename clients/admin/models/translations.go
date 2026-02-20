@@ -19,8 +19,8 @@ import (
 // swagger:model Translations
 type Translations struct {
 
-	// list of translations
-	Translations []*Translation `json:"translations" yaml:"translations"`
+	// translations
+	Translations []*TranslationSummary `json:"translations" yaml:"translations"`
 }
 
 // Validate validates this translations

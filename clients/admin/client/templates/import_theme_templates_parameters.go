@@ -75,6 +75,18 @@ type ImportThemeTemplatesParams struct {
 	*/
 	ThemeID string
 
+	/* XCorrelationID.
+
+	   Unique identifier included in audit events for request tracking
+	*/
+	XCorrelationID *string
+
+	/* XIdempotencyKey.
+
+	   Key used to safely retry failed requests without duplicate processing
+	*/
+	XIdempotencyKey *string
+
 	// ZipFile.
 	ZipFile string
 
@@ -153,6 +165,28 @@ func (o *ImportThemeTemplatesParams) SetThemeID(themeID string) {
 	o.ThemeID = themeID
 }
 
+// WithXCorrelationID adds the xCorrelationID to the import theme templates params
+func (o *ImportThemeTemplatesParams) WithXCorrelationID(xCorrelationID *string) *ImportThemeTemplatesParams {
+	o.SetXCorrelationID(xCorrelationID)
+	return o
+}
+
+// SetXCorrelationID adds the xCorrelationId to the import theme templates params
+func (o *ImportThemeTemplatesParams) SetXCorrelationID(xCorrelationID *string) {
+	o.XCorrelationID = xCorrelationID
+}
+
+// WithXIdempotencyKey adds the xIdempotencyKey to the import theme templates params
+func (o *ImportThemeTemplatesParams) WithXIdempotencyKey(xIdempotencyKey *string) *ImportThemeTemplatesParams {
+	o.SetXIdempotencyKey(xIdempotencyKey)
+	return o
+}
+
+// SetXIdempotencyKey adds the xIdempotencyKey to the import theme templates params
+func (o *ImportThemeTemplatesParams) SetXIdempotencyKey(xIdempotencyKey *string) {
+	o.XIdempotencyKey = xIdempotencyKey
+}
+
 // WithZipFile adds the zipFile to the import theme templates params
 func (o *ImportThemeTemplatesParams) WithZipFile(zipFile string) *ImportThemeTemplatesParams {
 	o.SetZipFile(zipFile)
@@ -183,6 +217,22 @@ func (o *ImportThemeTemplatesParams) WriteToRequest(r runtime.ClientRequest, reg
 	// path param themeID
 	if err := r.SetPathParam("themeID", o.ThemeID); err != nil {
 		return err
+	}
+
+	if o.XCorrelationID != nil {
+
+		// header param x-correlation-id
+		if err := r.SetHeaderParam("x-correlation-id", *o.XCorrelationID); err != nil {
+			return err
+		}
+	}
+
+	if o.XIdempotencyKey != nil {
+
+		// header param x-idempotency-key
+		if err := r.SetHeaderParam("x-idempotency-key", *o.XIdempotencyKey); err != nil {
+			return err
+		}
 	}
 	if err := r.SetBodyParam(o.ZipFile); err != nil {
 		return err

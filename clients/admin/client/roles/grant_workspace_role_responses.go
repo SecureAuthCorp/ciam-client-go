@@ -84,6 +84,18 @@ type GrantWorkspaceRoleNoContent struct {
 	     Format: etag
 	*/
 	Etag string
+
+	/* Indicates that a 5xx error was caused by tenant-provided code
+
+	in:header
+	*/
+	XExternalError string
+
+	/* OpenTelemetry trace identifier
+
+	in:header
+	*/
+	XTraceID string
 }
 
 // IsSuccess returns true when this grant workspace role no content response has a 2xx status code
@@ -131,6 +143,20 @@ func (o *GrantWorkspaceRoleNoContent) readResponse(response runtime.ClientRespon
 
 	if hdrEtag != "" {
 		o.Etag = hdrEtag
+	}
+
+	// hydrates response header x-external-error
+	hdrXExternalError := response.GetHeader("x-external-error")
+
+	if hdrXExternalError != "" {
+		o.XExternalError = hdrXExternalError
+	}
+
+	// hydrates response header x-trace-id
+	hdrXTraceID := response.GetHeader("x-trace-id")
+
+	if hdrXTraceID != "" {
+		o.XTraceID = hdrXTraceID
 	}
 
 	return nil

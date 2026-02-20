@@ -17,7 +17,7 @@ import (
 // swagger:model LoginAccepted
 type LoginAccepted struct {
 
-	// URL pointing to Cloudentity where the user is redirected to after authenticating with their identity source.
+	// URL pointing to SecureAuth where the user is redirected to after authenticating with their identity source.
 	// Applies only for the redirect authorization flows.
 	// Example: https://authorization.cloudentity.com:8443/tenant/server/oauth2/authorize?client_id=bugkgm23g9kregtu051g\u00266consent_verified=false\u0026login_id=cavai7d8s9nelp7k792g\u0026login_state=cauq8fonbud6q8806bf0
 	RedirectTo string `json:"redirect_to,omitempty" yaml:"redirect_to,omitempty"`

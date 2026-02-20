@@ -24,7 +24,7 @@ type NewUserCredential struct {
 	// Indicates if user is required to alter their credentials during their initial authentication. Currently, it is enforced only for password credentials, but it may change any time.
 	MustBeChanged bool `json:"must_be_changed,omitempty" yaml:"must_be_changed,omitempty"`
 
-	// Indicates if user is required to reset their credentials before first authentication. Currently, it is enforced only for password credentials, but it may change any time.
+	// Indicates if user is required to reset their credentials before first authentication.
 	// This flag takes precedence over MustBeChanged.
 	MustBeReset bool `json:"must_be_reset,omitempty" yaml:"must_be_reset,omitempty"`
 

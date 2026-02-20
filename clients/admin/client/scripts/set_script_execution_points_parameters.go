@@ -82,6 +82,18 @@ type SetScriptExecutionPointsParams struct {
 	*/
 	Wid string
 
+	/* XExternalError.
+
+	   Indicates that a 5xx error was caused by tenant-provided code
+	*/
+	XExternalError *string
+
+	/* XTraceID.
+
+	   OpenTelemetry trace identifier
+	*/
+	XTraceID *string
+
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
@@ -179,6 +191,28 @@ func (o *SetScriptExecutionPointsParams) SetWid(wid string) {
 	o.Wid = wid
 }
 
+// WithXExternalError adds the xExternalError to the set script execution points params
+func (o *SetScriptExecutionPointsParams) WithXExternalError(xExternalError *string) *SetScriptExecutionPointsParams {
+	o.SetXExternalError(xExternalError)
+	return o
+}
+
+// SetXExternalError adds the xExternalError to the set script execution points params
+func (o *SetScriptExecutionPointsParams) SetXExternalError(xExternalError *string) {
+	o.XExternalError = xExternalError
+}
+
+// WithXTraceID adds the xTraceID to the set script execution points params
+func (o *SetScriptExecutionPointsParams) WithXTraceID(xTraceID *string) *SetScriptExecutionPointsParams {
+	o.SetXTraceID(xTraceID)
+	return o
+}
+
+// SetXTraceID adds the xTraceId to the set script execution points params
+func (o *SetScriptExecutionPointsParams) SetXTraceID(xTraceID *string) {
+	o.XTraceID = xTraceID
+}
+
 // WriteToRequest writes these params to a swagger request
 func (o *SetScriptExecutionPointsParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Registry) error {
 
@@ -203,6 +237,22 @@ func (o *SetScriptExecutionPointsParams) WriteToRequest(r runtime.ClientRequest,
 	// path param wid
 	if err := r.SetPathParam("wid", o.Wid); err != nil {
 		return err
+	}
+
+	if o.XExternalError != nil {
+
+		// header param x-external-error
+		if err := r.SetHeaderParam("x-external-error", *o.XExternalError); err != nil {
+			return err
+		}
+	}
+
+	if o.XTraceID != nil {
+
+		// header param x-trace-id
+		if err := r.SetHeaderParam("x-trace-id", *o.XTraceID); err != nil {
+			return err
+		}
 	}
 
 	if len(res) > 0 {

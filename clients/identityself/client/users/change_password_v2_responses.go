@@ -96,6 +96,18 @@ type ChangePasswordV2NoContent struct {
 	     Format: etag
 	*/
 	Etag string
+
+	/* Indicates that a 5xx error was caused by tenant-provided code
+
+	in:header
+	*/
+	XExternalError string
+
+	/* OpenTelemetry trace identifier
+
+	in:header
+	*/
+	XTraceID string
 }
 
 // IsSuccess returns true when this change password v2 no content response has a 2xx status code
@@ -143,6 +155,20 @@ func (o *ChangePasswordV2NoContent) readResponse(response runtime.ClientResponse
 
 	if hdrEtag != "" {
 		o.Etag = hdrEtag
+	}
+
+	// hydrates response header x-external-error
+	hdrXExternalError := response.GetHeader("x-external-error")
+
+	if hdrXExternalError != "" {
+		o.XExternalError = hdrXExternalError
+	}
+
+	// hydrates response header x-trace-id
+	hdrXTraceID := response.GetHeader("x-trace-id")
+
+	if hdrXTraceID != "" {
+		o.XTraceID = hdrXTraceID
 	}
 
 	return nil

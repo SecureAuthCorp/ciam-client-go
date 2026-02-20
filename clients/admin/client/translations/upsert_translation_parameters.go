@@ -64,7 +64,7 @@ UpsertTranslationParams contains all the parameters to send to the API endpoint
 type UpsertTranslationParams struct {
 
 	// Translation.
-	Translation *models.Translation
+	Translation *models.CustomTranslation
 
 	/* IfMatch.
 
@@ -79,6 +79,18 @@ type UpsertTranslationParams struct {
 	   translation locale
 	*/
 	Locale string
+
+	/* XCorrelationID.
+
+	   Unique identifier included in audit events for request tracking
+	*/
+	XCorrelationID *string
+
+	/* XIdempotencyKey.
+
+	   Key used to safely retry failed requests without duplicate processing
+	*/
+	XIdempotencyKey *string
 
 	timeout    time.Duration
 	Context    context.Context
@@ -134,13 +146,13 @@ func (o *UpsertTranslationParams) SetHTTPClient(client *http.Client) {
 }
 
 // WithTranslation adds the translation to the upsert translation params
-func (o *UpsertTranslationParams) WithTranslation(translation *models.Translation) *UpsertTranslationParams {
+func (o *UpsertTranslationParams) WithTranslation(translation *models.CustomTranslation) *UpsertTranslationParams {
 	o.SetTranslation(translation)
 	return o
 }
 
 // SetTranslation adds the translation to the upsert translation params
-func (o *UpsertTranslationParams) SetTranslation(translation *models.Translation) {
+func (o *UpsertTranslationParams) SetTranslation(translation *models.CustomTranslation) {
 	o.Translation = translation
 }
 
@@ -164,6 +176,28 @@ func (o *UpsertTranslationParams) WithLocale(locale string) *UpsertTranslationPa
 // SetLocale adds the locale to the upsert translation params
 func (o *UpsertTranslationParams) SetLocale(locale string) {
 	o.Locale = locale
+}
+
+// WithXCorrelationID adds the xCorrelationID to the upsert translation params
+func (o *UpsertTranslationParams) WithXCorrelationID(xCorrelationID *string) *UpsertTranslationParams {
+	o.SetXCorrelationID(xCorrelationID)
+	return o
+}
+
+// SetXCorrelationID adds the xCorrelationId to the upsert translation params
+func (o *UpsertTranslationParams) SetXCorrelationID(xCorrelationID *string) {
+	o.XCorrelationID = xCorrelationID
+}
+
+// WithXIdempotencyKey adds the xIdempotencyKey to the upsert translation params
+func (o *UpsertTranslationParams) WithXIdempotencyKey(xIdempotencyKey *string) *UpsertTranslationParams {
+	o.SetXIdempotencyKey(xIdempotencyKey)
+	return o
+}
+
+// SetXIdempotencyKey adds the xIdempotencyKey to the upsert translation params
+func (o *UpsertTranslationParams) SetXIdempotencyKey(xIdempotencyKey *string) {
+	o.XIdempotencyKey = xIdempotencyKey
 }
 
 // WriteToRequest writes these params to a swagger request
@@ -190,6 +224,22 @@ func (o *UpsertTranslationParams) WriteToRequest(r runtime.ClientRequest, reg st
 	// path param locale
 	if err := r.SetPathParam("locale", o.Locale); err != nil {
 		return err
+	}
+
+	if o.XCorrelationID != nil {
+
+		// header param x-correlation-id
+		if err := r.SetHeaderParam("x-correlation-id", *o.XCorrelationID); err != nil {
+			return err
+		}
+	}
+
+	if o.XIdempotencyKey != nil {
+
+		// header param x-idempotency-key
+		if err := r.SetHeaderParam("x-idempotency-key", *o.XIdempotencyKey); err != nil {
+			return err
+		}
 	}
 
 	if len(res) > 0 {

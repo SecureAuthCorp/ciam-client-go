@@ -7594,12 +7594,12 @@ schemes:
 securityDefinitions:
   setup:
     authorizationUrl: /system/system/oauth2/authorize
-    flow: application
+    flow: accessCode
     tokenUrl: /system/system/oauth2/token
     type: oauth2
   system:
     authorizationUrl: /default/system/oauth2/authorize
-    flow: application
+    flow: accessCode
     scopes:
       manage_configuration: manage_configuration
     tokenUrl: /default/system/oauth2/token

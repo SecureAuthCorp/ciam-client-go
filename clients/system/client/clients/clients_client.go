@@ -56,6 +56,8 @@ type ClientOption func(*runtime.ClientOperation)
 
 // ClientService is the interface for Client methods
 type ClientService interface {
+	DeleteClient(params *DeleteClientParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*DeleteClientNoContent, error)
+
 	GetClient(params *GetClientParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetClientOK, error)
 
 	ListClientsSystem(params *ListClientsSystemParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListClientsSystemOK, error)
@@ -65,6 +67,47 @@ type ClientService interface {
 	RotateClientSecret(params *RotateClientSecretParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RotateClientSecretOK, error)
 
 	SetTransport(transport runtime.ClientTransport)
+}
+
+/*
+DeleteClient deletes client
+
+Delete client.
+*/
+func (a *Client) DeleteClient(params *DeleteClientParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*DeleteClientNoContent, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewDeleteClientParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "deleteClient",
+		Method:             "DELETE",
+		PathPattern:        "/client/{cid}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &DeleteClientReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*DeleteClientNoContent)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for deleteClient: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*

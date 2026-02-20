@@ -4952,7 +4952,7 @@ schemes:
 securityDefinitions:
   admin:
     authorizationUrl: /default/admin/oauth2/authorize
-    flow: application
+    flow: accessCode
     tokenUrl: /default/admin/oauth2/token
     type: oauth2
 swagger: "2.0"

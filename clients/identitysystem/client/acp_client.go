@@ -16,6 +16,7 @@ import (
 	"github.com/cloudentity/acp-client-go/clients/identitysystem/client/schemas"
 	"github.com/cloudentity/acp-client-go/clients/identitysystem/client/tenants"
 	"github.com/cloudentity/acp-client-go/clients/identitysystem/client/users"
+	"github.com/cloudentity/acp-client-go/clients/identitysystem/client/version2"
 )
 
 // Default acp HTTP client.
@@ -66,6 +67,7 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *Acp {
 	cli.Schemas = schemas.New(transport, formats)
 	cli.Tenants = tenants.New(transport, formats)
 	cli.Users = users.New(transport, formats)
+	cli.Version2 = version2.New(transport, formats)
 	return cli
 }
 
@@ -122,6 +124,8 @@ type Acp struct {
 
 	Users users.ClientService
 
+	Version2 version2.ClientService
+
 	Transport runtime.ClientTransport
 }
 
@@ -134,4 +138,5 @@ func (c *Acp) SetTransport(transport runtime.ClientTransport) {
 	c.Schemas.SetTransport(transport)
 	c.Tenants.SetTransport(transport)
 	c.Users.SetTransport(transport)
+	c.Version2.SetTransport(transport)
 }

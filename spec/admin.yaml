@@ -190,6 +190,9 @@ definitions:
           - email_otp
           - sms_otp
           - webauthn
+          - push
+          - symbol
+          - qr_code
           type: string
         type: array
         x-nullable: false
@@ -216,7 +219,7 @@ definitions:
         type: boolean
         x-nullable: false
       dbfp:
-        description: Arculix DBFP `jwt` cookie.
+        description: DBFP `jwt` cookie.
         type: string
         x-nullable: false
       grant_type:
@@ -395,6 +398,9 @@ definitions:
           - email_otp
           - sms_otp
           - webauthn
+          - push
+          - symbol
+          - qr_code
           type: string
         type: array
         x-nullable: false
@@ -421,7 +427,7 @@ definitions:
         type: boolean
         x-nullable: false
       dbfp:
-        description: Arculix DBFP `jwt` cookie.
+        description: DBFP `jwt` cookie.
         type: string
         x-nullable: false
       error:
@@ -592,6 +598,140 @@ definitions:
         type: string
         x-nullable: false
     type: object
+  ActiveDirectoryCredentials:
+    type: object
+  ActiveDirectoryIDP:
+    properties:
+      attributes:
+        $ref: '#/definitions/Attributes'
+      authorization_server_id:
+        description: ID of the authorization server (workspace) to which the IDP is
+          connected
+        format: serverID
+        type: string
+        x-nullable: false
+      client_id:
+        description: |-
+          Client application ID
+
+          It serves as a reference to a client application that is created in the System authorization
+          server (workspace), when a custom login page is created.
+        format: clientID
+        type: string
+        x-nullable: false
+      config:
+        $ref: '#/definitions/IDPConfiguration'
+      credentials:
+        $ref: '#/definitions/ActiveDirectoryCredentials'
+      disabled:
+        description: |-
+          If set to `true`, the IDP is disabled
+
+          When an IDP is disabled, it is not available for the users to be used. It is also not
+          displayed on the login page.
+        type: boolean
+        x-nullable: false
+      discovery_settings:
+        $ref: '#/definitions/IDPDiscoverySettings'
+      display_order:
+        description: Can be used to e.g. modify the order in which the Identity Providers
+          are presented on the login page.
+        example: 1
+        format: int64
+        type: integer
+        x-nullable: false
+      hidden:
+        description: |-
+          If set to `true`, the IDP is not displayed on the login page.
+
+          When an IDP is hidden, it will not be displayed on the login page. It can still be used
+          and script extensions can enabled it.
+        type: boolean
+        x-nullable: false
+      id:
+        description: |-
+          Unique ID of your identity provider
+
+          If not provided, a random ID is generated.
+        format: idpID
+        type: string
+        x-nullable: false
+      identity_pool_id:
+        description: ID of the Identity Pool to which the IDP is connected
+        format: poolID
+        type: string
+        x-nullable: false
+      jit:
+        $ref: '#/definitions/JITSettings'
+      logo_uri:
+        description: Logo URI
+        type: string
+        x-nullable: false
+      mappings:
+        $ref: '#/definitions/Mappings'
+      method:
+        description: |-
+          Defines the type of an IDP
+
+          SecureAuth is designed to make it possible for you to bring any of your own IDPs and integrate it
+          with SecureAuth as it delivers enterprise connectors for major Cloud IDPs and a possibility for
+          custom integration DKS for home-built solutions. You can also use built-in Sandbox IDP, which
+          is a static IDP, to create an IDP for testing purposes.
+        format: idpMethod
+        type: string
+        x-nullable: false
+      name:
+        description: Display name of your IDP
+        type: string
+        x-nullable: false
+      post_authn_app_id:
+        description: Points to the ID of the custom app, null if not set
+        format: customAppID
+        type: string
+        x-nullable: false
+      settings:
+        $ref: '#/definitions/ActiveDirectorySettings'
+      sso_settings:
+        $ref: '#/definitions/IDPSSOSettings'
+      static_amr:
+        description: |-
+          Authentication method reference
+
+          An array of case sensitive strings for authentication methods that are used in the user
+          authentication.
+
+          For example, an IDP may require the user to provide a biometric authentication using facial
+          recognition. For that, the value of the authentication method reference is `face`.
+        items:
+          format: amr
+          type: string
+        type: array
+        x-nullable: false
+      tenant_id:
+        description: ID of the tenant where an IDP is connected
+        format: tenantID
+        type: string
+        x-nullable: false
+      token_exchange_settings:
+        $ref: '#/definitions/IDPTokenExchangeSettings'
+      version:
+        description: |-
+          IDP version to track internal changes
+          version that is currently supported: 3
+        format: int64
+        type: integer
+        x-nullable: false
+      workspace_id:
+        description: ID of the Workspace to which the IDP is connected
+        format: serverID
+        type: string
+        x-nullable: false
+    type: object
+  ActiveDirectorySettings:
+    properties:
+      directory_id:
+        $ref: '#/definitions/DirectoryID'
+    type: object
   AdvancedConfiguration:
     properties:
       acr_values:
@@ -604,6 +744,10 @@ definitions:
       advertise_only_mtls_aliases_in_well_known:
         description: This option overrides all urls advertised by the well known endpoint
           with their mtls alias
+        type: boolean
+        x-nullable: false
+      auto_request_recovery:
+        description: auto request recovery
         type: boolean
         x-nullable: false
       block_response_modes:
@@ -710,6 +854,8 @@ definitions:
         x-nullable: false
     title: AffiliationDescriptor represents the SAML AffiliationDescriptor object.
     type: object
+  AgentCapability:
+    type: string
   ApigeeMetadata:
     properties:
       environment_name:
@@ -816,8 +962,8 @@ definitions:
         description: |-
           Defines the type of an IDP
 
-          Cloudentity is designed to make it possible for you to bring any of your own IDPs and integrate it
-          with Cloudentity as it delivers enterprise connectors for major Cloud IDPs and a possibility for
+          SecureAuth is designed to make it possible for you to bring any of your own IDPs and integrate it
+          with SecureAuth as it delivers enterprise connectors for major Cloud IDPs and a possibility for
           custom integration DKS for home-built solutions. You can also use built-in Sandbox IDP, which
           is a static IDP, to create an IDP for testing purposes.
         format: idpMethod
@@ -1117,6 +1263,7 @@ definitions:
         - client_consents
         - customer_consents
         - authorization_code
+        - authorization_details
         - access_token
         - saml_assertion
         - scopes
@@ -1139,6 +1286,7 @@ definitions:
         - organization
         - otp_inspect
         - totp
+        - device
         - webauthn
         - group
         example: client
@@ -1328,6 +1476,11 @@ definitions:
           Signature of a token that was used to perform an action that has published an audit event.
         type: string
         x-nullable: false
+      top_level_parent_id:
+        description: ID of the top-level parent organization for organization workspaces
+        format: serverID
+        type: string
+        x-nullable: false
       trace_id:
         description: Trace ID
         type: string
@@ -1358,6 +1511,8 @@ definitions:
         $ref: '#/definitions/AccessRequestDataWithError'
       authorization_code_issued:
         $ref: '#/definitions/AccessRequestData'
+      authorization_details_granted:
+        $ref: '#/definitions/AuthorizationDetailsGrantedPayload'
       bruteforce_deleted:
         $ref: '#/definitions/BruteForceLimit'
       bruteforce_updated:
@@ -1394,6 +1549,10 @@ definitions:
         $ref: '#/definitions/DCRCreatedEventPayload'
       dcr_rejected:
         $ref: '#/definitions/DCRRejectedEventPayload'
+      device_add_completed:
+        $ref: '#/definitions/UserIDAndIdentifierPayload'
+      device_add_requested:
+        $ref: '#/definitions/UserIDAndIdentifierPayload'
       gateway_policy_authorized:
         $ref: '#/definitions/RequestValidatedPayload'
       gateway_policy_unauthorized:
@@ -1620,8 +1779,8 @@ definitions:
         description: |-
           Defines the type of an IDP
 
-          Cloudentity is designed to make it possible for you to bring any of your own IDPs and integrate it
-          with Cloudentity as it delivers enterprise connectors for major Cloud IDPs and a possibility for
+          SecureAuth is designed to make it possible for you to bring any of your own IDPs and integrate it
+          with SecureAuth as it delivers enterprise connectors for major Cloud IDPs and a possibility for
           custom integration DKS for home-built solutions. You can also use built-in Sandbox IDP, which
           is a static IDP, to create an IDP for testing purposes.
         format: idpMethod
@@ -1950,6 +2109,20 @@ definitions:
     - type
     - service_id
     type: object
+  AuthorizationDetailsGrant:
+    properties:
+      type:
+        type: string
+        x-nullable: false
+    type: object
+  AuthorizationDetailsGrantedPayload:
+    properties:
+      authorization_details:
+        items:
+          $ref: '#/definitions/AuthorizationDetailsGrant'
+        type: array
+        x-nullable: false
+    type: object
   AuthorizationDetailsWithServices:
     properties:
       authorization_details:
@@ -2095,8 +2268,8 @@ definitions:
         description: |-
           Defines the type of an IDP
 
-          Cloudentity is designed to make it possible for you to bring any of your own IDPs and integrate it
-          with Cloudentity as it delivers enterprise connectors for major Cloud IDPs and a possibility for
+          SecureAuth is designed to make it possible for you to bring any of your own IDPs and integrate it
+          with SecureAuth as it delivers enterprise connectors for major Cloud IDPs and a possibility for
           custom integration DKS for home-built solutions. You can also use built-in Sandbox IDP, which
           is a static IDP, to create an IDP for testing purposes.
         format: idpMethod
@@ -2312,8 +2485,8 @@ definitions:
         description: |-
           Defines the type of an IDP
 
-          Cloudentity is designed to make it possible for you to bring any of your own IDPs and integrate it
-          with Cloudentity as it delivers enterprise connectors for major Cloud IDPs and a possibility for
+          SecureAuth is designed to make it possible for you to bring any of your own IDPs and integrate it
+          with SecureAuth as it delivers enterprise connectors for major Cloud IDPs and a possibility for
           custom integration DKS for home-built solutions. You can also use built-in Sandbox IDP, which
           is a static IDP, to create an IDP for testing purposes.
         format: idpMethod
@@ -2504,6 +2677,16 @@ definitions:
       policy_server_id:
         format: serverID
         type: string
+        x-nullable: false
+    type: object
+  BruteForceEventPayload:
+    description: BruteForceEventPayload brute force event payload
+    properties:
+      counter:
+        description: current brute force counter for identity authentication in case
+          of authentication failure
+        format: int64
+        type: integer
         x-nullable: false
     type: object
   BruteForceLimit:
@@ -2924,8 +3107,24 @@ definitions:
     type: object
   Client:
     properties:
+      agent_capability:
+        $ref: '#/definitions/AgentCapability'
       app_url:
         description: Application URL
+        type: string
+        x-nullable: false
+      application_purpose:
+        description: Application purpose
+        enum:
+        - single_page
+        - server_web
+        - mobile_desktop
+        - service
+        - legacy
+        - custom
+        - saml
+        - ai_agent
+        example: signle_page
         type: string
         x-nullable: false
       application_type:
@@ -3259,7 +3458,7 @@ definitions:
 
           If empty, the `token_endpoint_auth_method` is used.
 
-          Cloudentity supports the following client authentication methods:
+          SecureAuth supports the following client authentication methods:
           `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
           `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 
@@ -3279,7 +3478,7 @@ definitions:
         $ref: '#/definitions/ClientJWKs'
       jwks_uri:
         description: A URL of JSON Web Key Set with the public keys used by a client
-          application to authenticate to Cloudentity.
+          application to authenticate to SecureAuth.
         type: string
         x-nullable: false
       logo_uri:
@@ -3341,7 +3540,7 @@ definitions:
         description: |-
           Request object signing algorithm for the token endpoint
 
-          Cloudentity supports signing tokens with the RS256, ES256, and PS256 algorithms. If you do not want
+          SecureAuth supports signing tokens with the RS256, ES256, and PS256 algorithms. If you do not want
           to use a signing algorithm, set the value of this parameter to `none`.
         enum:
         - any
@@ -3372,7 +3571,7 @@ definitions:
           A revocation endpoint authentication method configured for the client application (read-only).
           If empty, the `token_endpoint_auth_method` is used.
 
-          Cloudentity supports the following client authentication methods:
+          SecureAuth supports the following client authentication methods:
           `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
           `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 
@@ -3400,6 +3599,11 @@ definitions:
         items:
           type: string
         type: array
+        x-nullable: false
+      saml_idp_accept_acs_from_request:
+        description: accept ACS from SamlRequest even if it's not registered in the
+          metadata
+        type: boolean
         x-nullable: false
       saml_idp_attributes_override:
         $ref: '#/definitions/SAMLIDPAttributesOverride'
@@ -3592,7 +3796,7 @@ definitions:
         description: |-
           Token endpoint authentication method configured for a client application
 
-          Cloudentity supports the following client authentication methods:
+          SecureAuth supports the following client authentication methods:
           `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
           `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 
@@ -3681,8 +3885,24 @@ definitions:
     type: object
   ClientAdminResponse:
     properties:
+      agent_capability:
+        $ref: '#/definitions/AgentCapability'
       app_url:
         description: Application URL
+        type: string
+        x-nullable: false
+      application_purpose:
+        description: Application purpose
+        enum:
+        - single_page
+        - server_web
+        - mobile_desktop
+        - service
+        - legacy
+        - custom
+        - saml
+        - ai_agent
+        example: signle_page
         type: string
         x-nullable: false
       application_type:
@@ -4014,7 +4234,7 @@ definitions:
 
           If empty, the `token_endpoint_auth_method` is used.
 
-          Cloudentity supports the following client authentication methods:
+          SecureAuth supports the following client authentication methods:
           `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
           `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 
@@ -4034,7 +4254,7 @@ definitions:
         $ref: '#/definitions/ClientJWKs'
       jwks_uri:
         description: A URL of JSON Web Key Set with the public keys used by a client
-          application to authenticate to Cloudentity.
+          application to authenticate to SecureAuth.
         type: string
         x-nullable: false
       logo_uri:
@@ -4094,7 +4314,7 @@ definitions:
         description: |-
           Request object signing algorithm for the token endpoint
 
-          Cloudentity supports signing tokens with the RS256, ES256, and PS256 algorithms. If you do not want
+          SecureAuth supports signing tokens with the RS256, ES256, and PS256 algorithms. If you do not want
           to use a signing algorithm, set the value of this parameter to `none`.
         enum:
         - any
@@ -4125,7 +4345,7 @@ definitions:
           A revocation endpoint authentication method configured for the client application (read-only).
           If empty, the `token_endpoint_auth_method` is used.
 
-          Cloudentity supports the following client authentication methods:
+          SecureAuth supports the following client authentication methods:
           `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
           `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 
@@ -4153,6 +4373,11 @@ definitions:
         items:
           type: string
         type: array
+        x-nullable: false
+      saml_idp_accept_acs_from_request:
+        description: accept ACS from SamlRequest even if it's not registered in the
+          metadata
+        type: boolean
         x-nullable: false
       saml_idp_attributes_override:
         $ref: '#/definitions/SAMLIDPAttributesOverride'
@@ -4351,7 +4576,7 @@ definitions:
         description: |-
           Token endpoint authentication method configured for a client application
 
-          Cloudentity supports the following client authentication methods:
+          SecureAuth supports the following client authentication methods:
           `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
           `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 
@@ -4439,8 +4664,24 @@ definitions:
     type: object
   ClientAuditPayload:
     properties:
+      agent_capability:
+        $ref: '#/definitions/AgentCapability'
       app_url:
         description: Application URL
+        type: string
+        x-nullable: false
+      application_purpose:
+        description: Application purpose
+        enum:
+        - single_page
+        - server_web
+        - mobile_desktop
+        - service
+        - legacy
+        - custom
+        - saml
+        - ai_agent
+        example: signle_page
         type: string
         x-nullable: false
       application_type:
@@ -4742,7 +4983,7 @@ definitions:
 
           If empty, the `token_endpoint_auth_method` is used.
 
-          Cloudentity supports the following client authentication methods:
+          SecureAuth supports the following client authentication methods:
           `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
           `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 
@@ -4762,7 +5003,7 @@ definitions:
         $ref: '#/definitions/ClientJWKs'
       jwks_uri:
         description: A URL of JSON Web Key Set with the public keys used by a client
-          application to authenticate to Cloudentity.
+          application to authenticate to SecureAuth.
         type: string
         x-nullable: false
       logo_uri:
@@ -4820,7 +5061,7 @@ definitions:
         description: |-
           Request object signing algorithm for the token endpoint
 
-          Cloudentity supports signing tokens with the RS256, ES256, and PS256 algorithms. If you do not want
+          SecureAuth supports signing tokens with the RS256, ES256, and PS256 algorithms. If you do not want
           to use a signing algorithm, set the value of this parameter to `none`.
         enum:
         - any
@@ -4851,7 +5092,7 @@ definitions:
           A revocation endpoint authentication method configured for the client application (read-only).
           If empty, the `token_endpoint_auth_method` is used.
 
-          Cloudentity supports the following client authentication methods:
+          SecureAuth supports the following client authentication methods:
           `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
           `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 
@@ -4983,7 +5224,7 @@ definitions:
         description: |-
           Token endpoint authentication method configured for a client application
 
-          Cloudentity supports the following client authentication methods:
+          SecureAuth supports the following client authentication methods:
           `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
           `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 
@@ -5320,8 +5561,8 @@ definitions:
         description: |-
           Defines the type of an IDP
 
-          Cloudentity is designed to make it possible for you to bring any of your own IDPs and integrate it
-          with Cloudentity as it delivers enterprise connectors for major Cloud IDPs and a possibility for
+          SecureAuth is designed to make it possible for you to bring any of your own IDPs and integrate it
+          with SecureAuth as it delivers enterprise connectors for major Cloud IDPs and a possibility for
           custom integration DKS for home-built solutions. You can also use built-in Sandbox IDP, which
           is a static IDP, to create an IDP for testing purposes.
         format: idpMethod
@@ -5910,8 +6151,24 @@ definitions:
     type: object
   CreateClientAdminRequest:
     properties:
+      agent_capability:
+        $ref: '#/definitions/AgentCapability'
       app_url:
         description: Application URL
+        type: string
+        x-nullable: false
+      application_purpose:
+        description: Application purpose
+        enum:
+        - single_page
+        - server_web
+        - mobile_desktop
+        - service
+        - legacy
+        - custom
+        - saml
+        - ai_agent
+        example: signle_page
         type: string
         x-nullable: false
       application_type:
@@ -6240,7 +6497,7 @@ definitions:
 
           If empty, the `token_endpoint_auth_method` is used.
 
-          Cloudentity supports the following client authentication methods:
+          SecureAuth supports the following client authentication methods:
           `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
           `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 
@@ -6260,7 +6517,7 @@ definitions:
         $ref: '#/definitions/ClientJWKs'
       jwks_uri:
         description: A URL of JSON Web Key Set with the public keys used by a client
-          application to authenticate to Cloudentity.
+          application to authenticate to SecureAuth.
         type: string
         x-nullable: false
       logo_uri:
@@ -6318,7 +6575,7 @@ definitions:
         description: |-
           Request object signing algorithm for the token endpoint
 
-          Cloudentity supports signing tokens with the RS256, ES256, and PS256 algorithms. If you do not want
+          SecureAuth supports signing tokens with the RS256, ES256, and PS256 algorithms. If you do not want
           to use a signing algorithm, set the value of this parameter to `none`.
         enum:
         - any
@@ -6349,7 +6606,7 @@ definitions:
           A revocation endpoint authentication method configured for the client application (read-only).
           If empty, the `token_endpoint_auth_method` is used.
 
-          Cloudentity supports the following client authentication methods:
+          SecureAuth supports the following client authentication methods:
           `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
           `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 
@@ -6488,7 +6745,7 @@ definitions:
         description: |-
           Token endpoint authentication method configured for a client application
 
-          Cloudentity supports the following client authentication methods:
+          SecureAuth supports the following client authentication methods:
           `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
           `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 
@@ -6592,7 +6849,7 @@ definitions:
         x-nullable: false
       name:
         description: gateway name
-        example: Cloudentity Pyron
+        example: SecureAuth Pyron
         type: string
         x-nullable: false
       server_id:
@@ -6620,6 +6877,9 @@ definitions:
           - email_otp
           - sms_otp
           - webauthn
+          - push
+          - symbol
+          - qr_code
           type: string
         type: array
         x-nullable: false
@@ -6690,6 +6950,7 @@ definitions:
         - password
         - webauthn
         - totp
+        - device
         type: string
         x-nullable: false
       operation_type:
@@ -6747,6 +7008,13 @@ definitions:
         format: customAppID
         type: string
         x-nullable: false
+      identity_pool_id:
+        description: |-
+          IdentityPoolID associated with the CustomApp.
+          Required for type 'scim'. Not allowed for type 'post-authn'.
+        format: poolID
+        type: string
+        x-nullable: false
       name:
         description: Name of the CustomApp
         type: string
@@ -6767,18 +7035,20 @@ definitions:
         description: Type of the custom app
         enum:
         - post-authn
+        - scim
         example: post-authn
         type: string
         x-nullable: false
       url:
-        description: url of the CustomApp
+        description: |-
+          URL of the CustomApp.
+          Required for type 'post-authn'. Not allowed for type 'scim'.
         type: string
         x-nullable: false
     required:
     - id
     - tenant_id
     - server_id
-    - url
     type: object
   CustomAppResponse:
     description: CustomApp object on list or get
@@ -6795,6 +7065,13 @@ definitions:
         format: customAppID
         type: string
         x-nullable: false
+      identity_pool_id:
+        description: |-
+          IdentityPoolID associated with the CustomApp.
+          Required for type 'scim'. Not allowed for type 'post-authn'.
+        format: poolID
+        type: string
+        x-nullable: false
       name:
         description: Name of the CustomApp
         type: string
@@ -6815,18 +7092,20 @@ definitions:
         description: Type of the custom app
         enum:
         - post-authn
+        - scim
         example: post-authn
         type: string
         x-nullable: false
       url:
-        description: url of the CustomApp
+        description: |-
+          URL of the CustomApp.
+          Required for type 'post-authn'. Not allowed for type 'scim'.
         type: string
         x-nullable: false
     required:
     - id
     - tenant_id
     - server_id
-    - url
     type: object
   CustomAppsResponse:
     description: CustomApps
@@ -6938,8 +7217,8 @@ definitions:
         description: |-
           Defines the type of an IDP
 
-          Cloudentity is designed to make it possible for you to bring any of your own IDPs and integrate it
-          with Cloudentity as it delivers enterprise connectors for major Cloud IDPs and a possibility for
+          SecureAuth is designed to make it possible for you to bring any of your own IDPs and integrate it
+          with SecureAuth as it delivers enterprise connectors for major Cloud IDPs and a possibility for
           custom integration DKS for home-built solutions. You can also use built-in Sandbox IDP, which
           is a static IDP, to create an IDP for testing purposes.
         format: idpMethod
@@ -7010,13 +7289,18 @@ definitions:
         example: https://example.com/login
         type: string
         x-nullable: false
+      recovery_methods:
+        description: List of supported recovery methods by this custom idp
+        items: {}
+        type: array
+        x-nullable: false
       type:
         description: |-
           Type metadata
 
           There are two type metadatas: `generic` and `cloudentity`. If you choose `cloudentity` and do
           not provide authentication context attributes, it defaults to using the attributes from
-          Cloudentity Cloud Identity Plane (CIP).
+          SecureAuth Cloud Identity Plane (CIP).
 
           If not provided, the `generic` type is set.
         format: customIDPType
@@ -7071,7 +7355,7 @@ definitions:
         type: string
         x-nullable: false
       dbfp:
-        description: Arculix DBFP `jwt` cookie.
+        description: DBFP `jwt` cookie.
         type: string
         x-nullable: false
       latitude:
@@ -7164,7 +7448,7 @@ definitions:
         type: string
         x-nullable: false
       dbfp:
-        description: Arculix DBFP `jwt` cookie.
+        description: DBFP `jwt` cookie.
         type: string
         x-nullable: false
       error:
@@ -7313,6 +7597,8 @@ definitions:
         type: integer
         x-nullable: false
     type: object
+  DirectoryID:
+    type: string
   Duration:
     description: |-
       A Duration represents the elapsed time between two instants
@@ -7553,6 +7839,10 @@ definitions:
         description: ACR support
         type: boolean
         x-nullable: false
+      active_directory_idp:
+        description: Active Directory IDP
+        type: boolean
+        x-nullable: false
       add_fake_tenant_url_to_login_request_for_non_default_routing:
         description: add fake tenantUrl to query params for routing other than default
           (needed for backward compatibility with CIP for vanity domains)
@@ -7565,16 +7855,8 @@ definitions:
         description: admin workspace access
         type: boolean
         x-nullable: false
-      agentic_ai:
-        description: Agentic AI
-        type: boolean
-        x-nullable: false
       allow_identity_pool_otp_challenge_confirmation_via_web_page:
         description: allow Identity Pool OTP Challenge confirmation via web page
-        type: boolean
-        x-nullable: false
-      allow_skip_2fa_if_none_set_up:
-        description: allow to skip 2FA if user does not have any authn methods configured
         type: boolean
         x-nullable: false
       analytics_duration:
@@ -7622,7 +7904,7 @@ definitions:
         type: boolean
         x-nullable: false
       cloudentity_idp:
-        description: Cloudentity IDP
+        description: SecureAuth IDP
         type: boolean
         x-nullable: false
       commit:
@@ -7634,6 +7916,10 @@ definitions:
         x-nullable: false
       connect_id_consent_page_face_lifting:
         description: connect ID consent page facelifting
+        type: boolean
+        x-nullable: false
+      custom_recovery:
+        description: Custom recovery
         type: boolean
         x-nullable: false
       debug:
@@ -7670,6 +7956,11 @@ definitions:
         x-nullable: false
       disable_self_user_identity_api_complete_address_verification:
         description: disable self user Identity API to complete address verification
+        type: boolean
+        x-nullable: false
+      disable_server_error_on_script_user_error:
+        description: disable failing with server error on script user error instead
+          of redirecting to the client app
         type: boolean
         x-nullable: false
       display_workspace_wizard:
@@ -7711,12 +8002,6 @@ definitions:
       image_proxy_url:
         type: string
         x-nullable: false
-      initialize_demo_workspace:
-        description: when enabled and the display_workspace_wizard feature flag is
-          set to true, a demo workspace with a set of preconfigured IDPs is created
-          and no welcome screen is displayed
-        type: boolean
-        x-nullable: false
       insecure_disable_csrf:
         description: disable csrf
         type: boolean
@@ -7733,6 +8018,10 @@ definitions:
         description: mark address as verified on any proof of possession of the address
         type: boolean
         x-nullable: false
+      nats:
+        description: publish events to NATS
+        type: boolean
+        x-nullable: false
       obbr:
         description: openbanking brasil
         type: boolean
@@ -7741,19 +8030,16 @@ definitions:
         description: openbanking ksa workspace and security profile
         type: boolean
         x-nullable: false
-      organizations:
-        description: |-
-          Organizations
-
-          Delineate a structured and hierarchical separation among your business customers' companies or partners. Enable Delegated Admin Portal.
-        type: boolean
-        x-nullable: false
-      qualified_chatbot:
-        description: Qualified chatbot
+      push:
+        description: Push
         type: boolean
         x-nullable: false
       rar:
         description: rich authorization requests
+        type: boolean
+        x-nullable: false
+      remote_risk_dashboard:
+        description: Remote risk dashboard
         type: boolean
         x-nullable: false
       risk_engine_ab:
@@ -7765,12 +8051,17 @@ definitions:
           $ref: '#/definitions/Insight'
         type: object
         x-nullable: false
-      risk_insights_topn_graphs:
-        description: Risk Insights TopN Graphs
-        type: boolean
+      risk_manifest_url:
+        type: string
         x-nullable: false
-      saml_idp_initiated_sso:
-        description: SAML IDP initiated SSO
+      risk_public_url:
+        type: string
+        x-nullable: false
+      risk_tenant_id:
+        type: string
+        x-nullable: false
+      saml_idp_overrides_per_sp:
+        description: SAML IDP overrides per SP
         type: boolean
         x-nullable: false
       scim_v2:
@@ -7814,8 +8105,20 @@ definitions:
         description: hierarchical dumps tenant APIs
         type: boolean
         x-nullable: false
+      two_step_activation:
+        description: Two-step activation flow to prevent email scanner auto-activation
+        type: boolean
+        x-nullable: false
       use_new_dn_format:
         description: Use new DN format
+        type: boolean
+        x-nullable: false
+      user_cross_organization_role_assignment:
+        description: User cross-organization role assignment
+        type: boolean
+        x-nullable: false
+      user_friendly_credentials_setup:
+        description: User-friendly credentials setup
         type: boolean
         x-nullable: false
       version:
@@ -8044,8 +8347,8 @@ definitions:
         description: |-
           Defines the type of an IDP
 
-          Cloudentity is designed to make it possible for you to bring any of your own IDPs and integrate it
-          with Cloudentity as it delivers enterprise connectors for major Cloud IDPs and a possibility for
+          SecureAuth is designed to make it possible for you to bring any of your own IDPs and integrate it
+          with SecureAuth as it delivers enterprise connectors for major Cloud IDPs and a possibility for
           custom integration DKS for home-built solutions. You can also use built-in Sandbox IDP, which
           is a static IDP, to create an IDP for testing purposes.
         format: idpMethod
@@ -8457,7 +8760,7 @@ definitions:
         x-nullable: false
       name:
         description: gateway name
-        example: Cloudentity Pyron
+        example: SecureAuth Pyron
         type: string
         x-nullable: false
       tenant_id:
@@ -8599,7 +8902,7 @@ definitions:
         x-nullable: false
       name:
         description: gateway name
-        example: Cloudentity Pyron
+        example: SecureAuth Pyron
         type: string
         x-nullable: false
       server_url:
@@ -8713,8 +9016,8 @@ definitions:
         description: |-
           Defines the type of an IDP
 
-          Cloudentity is designed to make it possible for you to bring any of your own IDPs and integrate it
-          with Cloudentity as it delivers enterprise connectors for major Cloud IDPs and a possibility for
+          SecureAuth is designed to make it possible for you to bring any of your own IDPs and integrate it
+          with SecureAuth as it delivers enterprise connectors for major Cloud IDPs and a possibility for
           custom integration DKS for home-built solutions. You can also use built-in Sandbox IDP, which
           is a static IDP, to create an IDP for testing purposes.
         format: idpMethod
@@ -8838,8 +9141,8 @@ definitions:
         description: |-
           Defines the type of an IDP
 
-          Cloudentity is designed to make it possible for you to bring any of your own IDPs and integrate it
-          with Cloudentity as it delivers enterprise connectors for major Cloud IDPs and a possibility for
+          SecureAuth is designed to make it possible for you to bring any of your own IDPs and integrate it
+          with SecureAuth as it delivers enterprise connectors for major Cloud IDPs and a possibility for
           custom integration DKS for home-built solutions. You can also use built-in Sandbox IDP, which
           is a static IDP, to create an IDP for testing purposes.
         format: idpMethod
@@ -9010,8 +9313,8 @@ definitions:
         description: |-
           Defines the type of an IDP
 
-          Cloudentity is designed to make it possible for you to bring any of your own IDPs and integrate it
-          with Cloudentity as it delivers enterprise connectors for major Cloud IDPs and a possibility for
+          SecureAuth is designed to make it possible for you to bring any of your own IDPs and integrate it
+          with SecureAuth as it delivers enterprise connectors for major Cloud IDPs and a possibility for
           custom integration DKS for home-built solutions. You can also use built-in Sandbox IDP, which
           is a static IDP, to create an IDP for testing purposes.
         format: idpMethod
@@ -9135,8 +9438,8 @@ definitions:
         description: |-
           Defines the type of an IDP
 
-          Cloudentity is designed to make it possible for you to bring any of your own IDPs and integrate it
-          with Cloudentity as it delivers enterprise connectors for major Cloud IDPs and a possibility for
+          SecureAuth is designed to make it possible for you to bring any of your own IDPs and integrate it
+          with SecureAuth as it delivers enterprise connectors for major Cloud IDPs and a possibility for
           custom integration DKS for home-built solutions. You can also use built-in Sandbox IDP, which
           is a static IDP, to create an IDP for testing purposes.
         format: idpMethod
@@ -9312,8 +9615,8 @@ definitions:
         description: |-
           Defines the type of an IDP
 
-          Cloudentity is designed to make it possible for you to bring any of your own IDPs and integrate it
-          with Cloudentity as it delivers enterprise connectors for major Cloud IDPs and a possibility for
+          SecureAuth is designed to make it possible for you to bring any of your own IDPs and integrate it
+          with SecureAuth as it delivers enterprise connectors for major Cloud IDPs and a possibility for
           custom integration DKS for home-built solutions. You can also use built-in Sandbox IDP, which
           is a static IDP, to create an IDP for testing purposes.
         format: idpMethod
@@ -9582,6 +9885,13 @@ definitions:
   Group:
     description: Group group
     properties:
+      created_at:
+        description: |-
+          created at
+          Format: date-time
+        format: date-time
+        type: string
+        x-nullable: false
       description:
         description: description
         type: string
@@ -9600,6 +9910,13 @@ definitions:
         x-nullable: false
       tenant_id:
         description: tenant id
+        type: string
+        x-nullable: false
+      updated_at:
+        description: |-
+          updated at
+          Format: date-time
+        format: date-time
         type: string
         x-nullable: false
       user_pool_id:
@@ -9719,8 +10036,8 @@ definitions:
         description: |-
           Defines the type of an IDP
 
-          Cloudentity is designed to make it possible for you to bring any of your own IDPs and integrate it
-          with Cloudentity as it delivers enterprise connectors for major Cloud IDPs and a possibility for
+          SecureAuth is designed to make it possible for you to bring any of your own IDPs and integrate it
+          with SecureAuth as it delivers enterprise connectors for major Cloud IDPs and a possibility for
           custom integration DKS for home-built solutions. You can also use built-in Sandbox IDP, which
           is a static IDP, to create an IDP for testing purposes.
         format: idpMethod
@@ -9786,6 +10103,32 @@ definitions:
 
           This may only apply to specific IDPs, such as LinkedIn.
         type: boolean
+        x-nullable: false
+    type: object
+  IDPDebugInput:
+    properties:
+      access_token_payload:
+        additionalProperties:
+          type: object
+        type: object
+        x-nullable: false
+      groups:
+        items:
+          type: string
+        type: array
+        x-nullable: false
+      id_token_payload:
+        additionalProperties:
+          type: object
+        type: object
+        x-nullable: false
+      saml_response:
+        type: string
+        x-nullable: false
+      user_data:
+        additionalProperties:
+          type: object
+        type: object
         x-nullable: false
     type: object
   IDPDiscovery:
@@ -10109,8 +10452,8 @@ definitions:
         description: |-
           Defines the type of an IDP
 
-          Cloudentity is designed to make it possible for you to bring any of your own IDPs and integrate it
-          with Cloudentity as it delivers enterprise connectors for major Cloud IDPs and a possibility for
+          SecureAuth is designed to make it possible for you to bring any of your own IDPs and integrate it
+          with SecureAuth as it delivers enterprise connectors for major Cloud IDPs and a possibility for
           custom integration DKS for home-built solutions. You can also use built-in Sandbox IDP, which
           is a static IDP, to create an IDP for testing purposes.
         format: idpMethod
@@ -10250,6 +10593,12 @@ definitions:
         example: my-server
         format: serverID
         type: string
+        x-nullable: false
+      capabilities:
+        description: Service capabilities
+        items:
+          $ref: '#/definitions/ServiceCapability'
+        type: array
         x-nullable: false
       created_apis:
         items:
@@ -10468,8 +10817,8 @@ definitions:
         description: |-
           Defines the type of an IDP
 
-          Cloudentity is designed to make it possible for you to bring any of your own IDPs and integrate it
-          with Cloudentity as it delivers enterprise connectors for major Cloud IDPs and a possibility for
+          SecureAuth is designed to make it possible for you to bring any of your own IDPs and integrate it
+          with SecureAuth as it delivers enterprise connectors for major Cloud IDPs and a possibility for
           custom integration DKS for home-built solutions. You can also use built-in Sandbox IDP, which
           is a static IDP, to create an IDP for testing purposes.
         format: idpMethod
@@ -10894,8 +11243,8 @@ definitions:
         description: |-
           Defines the type of an IDP
 
-          Cloudentity is designed to make it possible for you to bring any of your own IDPs and integrate it
-          with Cloudentity as it delivers enterprise connectors for major Cloud IDPs and a possibility for
+          SecureAuth is designed to make it possible for you to bring any of your own IDPs and integrate it
+          with SecureAuth as it delivers enterprise connectors for major Cloud IDPs and a possibility for
           custom integration DKS for home-built solutions. You can also use built-in Sandbox IDP, which
           is a static IDP, to create an IDP for testing purposes.
         format: idpMethod
@@ -11018,6 +11367,9 @@ definitions:
       error_hint:
         type: string
         x-nullable: false
+      error_uri:
+        type: string
+        x-nullable: false
       idp:
         $ref: '#/definitions/IDPPayload'
       status_code:
@@ -11035,6 +11387,10 @@ definitions:
         x-nullable: false
       idp:
         $ref: '#/definitions/IDPPayload'
+      idp_input:
+        $ref: '#/definitions/IDPDebugInput'
+      idp_mapping_details:
+        $ref: '#/definitions/MappingDetails'
     type: object
   MFAAuth:
     properties:
@@ -11153,6 +11509,10 @@ definitions:
         example: false
         type: boolean
         x-nullable: false
+      default:
+        description: Default value used when source value is missing in dynamic mode.
+        type: object
+        x-nullable: false
       mode:
         $ref: '#/definitions/MappingMode'
       source:
@@ -11194,8 +11554,31 @@ definitions:
     - type
     title: Attribute mapping.
     type: object
+  MappingDetail:
+    properties:
+      input:
+        type: object
+        x-nullable: false
+      output:
+        type: object
+        x-nullable: false
+      result:
+        $ref: '#/definitions/MappingResult'
+      source:
+        type: string
+        x-nullable: false
+      target:
+        type: string
+        x-nullable: false
+    type: object
+  MappingDetails:
+    items:
+      $ref: '#/definitions/MappingDetail'
+    type: array
   MappingMode:
     description: mapping mode
+    type: string
+  MappingResult:
     type: string
   Mappings:
     description: |-
@@ -11288,8 +11671,8 @@ definitions:
         description: |-
           Defines the type of an IDP
 
-          Cloudentity is designed to make it possible for you to bring any of your own IDPs and integrate it
-          with Cloudentity as it delivers enterprise connectors for major Cloud IDPs and a possibility for
+          SecureAuth is designed to make it possible for you to bring any of your own IDPs and integrate it
+          with SecureAuth as it delivers enterprise connectors for major Cloud IDPs and a possibility for
           custom integration DKS for home-built solutions. You can also use built-in Sandbox IDP, which
           is a static IDP, to create an IDP for testing purposes.
         format: idpMethod
@@ -11446,8 +11829,8 @@ definitions:
         description: |-
           Defines the type of an IDP
 
-          Cloudentity is designed to make it possible for you to bring any of your own IDPs and integrate it
-          with Cloudentity as it delivers enterprise connectors for major Cloud IDPs and a possibility for
+          SecureAuth is designed to make it possible for you to bring any of your own IDPs and integrate it
+          with SecureAuth as it delivers enterprise connectors for major Cloud IDPs and a possibility for
           custom integration DKS for home-built solutions. You can also use built-in Sandbox IDP, which
           is a static IDP, to create an IDP for testing purposes.
         format: idpMethod
@@ -11655,8 +12038,8 @@ definitions:
         description: |-
           Defines the type of an IDP
 
-          Cloudentity is designed to make it possible for you to bring any of your own IDPs and integrate it
-          with Cloudentity as it delivers enterprise connectors for major Cloud IDPs and a possibility for
+          SecureAuth is designed to make it possible for you to bring any of your own IDPs and integrate it
+          with SecureAuth as it delivers enterprise connectors for major Cloud IDPs and a possibility for
           custom integration DKS for home-built solutions. You can also use built-in Sandbox IDP, which
           is a static IDP, to create an IDP for testing purposes.
         format: idpMethod
@@ -11835,8 +12218,8 @@ definitions:
         description: |-
           Defines the type of an IDP
 
-          Cloudentity is designed to make it possible for you to bring any of your own IDPs and integrate it
-          with Cloudentity as it delivers enterprise connectors for major Cloud IDPs and a possibility for
+          SecureAuth is designed to make it possible for you to bring any of your own IDPs and integrate it
+          with SecureAuth as it delivers enterprise connectors for major Cloud IDPs and a possibility for
           custom integration DKS for home-built solutions. You can also use built-in Sandbox IDP, which
           is a static IDP, to create an IDP for testing purposes.
         format: idpMethod
@@ -12063,8 +12446,8 @@ definitions:
         description: |-
           Defines the type of an IDP
 
-          Cloudentity is designed to make it possible for you to bring any of your own IDPs and integrate it
-          with Cloudentity as it delivers enterprise connectors for major Cloud IDPs and a possibility for
+          SecureAuth is designed to make it possible for you to bring any of your own IDPs and integrate it
+          with SecureAuth as it delivers enterprise connectors for major Cloud IDPs and a possibility for
           custom integration DKS for home-built solutions. You can also use built-in Sandbox IDP, which
           is a static IDP, to create an IDP for testing purposes.
         format: idpMethod
@@ -12254,8 +12637,8 @@ definitions:
         description: |-
           Defines the type of an IDP
 
-          Cloudentity is designed to make it possible for you to bring any of your own IDPs and integrate it
-          with Cloudentity as it delivers enterprise connectors for major Cloud IDPs and a possibility for
+          SecureAuth is designed to make it possible for you to bring any of your own IDPs and integrate it
+          with SecureAuth as it delivers enterprise connectors for major Cloud IDPs and a possibility for
           custom integration DKS for home-built solutions. You can also use built-in Sandbox IDP, which
           is a static IDP, to create an IDP for testing purposes.
         format: idpMethod
@@ -12388,6 +12771,9 @@ definitions:
           - email_otp
           - sms_otp
           - webauthn
+          - push
+          - symbol
+          - qr_code
           type: string
         type: array
         x-nullable: false
@@ -12541,8 +12927,8 @@ definitions:
         description: |-
           Defines the type of an IDP
 
-          Cloudentity is designed to make it possible for you to bring any of your own IDPs and integrate it
-          with Cloudentity as it delivers enterprise connectors for major Cloud IDPs and a possibility for
+          SecureAuth is designed to make it possible for you to bring any of your own IDPs and integrate it
+          with SecureAuth as it delivers enterprise connectors for major Cloud IDPs and a possibility for
           custom integration DKS for home-built solutions. You can also use built-in Sandbox IDP, which
           is a static IDP, to create an IDP for testing purposes.
         format: idpMethod
@@ -12613,6 +12999,9 @@ definitions:
           - email_otp
           - sms_otp
           - webauthn
+          - push
+          - symbol
+          - qr_code
           type: string
         type: array
         x-nullable: false
@@ -12799,7 +13188,7 @@ definitions:
         description: |-
           Language of a policy
 
-          ACP supports creating Cloudentity policies (using a visual editor or defined using JSON or
+          ACP supports creating SecureAuth policies (using a visual editor or defined using JSON or
           YAML) and policies defined using REGO (language used by Open Policy Agent (OPA)).
         example: cloudentity
         format: policyLanguage
@@ -12851,7 +13240,7 @@ definitions:
         type: string
         x-nullable: false
       validators:
-        description: An array of validators for a Cloudentity policy
+        description: An array of validators for a SecureAuth policy
         items:
           $ref: '#/definitions/ValidatorConfig'
         type: array
@@ -13185,7 +13574,7 @@ definitions:
     type: object
   RedirectURIs:
     description: |-
-      Cloudentity uses redirect URIs to redirect users back to the application after they authorized the application. Along
+      SecureAuth uses redirect URIs to redirect users back to the application after they authorized the application. Along
       with the redirection, an authorization code or access token is added to the URL.
 
       For backward compatibility reasons, it's also acceptable to pass `redirect_uris` as a string, for example:
@@ -13729,6 +14118,9 @@ definitions:
           - email_otp
           - sms_otp
           - webauthn
+          - push
+          - symbol
+          - qr_code
           type: string
         type: array
         x-nullable: false
@@ -13755,7 +14147,7 @@ definitions:
         type: boolean
         x-nullable: false
       dbfp:
-        description: Arculix DBFP `jwt` cookie.
+        description: DBFP `jwt` cookie.
         type: string
         x-nullable: false
       error:
@@ -13960,6 +14352,9 @@ definitions:
           - email_otp
           - sms_otp
           - webauthn
+          - push
+          - symbol
+          - qr_code
           type: string
         type: array
         x-nullable: false
@@ -13986,7 +14381,7 @@ definitions:
         type: boolean
         x-nullable: false
       dbfp:
-        description: Arculix DBFP `jwt` cookie.
+        description: DBFP `jwt` cookie.
         type: string
         x-nullable: false
       grant_type:
@@ -14188,6 +14583,8 @@ definitions:
         x-nullable: false
       response_binding_mode:
         $ref: '#/definitions/SAMLResponseBindingMode'
+      service_provider_discovery_mode:
+        $ref: '#/definitions/ServiceProviderDiscoveryMode'
       signing_hash_algorithms:
         default:
         - sha-256
@@ -14303,8 +14700,8 @@ definitions:
         description: |-
           Defines the type of an IDP
 
-          Cloudentity is designed to make it possible for you to bring any of your own IDPs and integrate it
-          with Cloudentity as it delivers enterprise connectors for major Cloud IDPs and a possibility for
+          SecureAuth is designed to make it possible for you to bring any of your own IDPs and integrate it
+          with SecureAuth as it delivers enterprise connectors for major Cloud IDPs and a possibility for
           custom integration DKS for home-built solutions. You can also use built-in Sandbox IDP, which
           is a static IDP, to create an IDP for testing purposes.
         format: idpMethod
@@ -14528,8 +14925,8 @@ definitions:
         description: |-
           Defines the type of an IDP
 
-          Cloudentity is designed to make it possible for you to bring any of your own IDPs and integrate it
-          with Cloudentity as it delivers enterprise connectors for major Cloud IDPs and a possibility for
+          SecureAuth is designed to make it possible for you to bring any of your own IDPs and integrate it
+          with SecureAuth as it delivers enterprise connectors for major Cloud IDPs and a possibility for
           custom integration DKS for home-built solutions. You can also use built-in Sandbox IDP, which
           is a static IDP, to create an IDP for testing purposes.
         format: idpMethod
@@ -15572,6 +15969,9 @@ definitions:
           - email_otp
           - sms_otp
           - webauthn
+          - push
+          - symbol
+          - qr_code
           type: string
         type: array
         x-nullable: false
@@ -15856,6 +16256,7 @@ definitions:
         - fapi_20_message_signing
         - connect_id
         - agentic_ai
+        - saidp_legacy
         example: default
         type: string
         x-nullable: false
@@ -16141,6 +16542,9 @@ definitions:
           - email_otp
           - sms_otp
           - webauthn
+          - push
+          - symbol
+          - qr_code
           type: string
         type: array
         x-nullable: false
@@ -16423,6 +16827,7 @@ definitions:
         - fapi_20_message_signing
         - connect_id
         - agentic_ai
+        - saidp_legacy
         example: default
         type: string
         x-nullable: false
@@ -16670,6 +17075,7 @@ definitions:
         - fapi_20_message_signing
         - connect_id
         - agentic_ai
+        - saidp_legacy
         example: default
         type: string
         x-nullable: false
@@ -16810,6 +17216,7 @@ definitions:
         - fapi_20_message_signing
         - connect_id
         - agentic_ai
+        - saidp_legacy
         example: default
         type: string
         x-nullable: false
@@ -17085,6 +17492,9 @@ definitions:
           - email_otp
           - sms_otp
           - webauthn
+          - push
+          - symbol
+          - qr_code
           type: string
         type: array
         x-nullable: false
@@ -17375,6 +17785,7 @@ definitions:
         - fapi_20_message_signing
         - connect_id
         - agentic_ai
+        - saidp_legacy
         example: default
         type: string
         x-nullable: false
@@ -17519,6 +17930,7 @@ definitions:
           - legacy
           - custom
           - saml
+          - ai_agent
           type: string
         type: array
         x-nullable: false
@@ -17702,6 +18114,12 @@ definitions:
         format: serverID
         type: string
         x-nullable: false
+      capabilities:
+        description: Service capabilities
+        items:
+          $ref: '#/definitions/ServiceCapability'
+        type: array
+        x-nullable: false
       custom_audience:
         description: Custom service audience
         example: https://api.example.com
@@ -17763,6 +18181,12 @@ definitions:
     type: object
   ServiceAuditPayload:
     properties:
+      capabilities:
+        description: Service capabilities
+        items:
+          $ref: '#/definitions/ServiceCapability'
+        type: array
+        x-nullable: false
       custom_audience:
         description: Custom service audience
         example: https://api.example.com
@@ -17816,6 +18240,10 @@ definitions:
         type: boolean
         x-nullable: false
     type: object
+  ServiceCapability:
+    type: string
+  ServiceProviderDiscoveryMode:
+    type: string
   ServiceResponse:
     properties:
       audience:
@@ -17826,6 +18254,12 @@ definitions:
         example: my-server
         format: serverID
         type: string
+        x-nullable: false
+      capabilities:
+        description: Service capabilities
+        items:
+          $ref: '#/definitions/ServiceCapability'
+        type: array
         x-nullable: false
       custom_audience:
         description: Custom service audience
@@ -17909,6 +18343,12 @@ definitions:
         format: serverID
         type: string
         x-nullable: false
+      capabilities:
+        description: Service capabilities
+        items:
+          $ref: '#/definitions/ServiceCapability'
+        type: array
+        x-nullable: false
       custom_audience:
         description: Custom service audience
         example: https://api.example.com
@@ -17978,6 +18418,12 @@ definitions:
         example: my-server
         format: serverID
         type: string
+        x-nullable: false
+      capabilities:
+        description: Service capabilities
+        items:
+          $ref: '#/definitions/ServiceCapability'
+        type: array
         x-nullable: false
       custom_audience:
         description: Custom service audience
@@ -18150,8 +18596,8 @@ definitions:
         description: |-
           Defines the type of an IDP
 
-          Cloudentity is designed to make it possible for you to bring any of your own IDPs and integrate it
-          with Cloudentity as it delivers enterprise connectors for major Cloud IDPs and a possibility for
+          SecureAuth is designed to make it possible for you to bring any of your own IDPs and integrate it
+          with SecureAuth as it delivers enterprise connectors for major Cloud IDPs and a possibility for
           custom integration DKS for home-built solutions. You can also use built-in Sandbox IDP, which
           is a static IDP, to create an IDP for testing purposes.
         format: idpMethod
@@ -18733,7 +19179,7 @@ definitions:
         type: object
         x-nullable: false
       workforce:
-        $ref: '#/definitions/WorkforceSettings'
+        $ref: '#/definitions/TenantWorkforceSettings'
     type: object
   TenantTranslationsSettings:
     properties:
@@ -18756,6 +19202,18 @@ definitions:
       selector_enabled:
         description: Is locale selector enabled in templates
         type: boolean
+        x-nullable: false
+    type: object
+  TenantWorkforceSettings:
+    properties:
+      faye_url:
+        type: string
+        x-nullable: false
+      manifest_url:
+        type: string
+        x-nullable: false
+      url:
+        type: string
         x-nullable: false
     type: object
   TestAPIResult:
@@ -18790,7 +19248,7 @@ definitions:
         description: |-
           Language of a policy
 
-          ACP supports creating Cloudentity policies (using a visual editor or defined using JSON or
+          ACP supports creating SecureAuth policies (using a visual editor or defined using JSON or
           YAML) and Open Policy Agent (OPA) policies (defined using REGO).
 
           OPA is a policy engine that unifies policy enforcement and provides a high-level declarative
@@ -18801,7 +19259,7 @@ definitions:
         type: string
         x-nullable: false
       validators:
-        description: An array of validators for a Cloudentity policy
+        description: An array of validators for a SecureAuth policy
         items:
           $ref: '#/definitions/ValidatorConfig'
         type: array
@@ -19185,8 +19643,24 @@ definitions:
     type: object
   UpdateClientAdminRequest:
     properties:
+      agent_capability:
+        $ref: '#/definitions/AgentCapability'
       app_url:
         description: Application URL
+        type: string
+        x-nullable: false
+      application_purpose:
+        description: Application purpose
+        enum:
+        - single_page
+        - server_web
+        - mobile_desktop
+        - service
+        - legacy
+        - custom
+        - saml
+        - ai_agent
+        example: signle_page
         type: string
         x-nullable: false
       application_type:
@@ -19515,7 +19989,7 @@ definitions:
 
           If empty, the `token_endpoint_auth_method` is used.
 
-          Cloudentity supports the following client authentication methods:
+          SecureAuth supports the following client authentication methods:
           `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
           `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 
@@ -19535,7 +20009,7 @@ definitions:
         $ref: '#/definitions/ClientJWKs'
       jwks_uri:
         description: A URL of JSON Web Key Set with the public keys used by a client
-          application to authenticate to Cloudentity.
+          application to authenticate to SecureAuth.
         type: string
         x-nullable: false
       logo_uri:
@@ -19593,7 +20067,7 @@ definitions:
         description: |-
           Request object signing algorithm for the token endpoint
 
-          Cloudentity supports signing tokens with the RS256, ES256, and PS256 algorithms. If you do not want
+          SecureAuth supports signing tokens with the RS256, ES256, and PS256 algorithms. If you do not want
           to use a signing algorithm, set the value of this parameter to `none`.
         enum:
         - any
@@ -19624,7 +20098,7 @@ definitions:
           A revocation endpoint authentication method configured for the client application (read-only).
           If empty, the `token_endpoint_auth_method` is used.
 
-          Cloudentity supports the following client authentication methods:
+          SecureAuth supports the following client authentication methods:
           `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
           `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 
@@ -19652,6 +20126,11 @@ definitions:
         items:
           type: string
         type: array
+        x-nullable: false
+      saml_idp_accept_acs_from_request:
+        description: accept ACS from SamlRequest even if it's not registered in the
+          metadata
+        type: boolean
         x-nullable: false
       saml_idp_attributes_override:
         $ref: '#/definitions/SAMLIDPAttributesOverride'
@@ -19825,7 +20304,7 @@ definitions:
         description: |-
           Token endpoint authentication method configured for a client application
 
-          Cloudentity supports the following client authentication methods:
+          SecureAuth supports the following client authentication methods:
           `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
           `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 
@@ -19924,7 +20403,7 @@ definitions:
         x-nullable: false
       name:
         description: gateway name
-        example: Cloudentity Pyron
+        example: SecureAuth Pyron
         type: string
         x-nullable: false
       token_exchange:
@@ -19957,6 +20436,10 @@ definitions:
           single values are converted to slices if required. Each element is weakly decoded.
         example: false
         type: boolean
+        x-nullable: false
+      default:
+        description: Default value used when source value is missing in dynamic mode.
+        type: object
         x-nullable: false
       mode:
         $ref: '#/definitions/MappingMode'
@@ -20017,8 +20500,13 @@ definitions:
         - email_otp
         - sms_otp
         - webauthn
+        - push
+        - symbol
+        - qr_code
         type: string
         x-nullable: false
+      brute_force:
+        $ref: '#/definitions/BruteForceEventPayload'
       failure_reason:
         description: failure reason
         type: string
@@ -20036,6 +20524,9 @@ definitions:
         - email_otp
         - sms_otp
         - webauthn
+        - push
+        - symbol
+        - qr_code
         type: string
         x-nullable: false
       mfa_skipped:
@@ -20108,8 +20599,29 @@ definitions:
         description: address
         type: string
         x-nullable: false
+      address_type:
+        description: address type
+        enum:
+        - email
+        - mobile
+        type: string
+        x-nullable: false
+      address_verified:
+        description: address verified
+        type: boolean
+        x-nullable: false
       identifier:
         description: identifier
+        type: string
+        x-nullable: false
+      identifier_type:
+        description: identifier type
+        enum:
+        - email
+        - mobile
+        - uid
+        - external
+        - federated
         type: string
         x-nullable: false
       identifiers:
@@ -20152,6 +20664,14 @@ definitions:
         items:
           $ref: '#/definitions/EventIdentifier'
         type: array
+        x-nullable: false
+      user_type:
+        description: user type
+        enum:
+        - jit
+        - standard
+        - scim
+        type: string
         x-nullable: false
     type: object
   UserWorkspacesResponse:
@@ -20270,6 +20790,11 @@ definitions:
         description: events
         type: object
         x-nullable: false
+      include_child_events:
+        description: IncludeChildEvents indicates whether to receive events from child
+          organizations
+        type: boolean
+        x-nullable: false
       insecure:
         description: Insecure
         type: boolean
@@ -20318,6 +20843,11 @@ definitions:
         description: events
         type: object
         x-nullable: false
+      include_child_events:
+        description: IncludeChildEvents indicates whether to receive events from child
+          organizations
+        type: boolean
+        x-nullable: false
       insecure:
         description: Insecure
         type: boolean
@@ -20347,6 +20877,11 @@ definitions:
         description: events
         type: object
         x-nullable: false
+      include_child_events:
+        description: IncludeChildEvents indicates whether to receive events from child
+          organizations
+        type: boolean
+        x-nullable: false
       insecure:
         description: Insecure
         type: boolean
@@ -20375,6 +20910,14 @@ definitions:
     type: object
   WorkforceConfiguration:
     properties:
+      client_id:
+        description: workforce authentication client id
+        type: string
+        x-nullable: false
+      client_secret:
+        description: workforce authentication client secret
+        type: string
+        x-nullable: false
       status:
         $ref: '#/definitions/WorkforceProvisioningStatus'
       tenant_slug:
@@ -20382,18 +20925,146 @@ definitions:
         type: string
         x-nullable: false
     type: object
+  WorkforceCredentials:
+    type: object
+  WorkforceIDP:
+    properties:
+      attributes:
+        $ref: '#/definitions/Attributes'
+      authorization_server_id:
+        description: ID of the authorization server (workspace) to which the IDP is
+          connected
+        format: serverID
+        type: string
+        x-nullable: false
+      client_id:
+        description: |-
+          Client application ID
+
+          It serves as a reference to a client application that is created in the System authorization
+          server (workspace), when a custom login page is created.
+        format: clientID
+        type: string
+        x-nullable: false
+      config:
+        $ref: '#/definitions/IDPConfiguration'
+      credentials:
+        $ref: '#/definitions/WorkforceCredentials'
+      disabled:
+        description: |-
+          If set to `true`, the IDP is disabled
+
+          When an IDP is disabled, it is not available for the users to be used. It is also not
+          displayed on the login page.
+        type: boolean
+        x-nullable: false
+      discovery_settings:
+        $ref: '#/definitions/IDPDiscoverySettings'
+      display_order:
+        description: Can be used to e.g. modify the order in which the Identity Providers
+          are presented on the login page.
+        example: 1
+        format: int64
+        type: integer
+        x-nullable: false
+      hidden:
+        description: |-
+          If set to `true`, the IDP is not displayed on the login page.
+
+          When an IDP is hidden, it will not be displayed on the login page. It can still be used
+          and script extensions can enabled it.
+        type: boolean
+        x-nullable: false
+      id:
+        description: |-
+          Unique ID of your identity provider
+
+          If not provided, a random ID is generated.
+        format: idpID
+        type: string
+        x-nullable: false
+      identity_pool_id:
+        description: ID of the Identity Pool to which the IDP is connected
+        format: poolID
+        type: string
+        x-nullable: false
+      jit:
+        $ref: '#/definitions/JITSettings'
+      logo_uri:
+        description: Logo URI
+        type: string
+        x-nullable: false
+      mappings:
+        $ref: '#/definitions/Mappings'
+      method:
+        description: |-
+          Defines the type of an IDP
+
+          SecureAuth is designed to make it possible for you to bring any of your own IDPs and integrate it
+          with SecureAuth as it delivers enterprise connectors for major Cloud IDPs and a possibility for
+          custom integration DKS for home-built solutions. You can also use built-in Sandbox IDP, which
+          is a static IDP, to create an IDP for testing purposes.
+        format: idpMethod
+        type: string
+        x-nullable: false
+      name:
+        description: Display name of your IDP
+        type: string
+        x-nullable: false
+      post_authn_app_id:
+        description: Points to the ID of the custom app, null if not set
+        format: customAppID
+        type: string
+        x-nullable: false
+      settings:
+        $ref: '#/definitions/WorkforceSettings'
+      sso_settings:
+        $ref: '#/definitions/IDPSSOSettings'
+      static_amr:
+        description: |-
+          Authentication method reference
+
+          An array of case sensitive strings for authentication methods that are used in the user
+          authentication.
+
+          For example, an IDP may require the user to provide a biometric authentication using facial
+          recognition. For that, the value of the authentication method reference is `face`.
+        items:
+          format: amr
+          type: string
+        type: array
+        x-nullable: false
+      tenant_id:
+        description: ID of the tenant where an IDP is connected
+        format: tenantID
+        type: string
+        x-nullable: false
+      token_exchange_settings:
+        $ref: '#/definitions/IDPTokenExchangeSettings'
+      version:
+        description: |-
+          IDP version to track internal changes
+          version that is currently supported: 3
+        format: int64
+        type: integer
+        x-nullable: false
+      workspace_id:
+        description: ID of the Workspace to which the IDP is connected
+        format: serverID
+        type: string
+        x-nullable: false
+    type: object
   WorkforceProvisioningStatus:
     type: string
   WorkforceSettings:
     properties:
-      faye_url:
+      issuer_url:
         type: string
         x-nullable: false
-      manifest_url:
-        type: string
-        x-nullable: false
-      url:
-        type: string
+      scopes:
+        items:
+          type: string
+        type: array
         x-nullable: false
     type: object
   WorkspaceIDP:
@@ -20467,8 +21138,8 @@ definitions:
         description: |-
           Defines the type of an IDP
 
-          Cloudentity is designed to make it possible for you to bring any of your own IDPs and integrate it
-          with Cloudentity as it delivers enterprise connectors for major Cloud IDPs and a possibility for
+          SecureAuth is designed to make it possible for you to bring any of your own IDPs and integrate it
+          with SecureAuth as it delivers enterprise connectors for major Cloud IDPs and a possibility for
           custom integration DKS for home-built solutions. You can also use built-in Sandbox IDP, which
           is a static IDP, to create an IDP for testing purposes.
         format: idpMethod
@@ -20687,6 +21358,9 @@ definitions:
           - email_otp
           - sms_otp
           - webauthn
+          - push
+          - symbol
+          - qr_code
           type: string
         type: array
         x-nullable: false
@@ -20730,6 +21404,18 @@ definitions:
         format: int64
         type: integer
         x-nullable: false
+      number_of_clients:
+        format: int64
+        type: integer
+        x-nullable: false
+      number_of_idps_excluding_organization:
+        format: int64
+        type: integer
+        x-nullable: false
+      number_of_services:
+        format: int64
+        type: integer
+        x-nullable: false
       preferences:
         $ref: '#/definitions/ServerPreferences'
       profile:
@@ -20763,6 +21449,7 @@ definitions:
         - fapi_20_message_signing
         - connect_id
         - agentic_ai
+        - saidp_legacy
         example: default
         type: string
         x-nullable: false
@@ -20979,8 +21666,8 @@ definitions:
         description: |-
           Defines the type of an IDP
 
-          Cloudentity is designed to make it possible for you to bring any of your own IDPs and integrate it
-          with Cloudentity as it delivers enterprise connectors for major Cloud IDPs and a possibility for
+          SecureAuth is designed to make it possible for you to bring any of your own IDPs and integrate it
+          with SecureAuth as it delivers enterprise connectors for major Cloud IDPs and a possibility for
           custom integration DKS for home-built solutions. You can also use built-in Sandbox IDP, which
           is a static IDP, to create an IDP for testing purposes.
         format: idpMethod
@@ -21062,7 +21749,7 @@ definitions:
 host: localhost:8443
 info:
   description: |-
-    Cloudentity Admin API
+    SecureAuth Admin API
 
     The POST APIs support idempotency for safely retrying requests without accidentally performing the same operation twice.
 
@@ -21073,7 +21760,7 @@ info:
     3. Retry failed requests with the same key within 1 minute.
 
     Responses for replayed requests will include the X-Idempotent-Replayed: true header.
-  title: Cloudentity API
+  title: SecureAuth API
   version: latest
 paths:
   /actions:
@@ -21282,6 +21969,51 @@ paths:
       summary: Update consent action
       tags:
       - consents
+  /agentic-ai/{wid}/package:
+    get:
+      description: Get package an agentic-ai specification.
+      operationId: getAgenticAIPackage
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
+      - default: default
+        description: ID of your authorization server (workspace)
+        in: path
+        name: wid
+        required: true
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          $ref: '#/responses/agenticAIPackage'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - admin: []
+      summary: Get package for an agentic-ai specification.
+      tags:
+      - agentic-ai
   /apis:
     post:
       description: It is not possible to create APIs for a service with imported specification.
@@ -23595,7 +24327,7 @@ paths:
           Limit
         format: int64
         in: query
-        maximum: 100
+        maximum: 512
         minimum: 1
         name: limit
         type: integer
@@ -23841,7 +24573,7 @@ paths:
   /policies:
     post:
       description: |-
-        ACP supports creating Cloudentity policies (using a visual editor or defined using JSON or
+        ACP supports creating SecureAuth policies (using a visual editor or defined using JSON or
         YAML) and policies defined using REGO (language used by Open Policy Agent (OPA)).
 
         In ACP, policies are created per tenant. It means that is not possible to create policies with
@@ -25995,8 +26727,11 @@ paths:
       - gateways
   /servers/{wid}/idps:
     get:
-      description: Returns a list of IDPs connected to a given authorization server
-        (workspace)
+      deprecated: true
+      description: |-
+        Returns a list of IDPs connected to a given authorization server (workspace).
+
+        This endpoint is deprecated. Use GET /servers/{wid}/v2/idps instead, which supports pagination and filtering.
       operationId: listIDPs
       parameters:
       - description: A server will only return requested resources if the resource
@@ -26034,6 +26769,7 @@ paths:
           $ref: '#/responses/tooManyRequestsHTTPError'
       security:
       - admin: []
+      summary: 'Deprecated: Use listIDPsV2 instead'
       tags:
       - idps
   /servers/{wid}/idps/{iid}:
@@ -26089,6 +26825,210 @@ paths:
       security:
       - admin: []
       summary: Delete IDP
+      tags:
+      - idps
+  /servers/{wid}/idps/active_directory:
+    post:
+      description: Create ActiveDirectory IDP.
+      operationId: createActiveDirectoryIDP
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
+      - default: default
+        description: Authorization server id
+        in: path
+        name: wid
+        required: true
+        type: string
+      - description: ActiveDirectoryIDP
+        in: body
+        name: ActiveDirectoryIDP
+        schema:
+          $ref: '#/definitions/ActiveDirectoryIDP'
+      responses:
+        "201":
+          description: ActiveDirectoryIDP
+          schema:
+            $ref: '#/definitions/ActiveDirectoryIDP'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "422":
+          $ref: '#/responses/unprocessableEntityHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - admin: []
+      summary: Create ActiveDirectory IDP
+      tags:
+      - idps
+  /servers/{wid}/idps/active_directory/{iid}:
+    get:
+      description: Get ActiveDirectory IDP.
+      operationId: getActiveDirectoryIDP
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
+      - default: default
+        description: Authorization server id
+        in: path
+        name: wid
+        required: true
+        type: string
+      - description: IDP id
+        in: path
+        name: iid
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ActiveDirectoryIDP
+          schema:
+            $ref: '#/definitions/ActiveDirectoryIDP'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - admin: []
+      summary: Get ActiveDirectory IDP
+      tags:
+      - idps
+    put:
+      description: Update ActiveDirectory IDP.
+      operationId: updateActiveDirectoryIDP
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
+      - default: default
+        description: Authorization server id
+        in: path
+        name: wid
+        required: true
+        type: string
+      - default: default
+        description: IDP id
+        in: path
+        name: iid
+        required: true
+        type: string
+      - description: ActiveDirectoryIDP
+        in: body
+        name: ActiveDirectoryIDP
+        schema:
+          $ref: '#/definitions/ActiveDirectoryIDP'
+      responses:
+        "200":
+          description: ActiveDirectoryIDP
+          schema:
+            $ref: '#/definitions/ActiveDirectoryIDP'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "422":
+          $ref: '#/responses/unprocessableEntityHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - admin: []
+      summary: Update ActiveDirectory IDP
+      tags:
+      - idps
+  /servers/{wid}/idps/active_directory/{iid}/client:
+    get:
+      operationId: getActiveDirectoryIDPClient
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
+      - default: default
+        description: Authorization server id
+        in: path
+        name: wid
+        required: true
+        type: string
+      - description: IDP id
+        in: path
+        name: iid
+        required: true
+        type: string
+      responses:
+        "200":
+          $ref: '#/responses/ClientAdminResponse'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - admin: []
+      summary: Return ActiveDirectory IDP client
       tags:
       - idps
   /servers/{wid}/idps/apple:
@@ -31087,6 +32027,210 @@ paths:
       summary: Return Static IDP client
       tags:
       - idps
+  /servers/{wid}/idps/workforce:
+    post:
+      description: Create Workforce IDP.
+      operationId: createWorkforceIDP
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
+      - default: default
+        description: Authorization server id
+        in: path
+        name: wid
+        required: true
+        type: string
+      - description: WorkforceIDP
+        in: body
+        name: WorkforceIDP
+        schema:
+          $ref: '#/definitions/WorkforceIDP'
+      responses:
+        "201":
+          description: WorkforceIDP
+          schema:
+            $ref: '#/definitions/WorkforceIDP'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "422":
+          $ref: '#/responses/unprocessableEntityHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - admin: []
+      summary: Create Workforce IDP
+      tags:
+      - idps
+  /servers/{wid}/idps/workforce/{iid}:
+    get:
+      description: Get Workforce IDP.
+      operationId: getWorkforceIDP
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
+      - default: default
+        description: Authorization server id
+        in: path
+        name: wid
+        required: true
+        type: string
+      - description: IDP id
+        in: path
+        name: iid
+        required: true
+        type: string
+      responses:
+        "200":
+          description: WorkforceIDP
+          schema:
+            $ref: '#/definitions/WorkforceIDP'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - admin: []
+      summary: Get Workforce IDP
+      tags:
+      - idps
+    put:
+      description: Update Workforce IDP.
+      operationId: updateWorkforceIDP
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
+      - default: default
+        description: Authorization server id
+        in: path
+        name: wid
+        required: true
+        type: string
+      - default: default
+        description: IDP id
+        in: path
+        name: iid
+        required: true
+        type: string
+      - description: WorkforceIDP
+        in: body
+        name: WorkforceIDP
+        schema:
+          $ref: '#/definitions/WorkforceIDP'
+      responses:
+        "200":
+          description: WorkforceIDP
+          schema:
+            $ref: '#/definitions/WorkforceIDP'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "422":
+          $ref: '#/responses/unprocessableEntityHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - admin: []
+      summary: Update Workforce IDP
+      tags:
+      - idps
+  /servers/{wid}/idps/workforce/{iid}/client:
+    get:
+      operationId: getWorkforceIDPClient
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
+      - default: default
+        description: Authorization server id
+        in: path
+        name: wid
+        required: true
+        type: string
+      - description: IDP id
+        in: path
+        name: iid
+        required: true
+        type: string
+      responses:
+        "200":
+          $ref: '#/responses/ClientAdminResponse'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - admin: []
+      summary: Return Workforce IDP client
+      tags:
+      - idps
   /servers/{wid}/idps/workspace:
     post:
       description: Create Workspace IDP.
@@ -33474,6 +34618,115 @@ paths:
       summary: Unbind server
       tags:
       - servers
+  /servers/{wid}/v2/idps:
+    get:
+      description: V2 endpoint supports pagination.
+      operationId: listIDPsV2
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
+      - default: default
+        description: ID of your authorization server (workspace)
+        in: path
+        name: wid
+        required: true
+        type: string
+      - description: |-
+          An optional IDP method filter (deprecated, use 'methods' instead for filtering by multiple methods)
+          Method
+        format: idpMethod
+        in: query
+        name: method
+        type: string
+      - description: |-
+          An optional IDP methods filter (allows filtering by multiple methods)
+          Methods
+        in: query
+        name: methods
+        type: string
+      - description: |-
+          An optional and case insensitive search phrase that contains either idp ID or name
+          name substring
+          SearchPhrase
+        in: query
+        name: search_phrase
+        type: string
+      - description: |-
+          optional list idps after given id
+          AfterIDPID
+        in: query
+        name: after_idp_id
+        type: string
+      - description: |-
+          optional list idps before given id
+          BeforeIDPID
+        in: query
+        name: before_idp_id
+        type: string
+      - description: |-
+          optional sort idps by given field, one of: name
+          Sort
+        in: query
+        name: sort
+        type: string
+      - description: |-
+          optional order idps by given direction
+          Order
+        in: query
+        name: order
+        type: string
+      - default: 20
+        description: |-
+          optional limit results
+          Limit
+        format: int64
+        in: query
+        maximum: 100
+        minimum: 1
+        name: limit
+        type: integer
+      - description: |-
+          optional filter by disabled status
+          Disabled
+        in: query
+        name: disabled
+        type: boolean
+      - description: |-
+          optional filter by token exchange enabled status
+          TokenExchangeEnabled
+        in: query
+        name: token_exchange_enabled
+        type: boolean
+      responses:
+        "200":
+          $ref: '#/responses/IDPsResponse'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - admin: []
+      summary: Returns a list of IDPs connected to a given authorization server (workspace).
+      tags:
+      - idps
   /servers/{wid}/webhooks:
     get:
       description: 'Returns list of webhooks for server'
@@ -35689,7 +36942,7 @@ paths:
         type: string
       responses:
         "200":
-          $ref: '#/responses/Server'
+          $ref: '#/responses/Workspace'
         "401":
           $ref: '#/responses/unauthorizedHTTPError'
         "403":
@@ -38161,6 +39414,30 @@ responses:
         type: string
     schema:
       $ref: '#/definitions/WorkspacesResponse'
+  agenticAIPackage:
+    description: Agentic AI package
+    headers:
+      etag:
+        description: |-
+          The ETag HTTP header is an identifier for a specific version of a resource
+
+          in:header
+        format: etag
+        type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
+    schema:
+      type: file
   badRequestHTTPError:
     description: Bad request
     schema:
@@ -38330,7 +39607,7 @@ schemes:
 securityDefinitions:
   admin:
     authorizationUrl: /default/admin/oauth2/authorize
-    flow: application
+    flow: accessCode
     tokenUrl: /default/admin/oauth2/token
     type: oauth2
 swagger: "2.0"

@@ -1829,7 +1829,7 @@ schemes:
 securityDefinitions:
   self:
     authorizationUrl: /default/default/oauth2/authorize
-    flow: password
+    flow: accessCode
     scopes:
       manage_ss_profile: manage_ss_profile
       view_ss_profile: view_ss_profile

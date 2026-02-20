@@ -24,8 +24,19 @@ type UserPayload struct {
 	// address
 	Address string `json:"address,omitempty" yaml:"address,omitempty"`
 
+	// address type
+	// Enum: ["email","mobile"]
+	AddressType string `json:"address_type,omitempty" yaml:"address_type,omitempty"`
+
+	// address verified
+	AddressVerified bool `json:"address_verified,omitempty" yaml:"address_verified,omitempty"`
+
 	// identifier
 	Identifier string `json:"identifier,omitempty" yaml:"identifier,omitempty"`
+
+	// identifier type
+	// Enum: ["email","mobile","uid","external","federated"]
+	IdentifierType string `json:"identifier_type,omitempty" yaml:"identifier_type,omitempty"`
 
 	// identifiers
 	Identifiers []string `json:"identifiers" yaml:"identifiers"`
@@ -48,11 +59,23 @@ type UserPayload struct {
 
 	// user identifiers
 	UserIdentifiers []*EventIdentifier `json:"user_identifiers" yaml:"user_identifiers"`
+
+	// user type
+	// Enum: ["jit","standard","scim"]
+	UserType string `json:"user_type,omitempty" yaml:"user_type,omitempty"`
 }
 
 // Validate validates this user payload
 func (m *UserPayload) Validate(formats strfmt.Registry) error {
 	var res []error
+
+	if err := m.validateAddressType(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateIdentifierType(formats); err != nil {
+		res = append(res, err)
+	}
 
 	if err := m.validateStatus(formats); err != nil {
 		res = append(res, err)
@@ -66,9 +89,106 @@ func (m *UserPayload) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateUserType(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+var userPayloadTypeAddressTypePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["email","mobile"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		userPayloadTypeAddressTypePropEnum = append(userPayloadTypeAddressTypePropEnum, v)
+	}
+}
+
+const (
+
+	// UserPayloadAddressTypeEmail captures enum value "email"
+	UserPayloadAddressTypeEmail string = "email"
+
+	// UserPayloadAddressTypeMobile captures enum value "mobile"
+	UserPayloadAddressTypeMobile string = "mobile"
+)
+
+// prop value enum
+func (m *UserPayload) validateAddressTypeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, userPayloadTypeAddressTypePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *UserPayload) validateAddressType(formats strfmt.Registry) error {
+	if swag.IsZero(m.AddressType) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateAddressTypeEnum("address_type", "body", m.AddressType); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+var userPayloadTypeIdentifierTypePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["email","mobile","uid","external","federated"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		userPayloadTypeIdentifierTypePropEnum = append(userPayloadTypeIdentifierTypePropEnum, v)
+	}
+}
+
+const (
+
+	// UserPayloadIdentifierTypeEmail captures enum value "email"
+	UserPayloadIdentifierTypeEmail string = "email"
+
+	// UserPayloadIdentifierTypeMobile captures enum value "mobile"
+	UserPayloadIdentifierTypeMobile string = "mobile"
+
+	// UserPayloadIdentifierTypeUID captures enum value "uid"
+	UserPayloadIdentifierTypeUID string = "uid"
+
+	// UserPayloadIdentifierTypeExternal captures enum value "external"
+	UserPayloadIdentifierTypeExternal string = "external"
+
+	// UserPayloadIdentifierTypeFederated captures enum value "federated"
+	UserPayloadIdentifierTypeFederated string = "federated"
+)
+
+// prop value enum
+func (m *UserPayload) validateIdentifierTypeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, userPayloadTypeIdentifierTypePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *UserPayload) validateIdentifierType(formats strfmt.Registry) error {
+	if swag.IsZero(m.IdentifierType) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateIdentifierTypeEnum("identifier_type", "body", m.IdentifierType); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -167,6 +287,51 @@ func (m *UserPayload) validateUserIdentifiers(formats strfmt.Registry) error {
 			}
 		}
 
+	}
+
+	return nil
+}
+
+var userPayloadTypeUserTypePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["jit","standard","scim"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		userPayloadTypeUserTypePropEnum = append(userPayloadTypeUserTypePropEnum, v)
+	}
+}
+
+const (
+
+	// UserPayloadUserTypeJit captures enum value "jit"
+	UserPayloadUserTypeJit string = "jit"
+
+	// UserPayloadUserTypeStandard captures enum value "standard"
+	UserPayloadUserTypeStandard string = "standard"
+
+	// UserPayloadUserTypeScim captures enum value "scim"
+	UserPayloadUserTypeScim string = "scim"
+)
+
+// prop value enum
+func (m *UserPayload) validateUserTypeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, userPayloadTypeUserTypePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *UserPayload) validateUserType(formats strfmt.Registry) error {
+	if swag.IsZero(m.UserType) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateUserTypeEnum("user_type", "body", m.UserType); err != nil {
+		return err
 	}
 
 	return nil

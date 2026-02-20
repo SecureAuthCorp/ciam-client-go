@@ -120,6 +120,18 @@ type TokenParams struct {
 	// Username.
 	Username *string
 
+	/* XCorrelationID.
+
+	   Unique identifier included in audit events for request tracking
+	*/
+	XCorrelationID *string
+
+	/* XIdempotencyKey.
+
+	   Key used to safely retry failed requests without duplicate processing
+	*/
+	XIdempotencyKey *string
+
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
@@ -358,6 +370,28 @@ func (o *TokenParams) WithUsername(username *string) *TokenParams {
 // SetUsername adds the username to the token params
 func (o *TokenParams) SetUsername(username *string) {
 	o.Username = username
+}
+
+// WithXCorrelationID adds the xCorrelationID to the token params
+func (o *TokenParams) WithXCorrelationID(xCorrelationID *string) *TokenParams {
+	o.SetXCorrelationID(xCorrelationID)
+	return o
+}
+
+// SetXCorrelationID adds the xCorrelationId to the token params
+func (o *TokenParams) SetXCorrelationID(xCorrelationID *string) {
+	o.XCorrelationID = xCorrelationID
+}
+
+// WithXIdempotencyKey adds the xIdempotencyKey to the token params
+func (o *TokenParams) WithXIdempotencyKey(xIdempotencyKey *string) *TokenParams {
+	o.SetXIdempotencyKey(xIdempotencyKey)
+	return o
+}
+
+// SetXIdempotencyKey adds the xIdempotencyKey to the token params
+func (o *TokenParams) SetXIdempotencyKey(xIdempotencyKey *string) {
+	o.XIdempotencyKey = xIdempotencyKey
 }
 
 // WriteToRequest writes these params to a swagger request
@@ -600,6 +634,22 @@ func (o *TokenParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Registr
 			if err := r.SetFormParam("username", fUsername); err != nil {
 				return err
 			}
+		}
+	}
+
+	if o.XCorrelationID != nil {
+
+		// header param x-correlation-id
+		if err := r.SetHeaderParam("x-correlation-id", *o.XCorrelationID); err != nil {
+			return err
+		}
+	}
+
+	if o.XIdempotencyKey != nil {
+
+		// header param x-idempotency-key
+		if err := r.SetHeaderParam("x-idempotency-key", *o.XIdempotencyKey); err != nil {
+			return err
 		}
 	}
 

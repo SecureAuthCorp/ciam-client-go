@@ -320,6 +320,21 @@ type Client struct {
 	// Allowed SAML attributes
 	SamlAllowedAttributes []string `json:"saml_allowed_attributes" yaml:"saml_allowed_attributes"`
 
+	// saml idp attributes override
+	SamlIdpAttributesOverride SAMLIDPAttributesOverride `json:"saml_idp_attributes_override,omitempty" yaml:"saml_idp_attributes_override,omitempty"`
+
+	// custom entity id
+	SamlIdpCustomEntityID string `json:"saml_idp_custom_entity_id,omitempty" yaml:"saml_idp_custom_entity_id,omitempty"`
+
+	// custom sso url
+	SamlIdpCustomSsoURL string `json:"saml_idp_custom_sso_url,omitempty" yaml:"saml_idp_custom_sso_url,omitempty"`
+
+	// enable flag
+	SamlIdpOverrideEnabled bool `json:"saml_idp_override_enabled,omitempty" yaml:"saml_idp_override_enabled,omitempty"`
+
+	// saml idp signing key
+	SamlIdpSigningKey *ServerJWK `json:"saml_idp_signing_key,omitempty" yaml:"saml_idp_signing_key,omitempty"`
+
 	// saml metadata
 	SamlMetadata *EntityDescriptor `json:"saml_metadata,omitempty" yaml:"saml_metadata,omitempty"`
 
@@ -613,6 +628,14 @@ func (m *Client) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateRevocationEndpointAuthMethod(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateSamlIdpAttributesOverride(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateSamlIdpSigningKey(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -1532,6 +1555,42 @@ func (m *Client) validateRevocationEndpointAuthMethod(formats strfmt.Registry) e
 	return nil
 }
 
+func (m *Client) validateSamlIdpAttributesOverride(formats strfmt.Registry) error {
+	if swag.IsZero(m.SamlIdpAttributesOverride) { // not required
+		return nil
+	}
+
+	if err := m.SamlIdpAttributesOverride.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("saml_idp_attributes_override")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("saml_idp_attributes_override")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *Client) validateSamlIdpSigningKey(formats strfmt.Registry) error {
+	if swag.IsZero(m.SamlIdpSigningKey) { // not required
+		return nil
+	}
+
+	if m.SamlIdpSigningKey != nil {
+		if err := m.SamlIdpSigningKey.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("saml_idp_signing_key")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("saml_idp_signing_key")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (m *Client) validateSamlMetadata(formats strfmt.Registry) error {
 	if swag.IsZero(m.SamlMetadata) { // not required
 		return nil
@@ -1984,6 +2043,14 @@ func (m *Client) ContextValidate(ctx context.Context, formats strfmt.Registry) e
 		res = append(res, err)
 	}
 
+	if err := m.contextValidateSamlIdpAttributesOverride(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateSamlIdpSigningKey(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.contextValidateSamlMetadata(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -2222,6 +2289,41 @@ func (m *Client) contextValidateResponseTypes(ctx context.Context, formats strfm
 			return ce.ValidateName("response_types")
 		}
 		return err
+	}
+
+	return nil
+}
+
+func (m *Client) contextValidateSamlIdpAttributesOverride(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := m.SamlIdpAttributesOverride.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("saml_idp_attributes_override")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("saml_idp_attributes_override")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *Client) contextValidateSamlIdpSigningKey(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.SamlIdpSigningKey != nil {
+
+		if swag.IsZero(m.SamlIdpSigningKey) { // not required
+			return nil
+		}
+
+		if err := m.SamlIdpSigningKey.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("saml_idp_signing_key")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("saml_idp_signing_key")
+			}
+			return err
+		}
 	}
 
 	return nil

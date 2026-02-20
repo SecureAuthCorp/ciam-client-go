@@ -62,9 +62,15 @@ type ClientService interface {
 
 	GetTenant(params *GetTenantParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetTenantOK, error)
 
+	GetTenantInternalSettings(params *GetTenantInternalSettingsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetTenantInternalSettingsOK, error)
+
 	ListAdminTenants(params *ListAdminTenantsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListAdminTenantsOK, error)
 
+	ListTenantInternalSettings(params *ListTenantInternalSettingsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListTenantInternalSettingsOK, error)
+
 	ListTenants(params *ListTenantsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListTenantsOK, error)
+
+	SetTenantInternalSettings(params *SetTenantInternalSettingsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*SetTenantInternalSettingsOK, error)
 
 	UpdateTenant(params *UpdateTenantParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UpdateTenantOK, error)
 
@@ -201,6 +207,47 @@ func (a *Client) GetTenant(params *GetTenantParams, authInfo runtime.ClientAuthI
 }
 
 /*
+GetTenantInternalSettings gets tenant internal settings
+
+Get tenant internal settings.
+*/
+func (a *Client) GetTenantInternalSettings(params *GetTenantInternalSettingsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetTenantInternalSettingsOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetTenantInternalSettingsParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "getTenantInternalSettings",
+		Method:             "GET",
+		PathPattern:        "/api/system/tenants/{tid}/internal-settings",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &GetTenantInternalSettingsReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*GetTenantInternalSettingsOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for getTenantInternalSettings: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
 ListAdminTenants lists tenants
 
 To be able to list tenants, you need to use an access token issued for a system tenant and admin workspace.
@@ -242,6 +289,47 @@ func (a *Client) ListAdminTenants(params *ListAdminTenantsParams, authInfo runti
 }
 
 /*
+ListTenantInternalSettings lists tenant internal settings
+
+List tenant internal settings with optional tenant source filter.
+*/
+func (a *Client) ListTenantInternalSettings(params *ListTenantInternalSettingsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListTenantInternalSettingsOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewListTenantInternalSettingsParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "listTenantInternalSettings",
+		Method:             "GET",
+		PathPattern:        "/api/system/tenant-internal-settings",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &ListTenantInternalSettingsReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*ListTenantInternalSettingsOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for listTenantInternalSettings: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
 ListTenants lists tenants
 
 List tenants.
@@ -279,6 +367,47 @@ func (a *Client) ListTenants(params *ListTenantsParams, authInfo runtime.ClientA
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for listTenants: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+SetTenantInternalSettings sets tenant internal settings
+
+Set tenant internal settings.
+*/
+func (a *Client) SetTenantInternalSettings(params *SetTenantInternalSettingsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*SetTenantInternalSettingsOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewSetTenantInternalSettingsParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "setTenantInternalSettings",
+		Method:             "PUT",
+		PathPattern:        "/api/system/tenants/{tid}/internal-settings",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &SetTenantInternalSettingsReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*SetTenantInternalSettingsOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for setTenantInternalSettings: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

@@ -43,6 +43,9 @@ type BaseExtendedUser struct {
 	// payload schema id
 	PayloadSchemaID string `json:"payload_schema_id,omitempty" yaml:"payload_schema_id,omitempty"`
 
+	// preferences
+	Preferences *UserPreferences `json:"preferences,omitempty" yaml:"preferences,omitempty"`
+
 	// status
 	// Example: active
 	// Required: true
@@ -87,6 +90,10 @@ func (m *BaseExtendedUser) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateIdentifiersWithDetails(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validatePreferences(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -175,6 +182,25 @@ func (m *BaseExtendedUser) validateIdentifiersWithDetails(formats strfmt.Registr
 			}
 		}
 
+	}
+
+	return nil
+}
+
+func (m *BaseExtendedUser) validatePreferences(formats strfmt.Registry) error {
+	if swag.IsZero(m.Preferences) { // not required
+		return nil
+	}
+
+	if m.Preferences != nil {
+		if err := m.Preferences.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("preferences")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("preferences")
+			}
+			return err
+		}
 	}
 
 	return nil
@@ -283,6 +309,10 @@ func (m *BaseExtendedUser) ContextValidate(ctx context.Context, formats strfmt.R
 		res = append(res, err)
 	}
 
+	if err := m.contextValidatePreferences(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
@@ -334,6 +364,27 @@ func (m *BaseExtendedUser) contextValidateIdentifiersWithDetails(ctx context.Con
 			}
 		}
 
+	}
+
+	return nil
+}
+
+func (m *BaseExtendedUser) contextValidatePreferences(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Preferences != nil {
+
+		if swag.IsZero(m.Preferences) { // not required
+			return nil
+		}
+
+		if err := m.Preferences.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("preferences")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("preferences")
+			}
+			return err
+		}
 	}
 
 	return nil

@@ -58,8 +58,6 @@ type ClientOption func(*runtime.ClientOperation)
 type ClientService interface {
 	DeleteTranslation(params *DeleteTranslationParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*DeleteTranslationNoContent, error)
 
-	GetBuiltinTranslation(params *GetBuiltinTranslationParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetBuiltinTranslationOK, error)
-
 	GetTranslation(params *GetTranslationParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetTranslationOK, error)
 
 	ListTranslations(params *ListTranslationsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListTranslationsOK, error)
@@ -70,9 +68,11 @@ type ClientService interface {
 }
 
 /*
-DeleteTranslation alphas delete translation
+	DeleteTranslation alphas delete custom translation
 
-Deletes the translation.
+	Deletes the custom translation for a given locale.
+
+If the custom translation does not exist, 204 No Content is returned.
 */
 func (a *Client) DeleteTranslation(params *DeleteTranslationParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*DeleteTranslationNoContent, error) {
 	// TODO: Validate the params before sending
@@ -111,50 +111,9 @@ func (a *Client) DeleteTranslation(params *DeleteTranslationParams, authInfo run
 }
 
 /*
-GetBuiltinTranslation alphas get built in translation
+GetTranslation alphas get translation for a given locale
 
-Returns the built-in translation and its content.
-*/
-func (a *Client) GetBuiltinTranslation(params *GetBuiltinTranslationParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetBuiltinTranslationOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewGetBuiltinTranslationParams()
-	}
-	op := &runtime.ClientOperation{
-		ID:                 "getBuiltinTranslation",
-		Method:             "GET",
-		PathPattern:        "/translation/{locale}/builtin",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"https"},
-		Params:             params,
-		Reader:             &GetBuiltinTranslationReader{formats: a.formats},
-		AuthInfo:           authInfo,
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*GetBuiltinTranslationOK)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for getBuiltinTranslation: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
-}
-
-/*
-GetTranslation alphas get translation
-
-Returns the translation and its content.
+Returns the built-in and/or custom translation for a given locale.
 */
 func (a *Client) GetTranslation(params *GetTranslationParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetTranslationOK, error) {
 	// TODO: Validate the params before sending
@@ -193,9 +152,12 @@ func (a *Client) GetTranslation(params *GetTranslationParams, authInfo runtime.C
 }
 
 /*
-ListTranslations alphas list translations
+	ListTranslations alphas list translations
 
-Returns all the translations.
+	Returns translations available for the tenant.
+
+The list includes built-in translations as well as custom translations created	by the tenant.
+Translations are groupped by Locale.
 */
 func (a *Client) ListTranslations(params *ListTranslationsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListTranslationsOK, error) {
 	// TODO: Validate the params before sending
@@ -234,9 +196,11 @@ func (a *Client) ListTranslations(params *ListTranslationsParams, authInfo runti
 }
 
 /*
-UpsertTranslation alphas update or insert translation
+	UpsertTranslation alphas update or create custom translation
 
-Updates an existing translation, or inserts a new one.
+	Updates an existing custom translation, or inserts a new one.
+
+Returns built-in translations (if exists) as well as custom translations created by the tenant.
 */
 func (a *Client) UpsertTranslation(params *UpsertTranslationParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UpsertTranslationOK, error) {
 	// TODO: Validate the params before sending

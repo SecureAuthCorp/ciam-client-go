@@ -89,6 +89,18 @@ type CreateWorkspacePoolParams struct {
 	*/
 	WithIdp *bool
 
+	/* XCorrelationID.
+
+	   Unique identifier included in audit events for request tracking
+	*/
+	XCorrelationID *string
+
+	/* XIdempotencyKey.
+
+	   Key used to safely retry failed requests without duplicate processing
+	*/
+	XIdempotencyKey *string
+
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
@@ -197,6 +209,28 @@ func (o *CreateWorkspacePoolParams) SetWithIdp(withIdp *bool) {
 	o.WithIdp = withIdp
 }
 
+// WithXCorrelationID adds the xCorrelationID to the create workspace pool params
+func (o *CreateWorkspacePoolParams) WithXCorrelationID(xCorrelationID *string) *CreateWorkspacePoolParams {
+	o.SetXCorrelationID(xCorrelationID)
+	return o
+}
+
+// SetXCorrelationID adds the xCorrelationId to the create workspace pool params
+func (o *CreateWorkspacePoolParams) SetXCorrelationID(xCorrelationID *string) {
+	o.XCorrelationID = xCorrelationID
+}
+
+// WithXIdempotencyKey adds the xIdempotencyKey to the create workspace pool params
+func (o *CreateWorkspacePoolParams) WithXIdempotencyKey(xIdempotencyKey *string) *CreateWorkspacePoolParams {
+	o.SetXIdempotencyKey(xIdempotencyKey)
+	return o
+}
+
+// SetXIdempotencyKey adds the xIdempotencyKey to the create workspace pool params
+func (o *CreateWorkspacePoolParams) SetXIdempotencyKey(xIdempotencyKey *string) {
+	o.XIdempotencyKey = xIdempotencyKey
+}
+
 // WriteToRequest writes these params to a swagger request
 func (o *CreateWorkspacePoolParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Registry) error {
 
@@ -237,6 +271,22 @@ func (o *CreateWorkspacePoolParams) WriteToRequest(r runtime.ClientRequest, reg 
 			if err := r.SetQueryParam("with_idp", qWithIdp); err != nil {
 				return err
 			}
+		}
+	}
+
+	if o.XCorrelationID != nil {
+
+		// header param x-correlation-id
+		if err := r.SetHeaderParam("x-correlation-id", *o.XCorrelationID); err != nil {
+			return err
+		}
+	}
+
+	if o.XIdempotencyKey != nil {
+
+		// header param x-idempotency-key
+		if err := r.SetHeaderParam("x-idempotency-key", *o.XIdempotencyKey); err != nil {
+			return err
 		}
 	}
 

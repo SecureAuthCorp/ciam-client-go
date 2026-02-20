@@ -24,7 +24,7 @@ type TestPolicyDefinition struct {
 
 	// Language of a policy
 	//
-	// ACP supports creating Cloudentity policies (using a visual editor or defined using JSON or
+	// ACP supports creating SecureAuth policies (using a visual editor or defined using JSON or
 	// YAML) and Open Policy Agent (OPA) policies (defined using REGO).
 	//
 	// OPA is a policy engine that unifies policy enforcement and provides a high-level declarative
@@ -33,7 +33,7 @@ type TestPolicyDefinition struct {
 	// Example: cloudentity
 	Language string `json:"language,omitempty" yaml:"language,omitempty"`
 
-	// An array of validators for a Cloudentity policy
+	// An array of validators for a SecureAuth policy
 	Validators []*ValidatorConfig `json:"validators" yaml:"validators"`
 }
 

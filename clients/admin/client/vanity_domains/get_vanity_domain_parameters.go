@@ -75,6 +75,18 @@ type GetVanityDomainParams struct {
 	*/
 	ServerID *string
 
+	/* XCorrelationID.
+
+	   Unique identifier included in audit events for request tracking
+	*/
+	XCorrelationID *string
+
+	/* XIdempotencyKey.
+
+	   Key used to safely retry failed requests without duplicate processing
+	*/
+	XIdempotencyKey *string
+
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
@@ -150,6 +162,28 @@ func (o *GetVanityDomainParams) SetServerID(serverID *string) {
 	o.ServerID = serverID
 }
 
+// WithXCorrelationID adds the xCorrelationID to the get vanity domain params
+func (o *GetVanityDomainParams) WithXCorrelationID(xCorrelationID *string) *GetVanityDomainParams {
+	o.SetXCorrelationID(xCorrelationID)
+	return o
+}
+
+// SetXCorrelationID adds the xCorrelationId to the get vanity domain params
+func (o *GetVanityDomainParams) SetXCorrelationID(xCorrelationID *string) {
+	o.XCorrelationID = xCorrelationID
+}
+
+// WithXIdempotencyKey adds the xIdempotencyKey to the get vanity domain params
+func (o *GetVanityDomainParams) WithXIdempotencyKey(xIdempotencyKey *string) *GetVanityDomainParams {
+	o.SetXIdempotencyKey(xIdempotencyKey)
+	return o
+}
+
+// SetXIdempotencyKey adds the xIdempotencyKey to the get vanity domain params
+func (o *GetVanityDomainParams) SetXIdempotencyKey(xIdempotencyKey *string) {
+	o.XIdempotencyKey = xIdempotencyKey
+}
+
 // WriteToRequest writes these params to a swagger request
 func (o *GetVanityDomainParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Registry) error {
 
@@ -180,6 +214,22 @@ func (o *GetVanityDomainParams) WriteToRequest(r runtime.ClientRequest, reg strf
 			if err := r.SetQueryParam("server_id", qServerID); err != nil {
 				return err
 			}
+		}
+	}
+
+	if o.XCorrelationID != nil {
+
+		// header param x-correlation-id
+		if err := r.SetHeaderParam("x-correlation-id", *o.XCorrelationID); err != nil {
+			return err
+		}
+	}
+
+	if o.XIdempotencyKey != nil {
+
+		// header param x-idempotency-key
+		if err := r.SetHeaderParam("x-idempotency-key", *o.XIdempotencyKey); err != nil {
+			return err
 		}
 	}
 

@@ -74,6 +74,8 @@ type ClientService interface {
 
 	ListUsers(params *ListUsersParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListUsersOK, error)
 
+	PatchUser(params *PatchUserParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*PatchUserOK, error)
+
 	RequestResetPassword(params *RequestResetPasswordParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RequestResetPasswordNoContent, error)
 
 	SendActivationMessage(params *SendActivationMessageParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*SendActivationMessageNoContent, error)
@@ -472,6 +474,53 @@ func (a *Client) ListUsers(params *ListUsersParams, authInfo runtime.ClientAuthI
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for listUsers: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+	PatchUser patches existing user supports both r f c6902 and r f c7396 JSON patch
+
+	Patch operates on the same fields as the **Update User Record** endpoint.
+
+example for RFC6902:
+[{"op": "replace", "path": "/payload/first_name", "value": "John"}]
+
+example for RFC7396:
+{"payload": {"first_name": "John"}}
+*/
+func (a *Client) PatchUser(params *PatchUserParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*PatchUserOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewPatchUserParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "patchUser",
+		Method:             "PATCH",
+		PathPattern:        "/admin/pools/{ipID}/users/{userID}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &PatchUserReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*PatchUserOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for patchUser: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

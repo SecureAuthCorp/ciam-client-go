@@ -42,12 +42,6 @@ func (o *DeleteTranslationReader) ReadResponse(response runtime.ClientResponse, 
 			return nil, err
 		}
 		return nil, result
-	case 404:
-		result := NewDeleteTranslationNotFound()
-		if err := result.readResponse(response, consumer, o.formats); err != nil {
-			return nil, err
-		}
-		return nil, result
 	case 429:
 		result := NewDeleteTranslationTooManyRequests()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -244,76 +238,6 @@ func (o *DeleteTranslationForbidden) GetPayload() *models.Error {
 }
 
 func (o *DeleteTranslationForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
-	o.Payload = new(models.Error)
-
-	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
-		return err
-	}
-
-	return nil
-}
-
-// NewDeleteTranslationNotFound creates a DeleteTranslationNotFound with default headers values
-func NewDeleteTranslationNotFound() *DeleteTranslationNotFound {
-	return &DeleteTranslationNotFound{}
-}
-
-/*
-DeleteTranslationNotFound describes a response with status code 404, with default header values.
-
-Not found
-*/
-type DeleteTranslationNotFound struct {
-	Payload *models.Error
-}
-
-// IsSuccess returns true when this delete translation not found response has a 2xx status code
-func (o *DeleteTranslationNotFound) IsSuccess() bool {
-	return false
-}
-
-// IsRedirect returns true when this delete translation not found response has a 3xx status code
-func (o *DeleteTranslationNotFound) IsRedirect() bool {
-	return false
-}
-
-// IsClientError returns true when this delete translation not found response has a 4xx status code
-func (o *DeleteTranslationNotFound) IsClientError() bool {
-	return true
-}
-
-// IsServerError returns true when this delete translation not found response has a 5xx status code
-func (o *DeleteTranslationNotFound) IsServerError() bool {
-	return false
-}
-
-// IsCode returns true when this delete translation not found response a status code equal to that given
-func (o *DeleteTranslationNotFound) IsCode(code int) bool {
-	return code == 404
-}
-
-// Code gets the status code for the delete translation not found response
-func (o *DeleteTranslationNotFound) Code() int {
-	return 404
-}
-
-func (o *DeleteTranslationNotFound) Error() string {
-	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[DELETE /translation/{locale}][%d] deleteTranslationNotFound %s", 404, payload)
-}
-
-func (o *DeleteTranslationNotFound) String() string {
-	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[DELETE /translation/{locale}][%d] deleteTranslationNotFound %s", 404, payload)
-}
-
-func (o *DeleteTranslationNotFound) GetPayload() *models.Error {
-	return o.Payload
-}
-
-func (o *DeleteTranslationNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.Error)
 

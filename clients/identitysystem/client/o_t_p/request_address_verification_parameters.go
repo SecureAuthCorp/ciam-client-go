@@ -66,6 +66,14 @@ type RequestAddressVerificationParams struct {
 	// RequestAddressVerification.
 	RequestAddressVerification *models.RequestOTPForAddress
 
+	/* CodeTypeInMessage.
+
+	   Code type in message
+
+	   Default: "code"
+	*/
+	CodeTypeInMessage *string
+
 	/* IfMatch.
 
 	   A server will only return requested resources if the resource matches one of the listed ETag value
@@ -79,6 +87,18 @@ type RequestAddressVerificationParams struct {
 
 	// UserID.
 	UserID string
+
+	/* XCorrelationID.
+
+	   Unique identifier included in audit events for request tracking
+	*/
+	XCorrelationID *string
+
+	/* XIdempotencyKey.
+
+	   Key used to safely retry failed requests without duplicate processing
+	*/
+	XIdempotencyKey *string
 
 	timeout    time.Duration
 	Context    context.Context
@@ -97,7 +117,18 @@ func (o *RequestAddressVerificationParams) WithDefaults() *RequestAddressVerific
 //
 // All values with no default are reset to their zero value.
 func (o *RequestAddressVerificationParams) SetDefaults() {
-	// no default values defined for this parameter
+	var (
+		codeTypeInMessageDefault = string("code")
+	)
+
+	val := RequestAddressVerificationParams{
+		CodeTypeInMessage: &codeTypeInMessageDefault,
+	}
+
+	val.timeout = o.timeout
+	val.Context = o.Context
+	val.HTTPClient = o.HTTPClient
+	*o = val
 }
 
 // WithTimeout adds the timeout to the request address verification params
@@ -144,6 +175,17 @@ func (o *RequestAddressVerificationParams) SetRequestAddressVerification(request
 	o.RequestAddressVerification = requestAddressVerification
 }
 
+// WithCodeTypeInMessage adds the codeTypeInMessage to the request address verification params
+func (o *RequestAddressVerificationParams) WithCodeTypeInMessage(codeTypeInMessage *string) *RequestAddressVerificationParams {
+	o.SetCodeTypeInMessage(codeTypeInMessage)
+	return o
+}
+
+// SetCodeTypeInMessage adds the codeTypeInMessage to the request address verification params
+func (o *RequestAddressVerificationParams) SetCodeTypeInMessage(codeTypeInMessage *string) {
+	o.CodeTypeInMessage = codeTypeInMessage
+}
+
 // WithIfMatch adds the ifMatch to the request address verification params
 func (o *RequestAddressVerificationParams) WithIfMatch(ifMatch *string) *RequestAddressVerificationParams {
 	o.SetIfMatch(ifMatch)
@@ -177,6 +219,28 @@ func (o *RequestAddressVerificationParams) SetUserID(userID string) {
 	o.UserID = userID
 }
 
+// WithXCorrelationID adds the xCorrelationID to the request address verification params
+func (o *RequestAddressVerificationParams) WithXCorrelationID(xCorrelationID *string) *RequestAddressVerificationParams {
+	o.SetXCorrelationID(xCorrelationID)
+	return o
+}
+
+// SetXCorrelationID adds the xCorrelationId to the request address verification params
+func (o *RequestAddressVerificationParams) SetXCorrelationID(xCorrelationID *string) {
+	o.XCorrelationID = xCorrelationID
+}
+
+// WithXIdempotencyKey adds the xIdempotencyKey to the request address verification params
+func (o *RequestAddressVerificationParams) WithXIdempotencyKey(xIdempotencyKey *string) *RequestAddressVerificationParams {
+	o.SetXIdempotencyKey(xIdempotencyKey)
+	return o
+}
+
+// SetXIdempotencyKey adds the xIdempotencyKey to the request address verification params
+func (o *RequestAddressVerificationParams) SetXIdempotencyKey(xIdempotencyKey *string) {
+	o.XIdempotencyKey = xIdempotencyKey
+}
+
 // WriteToRequest writes these params to a swagger request
 func (o *RequestAddressVerificationParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Registry) error {
 
@@ -187,6 +251,23 @@ func (o *RequestAddressVerificationParams) WriteToRequest(r runtime.ClientReques
 	if o.RequestAddressVerification != nil {
 		if err := r.SetBodyParam(o.RequestAddressVerification); err != nil {
 			return err
+		}
+	}
+
+	if o.CodeTypeInMessage != nil {
+
+		// query param code_type_in_message
+		var qrCodeTypeInMessage string
+
+		if o.CodeTypeInMessage != nil {
+			qrCodeTypeInMessage = *o.CodeTypeInMessage
+		}
+		qCodeTypeInMessage := qrCodeTypeInMessage
+		if qCodeTypeInMessage != "" {
+
+			if err := r.SetQueryParam("code_type_in_message", qCodeTypeInMessage); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -206,6 +287,22 @@ func (o *RequestAddressVerificationParams) WriteToRequest(r runtime.ClientReques
 	// path param userID
 	if err := r.SetPathParam("userID", o.UserID); err != nil {
 		return err
+	}
+
+	if o.XCorrelationID != nil {
+
+		// header param x-correlation-id
+		if err := r.SetHeaderParam("x-correlation-id", *o.XCorrelationID); err != nil {
+			return err
+		}
+	}
+
+	if o.XIdempotencyKey != nil {
+
+		// header param x-idempotency-key
+		if err := r.SetHeaderParam("x-idempotency-key", *o.XIdempotencyKey); err != nil {
+			return err
+		}
 	}
 
 	if len(res) > 0 {
