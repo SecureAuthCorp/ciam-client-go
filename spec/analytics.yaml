@@ -86,14 +86,14 @@ definitions:
 host: localhost:8443
 info:
   description: |-
-    Cloudentity Analytics API
+    SecureAuth Analytics API
 
-    The Cloudentity Analytics APIs provide a robust solution for capturing and analyzing metrics related to various operational aspects including access token minting, policy validations, OTP validations, authorizer validations, and HTTP metrics, among others.
+    The SecureAuth Analytics APIs provide a robust solution for capturing and analyzing metrics related to various operational aspects including access token minting, policy validations, OTP validations, authorizer validations, and HTTP metrics, among others.
 
-    For organizations using Cloudentity SaaS platform, the metrics are retained for a period of 90 days.
+    For organizations using SecureAuth SaaS platform, the metrics are retained for a period of 90 days.
 
-    Customers who choose to deploy Cloudentity on their own infrastructure have the flexibility to configure the metrics retention for up to a year, allowing for a more extensive data analysis and longer-term insights.
-  title: Cloudentity API
+    Customers who choose to deploy SecureAuth on their own infrastructure have the flexibility to configure the metrics retention for up to a year, allowing for a more extensive data analysis and longer-term insights.
+  title: SecureAuth API
   version: latest
 paths:
   /access-tokens:
@@ -423,6 +423,7 @@ paths:
         - device_os
         - device_browser
         - grid_1_0
+        - grid_5_0
         in: path
         name: group
         required: true
@@ -1660,6 +1661,7 @@ paths:
         - device_os
         - device_browser
         - grid_1_0
+        - grid_5_0
         in: path
         name: group
         required: true
@@ -2078,6 +2080,10 @@ paths:
         in: query
         name: origin
         type: string
+      - description: 'BBox (format: minLat,minLon,maxLat,maxLon)'
+        in: query
+        name: bbox
+        type: string
       - description: Filter by result (works only for grouping by method)
         in: query
         name: result
@@ -2116,6 +2122,7 @@ paths:
         - device_os
         - device_browser
         - grid_1_0
+        - grid_5_0
         in: path
         name: group
         required: true
@@ -2779,6 +2786,204 @@ paths:
       summary: Query level of assurance
       tags:
       - WorkspaceMetrics
+  /servers/{wid}/logins:
+    get:
+      description: Query login data points.
+      operationId: workspaceSingleLoginMetrics
+      parameters:
+      - default: default
+        description: Workspace ID
+        in: path
+        name: wid
+        required: true
+        type: string
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
+        type: string
+      - default: auto
+        description: Bucket
+        enum:
+        - auto
+        - all
+        - 1m
+        - 5m
+        - 15m
+        - 30m
+        - 1h
+        - 3h
+        - 6h
+        - 12h
+        - 1d
+        - 1w
+        - 1M
+        - 3M
+        - 6M
+        - 1Y
+        in: query
+        name: bucket
+        type: string
+      - description: Origin
+        format: date-time
+        in: query
+        name: origin
+        type: string
+      - description: Filter by idp id
+        in: query
+        name: idp_id
+        type: string
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
+      - default: count_successes
+        description: Function
+        enum:
+        - count_attempts
+        - count_successes
+        - count_users
+        in: query
+        name: function
+        type: string
+      responses:
+        "200":
+          $ref: '#/responses/DataPoints'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - admin: []
+      summary: Query logins
+      tags:
+      - WorkspaceMetrics
+  /servers/{wid}/logins/{group}:
+    get:
+      description: Query login data points by group.
+      operationId: workspaceAggregatedLoginMetrics
+      parameters:
+      - default: default
+        description: Workspace ID
+        in: path
+        name: wid
+        required: true
+        type: string
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
+        type: string
+      - default: auto
+        description: Bucket
+        enum:
+        - auto
+        - all
+        - 1m
+        - 5m
+        - 15m
+        - 30m
+        - 1h
+        - 3h
+        - 6h
+        - 12h
+        - 1d
+        - 1w
+        - 1M
+        - 3M
+        - 6M
+        - 1Y
+        in: query
+        name: bucket
+        type: string
+      - description: Origin
+        format: date-time
+        in: query
+        name: origin
+        type: string
+      - description: 'BBox (format: minLat,minLon,maxLat,maxLon)'
+        in: query
+        name: bbox
+        type: string
+      - description: Filter by idp id
+        in: query
+        name: idp_id
+        type: string
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
+      - default: count_successes
+        description: Function
+        enum:
+        - count_attempts
+        - count_successes
+        - count_users
+        in: query
+        name: function
+        type: string
+      - default: idp
+        description: Group by
+        enum:
+        - method
+        - idp
+        - country
+        - city
+        - device_type
+        - device_os
+        - device_browser
+        - grid_1_0
+        - grid_5_0
+        in: path
+        name: group
+        required: true
+        type: string
+      responses:
+        "200":
+          $ref: '#/responses/AggregatedDataPoints'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - admin: []
+      summary: Query logins by group
+      tags:
+      - WorkspaceMetrics
   /servers/{wid}/otp-operations:
     get:
       description: Query otp operation data points.
@@ -3320,6 +3525,10 @@ paths:
         in: query
         name: to
         type: string
+      - description: Filter by idp id
+        in: query
+        name: idp_id
+        type: string
       - description: A server will only return requested resources if the resource
           matches one of the listed ETag value
         format: etag
@@ -3338,6 +3547,8 @@ paths:
         description: Aggregate
         enum:
         - clients
+        - countries
+        - cities
         - users_with_authentication_failures
         - users_with_password_resets
         - users_with_high_risk
@@ -3711,6 +3922,7 @@ paths:
         - device_os
         - device_browser
         - grid_1_0
+        - grid_5_0
         in: path
         name: group
         required: true

@@ -438,8 +438,8 @@ definitions:
     type: object
 host: localhost:8443
 info:
-  description: Cloudentity Permissions API
-  title: Cloudentity API
+  description: SecureAuth Permissions API
+  title: SecureAuth API
   version: latest
 paths:
   /admin/systems:

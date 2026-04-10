@@ -21,7 +21,7 @@ import (
 type UserAuthenticatedPayload struct {
 
 	// authn method
-	// Enum: ["totp","password","otp","email_otp","sms_otp","webauthn","push","symbol","qr_code"]
+	// Enum: ["totp","password","otp","email_otp","sms_otp","voice_otp","webauthn","usernameless_webauthn","push","symbol","qr_code"]
 	AuthnMethod string `json:"authn_method,omitempty" yaml:"authn_method,omitempty"`
 
 	// brute force
@@ -34,7 +34,7 @@ type UserAuthenticatedPayload struct {
 	Identifier string `json:"identifier,omitempty" yaml:"identifier,omitempty"`
 
 	// mfa
-	// Enum: ["totp","password","otp","email_otp","sms_otp","webauthn","push","symbol","qr_code"]
+	// Enum: ["totp","password","otp","email_otp","sms_otp","voice_otp","webauthn","usernameless_webauthn","push","symbol","qr_code"]
 	Mfa string `json:"mfa,omitempty" yaml:"mfa,omitempty"`
 
 	// mfa skipped
@@ -78,7 +78,7 @@ var userAuthenticatedPayloadTypeAuthnMethodPropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["totp","password","otp","email_otp","sms_otp","webauthn","push","symbol","qr_code"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["totp","password","otp","email_otp","sms_otp","voice_otp","webauthn","usernameless_webauthn","push","symbol","qr_code"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -103,8 +103,14 @@ const (
 	// UserAuthenticatedPayloadAuthnMethodSmsOtp captures enum value "sms_otp"
 	UserAuthenticatedPayloadAuthnMethodSmsOtp string = "sms_otp"
 
+	// UserAuthenticatedPayloadAuthnMethodVoiceOtp captures enum value "voice_otp"
+	UserAuthenticatedPayloadAuthnMethodVoiceOtp string = "voice_otp"
+
 	// UserAuthenticatedPayloadAuthnMethodWebauthn captures enum value "webauthn"
 	UserAuthenticatedPayloadAuthnMethodWebauthn string = "webauthn"
+
+	// UserAuthenticatedPayloadAuthnMethodUsernamelessWebauthn captures enum value "usernameless_webauthn"
+	UserAuthenticatedPayloadAuthnMethodUsernamelessWebauthn string = "usernameless_webauthn"
 
 	// UserAuthenticatedPayloadAuthnMethodPush captures enum value "push"
 	UserAuthenticatedPayloadAuthnMethodPush string = "push"
@@ -160,7 +166,7 @@ var userAuthenticatedPayloadTypeMfaPropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["totp","password","otp","email_otp","sms_otp","webauthn","push","symbol","qr_code"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["totp","password","otp","email_otp","sms_otp","voice_otp","webauthn","usernameless_webauthn","push","symbol","qr_code"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -185,8 +191,14 @@ const (
 	// UserAuthenticatedPayloadMfaSmsOtp captures enum value "sms_otp"
 	UserAuthenticatedPayloadMfaSmsOtp string = "sms_otp"
 
+	// UserAuthenticatedPayloadMfaVoiceOtp captures enum value "voice_otp"
+	UserAuthenticatedPayloadMfaVoiceOtp string = "voice_otp"
+
 	// UserAuthenticatedPayloadMfaWebauthn captures enum value "webauthn"
 	UserAuthenticatedPayloadMfaWebauthn string = "webauthn"
+
+	// UserAuthenticatedPayloadMfaUsernamelessWebauthn captures enum value "usernameless_webauthn"
+	UserAuthenticatedPayloadMfaUsernamelessWebauthn string = "usernameless_webauthn"
 
 	// UserAuthenticatedPayloadMfaPush captures enum value "push"
 	UserAuthenticatedPayloadMfaPush string = "push"

@@ -421,7 +421,7 @@ func NewSetWebAuthnPreconditionFailed() *SetWebAuthnPreconditionFailed {
 /*
 SetWebAuthnPreconditionFailed describes a response with status code 412, with default header values.
 
-Payload too large
+Precondition failed
 */
 type SetWebAuthnPreconditionFailed struct {
 	Payload *models.Error

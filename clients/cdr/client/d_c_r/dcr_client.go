@@ -72,10 +72,10 @@ type ClientService interface {
 
 	Dynamic Client Registration endpoint allows to dynamically register OAuth 2.0 client applications
 
-with the Cloudentity Platform. When a request with all required registration metadata
-values reaches the Cloudentity authorization server, the server issues a client
+with the SecureAuth Platform. When a request with all required registration metadata
+values reaches the SecureAuth authorization server, the server issues a client
 identifier and provides client metadata values registered for the client.
-Client applications can use their registration data to communicate with the Cloudentity
+Client applications can use their registration data to communicate with the SecureAuth
 platform using the OAuth 2.0 protocol.
 */
 func (a *Client) DynamicClientRegistration(params *DynamicClientRegistrationParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*DynamicClientRegistrationCreated, error) {

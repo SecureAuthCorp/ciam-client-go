@@ -30,6 +30,9 @@ type OtpSettings struct {
 	// enroll webauthn
 	EnrollWebauthn *OtpConfig `json:"enroll_webauthn,omitempty" yaml:"enroll_webauthn,omitempty"`
 
+	// pair device
+	PairDevice *OtpConfig `json:"pair_device,omitempty" yaml:"pair_device,omitempty"`
+
 	// reset password
 	ResetPassword *OtpConfig `json:"reset_password,omitempty" yaml:"reset_password,omitempty"`
 
@@ -57,6 +60,10 @@ func (m *OtpSettings) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateEnrollWebauthn(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validatePairDevice(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -154,6 +161,25 @@ func (m *OtpSettings) validateEnrollWebauthn(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *OtpSettings) validatePairDevice(formats strfmt.Registry) error {
+	if swag.IsZero(m.PairDevice) { // not required
+		return nil
+	}
+
+	if m.PairDevice != nil {
+		if err := m.PairDevice.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("pair_device")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("pair_device")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (m *OtpSettings) validateResetPassword(formats strfmt.Registry) error {
 	if swag.IsZero(m.ResetPassword) { // not required
 		return nil
@@ -228,6 +254,10 @@ func (m *OtpSettings) ContextValidate(ctx context.Context, formats strfmt.Regist
 	}
 
 	if err := m.contextValidateEnrollWebauthn(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidatePairDevice(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -325,6 +355,27 @@ func (m *OtpSettings) contextValidateEnrollWebauthn(ctx context.Context, formats
 				return ve.ValidateName("enroll_webauthn")
 			} else if ce, ok := err.(*errors.CompositeError); ok {
 				return ce.ValidateName("enroll_webauthn")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *OtpSettings) contextValidatePairDevice(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.PairDevice != nil {
+
+		if swag.IsZero(m.PairDevice) { // not required
+			return nil
+		}
+
+		if err := m.PairDevice.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("pair_device")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("pair_device")
 			}
 			return err
 		}

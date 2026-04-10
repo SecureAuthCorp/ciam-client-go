@@ -1,4 +1,56 @@
 definitions:
+  DiscoveryIDP:
+    properties:
+      hidden:
+        description: Whether IDP is hidden from the login page
+        type: boolean
+        x-nullable: false
+      id:
+        description: IDP ID
+        type: string
+        x-nullable: false
+      instant_redirect:
+        description: Whether to instantly redirect to this IDP
+        type: boolean
+        x-nullable: false
+      logo_uri:
+        description: IDP logo URI
+        type: string
+        x-nullable: false
+      method:
+        description: IDP method (e.g. oidc, saml, static)
+        type: string
+        x-nullable: false
+      name:
+        description: IDP display name
+        type: string
+        x-nullable: false
+    type: object
+  DiscoveryRequest:
+    description: Discovery request
+    properties:
+      identifier:
+        description: User identifier (e.g. email address)
+        type: string
+        x-nullable: false
+      login_id:
+        description: Login session ID (required for script_execution discovery mode)
+        type: string
+        x-nullable: false
+      login_state:
+        description: Login state (required for script_execution discovery mode)
+        type: string
+        x-nullable: false
+    type: object
+  DiscoveryResponse:
+    properties:
+      idps:
+        description: List of matching IDPs
+        items:
+          $ref: '#/definitions/DiscoveryIDP'
+        type: array
+        x-nullable: false
+    type: object
   Error:
     description: HTTP error response
     properties:
@@ -45,6 +97,32 @@ info:
   title: ""
   version: ""
 paths:
+  /{aid}/login/discovery:
+    post:
+      description: |-
+        Returns a list of IDPs that match the given user identifier based on
+        identity pool membership, domain matching, or IDP discovery scripts.
+      operationId: discoverIDPs
+      parameters:
+      - description: Authorization server id
+        in: path
+        name: aid
+        required: true
+        type: string
+      - in: body
+        name: Body
+        schema:
+          $ref: '#/definitions/DiscoveryRequest'
+      responses:
+        "200":
+          $ref: '#/responses/DiscoveryResponse'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+      summary: Discover IDPs for a user identifier.
+      tags:
+      - web
   /{aid}/styling:
     get:
       operationId: getStyling
@@ -64,6 +142,10 @@ paths:
       tags:
       - web
 responses:
+  DiscoveryResponse:
+    description: Discovery response
+    schema:
+      $ref: '#/definitions/DiscoveryResponse'
   Styling:
     description: Styling
     schema:

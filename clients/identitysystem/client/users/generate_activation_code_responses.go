@@ -401,7 +401,7 @@ func NewGenerateActivationCodePreconditionFailed() *GenerateActivationCodePrecon
 /*
 GenerateActivationCodePreconditionFailed describes a response with status code 412, with default header values.
 
-Payload too large
+Precondition failed
 */
 type GenerateActivationCodePreconditionFailed struct {
 	Payload *models.Error

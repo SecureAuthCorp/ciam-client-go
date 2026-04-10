@@ -34,6 +34,9 @@ type TreeTenant struct {
 	// Example: Default
 	Name string `json:"name,omitempty" yaml:"name,omitempty"`
 
+	// phone provider config
+	PhoneProviderConfig *TreePhoneProviderConfig `json:"phone_provider_config,omitempty" yaml:"phone_provider_config,omitempty"`
+
 	// pools
 	Pools TreePools `json:"pools,omitempty" yaml:"pools,omitempty"`
 
@@ -77,6 +80,10 @@ func (m *TreeTenant) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateMfaMethods(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validatePhoneProviderConfig(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -182,6 +189,25 @@ func (m *TreeTenant) validateMfaMethods(formats strfmt.Registry) error {
 				return ve.ValidateName("mfa_methods")
 			} else if ce, ok := err.(*errors.CompositeError); ok {
 				return ce.ValidateName("mfa_methods")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *TreeTenant) validatePhoneProviderConfig(formats strfmt.Registry) error {
+	if swag.IsZero(m.PhoneProviderConfig) { // not required
+		return nil
+	}
+
+	if m.PhoneProviderConfig != nil {
+		if err := m.PhoneProviderConfig.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("phone_provider_config")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("phone_provider_config")
 			}
 			return err
 		}
@@ -343,6 +369,10 @@ func (m *TreeTenant) ContextValidate(ctx context.Context, formats strfmt.Registr
 		res = append(res, err)
 	}
 
+	if err := m.contextValidatePhoneProviderConfig(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.contextValidatePools(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -447,6 +477,27 @@ func (m *TreeTenant) contextValidateMfaMethods(ctx context.Context, formats strf
 			return ce.ValidateName("mfa_methods")
 		}
 		return err
+	}
+
+	return nil
+}
+
+func (m *TreeTenant) contextValidatePhoneProviderConfig(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.PhoneProviderConfig != nil {
+
+		if swag.IsZero(m.PhoneProviderConfig) { // not required
+			return nil
+		}
+
+		if err := m.PhoneProviderConfig.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("phone_provider_config")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("phone_provider_config")
+			}
+			return err
+		}
 	}
 
 	return nil

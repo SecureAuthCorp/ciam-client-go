@@ -553,7 +553,7 @@ func NewUpdateUserProfileV2PreconditionFailed() *UpdateUserProfileV2Precondition
 /*
 UpdateUserProfileV2PreconditionFailed describes a response with status code 412, with default header values.
 
-Payload too large
+Precondition failed
 */
 type UpdateUserProfileV2PreconditionFailed struct {
 	Payload *models.Error

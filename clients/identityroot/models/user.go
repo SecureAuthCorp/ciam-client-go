@@ -73,7 +73,8 @@ type User struct {
 	UserPoolID string `json:"user_pool_id" yaml:"user_pool_id"`
 
 	// user type
-	UserType interface{} `json:"user_type,omitempty" yaml:"user_type,omitempty"`
+	// Enum: ["jit","standard","scim"]
+	UserType string `json:"user_type,omitempty" yaml:"user_type,omitempty"`
 }
 
 // Validate validates this user
@@ -105,6 +106,10 @@ func (m *User) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateUserPoolID(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateUserType(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -230,6 +235,51 @@ func (m *User) validateUpdatedAt(formats strfmt.Registry) error {
 func (m *User) validateUserPoolID(formats strfmt.Registry) error {
 
 	if err := validate.RequiredString("user_pool_id", "body", m.UserPoolID); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+var userTypeUserTypePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["jit","standard","scim"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		userTypeUserTypePropEnum = append(userTypeUserTypePropEnum, v)
+	}
+}
+
+const (
+
+	// UserUserTypeJit captures enum value "jit"
+	UserUserTypeJit string = "jit"
+
+	// UserUserTypeStandard captures enum value "standard"
+	UserUserTypeStandard string = "standard"
+
+	// UserUserTypeScim captures enum value "scim"
+	UserUserTypeScim string = "scim"
+)
+
+// prop value enum
+func (m *User) validateUserTypeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, userTypeUserTypePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *User) validateUserType(formats strfmt.Registry) error {
+	if swag.IsZero(m.UserType) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateUserTypeEnum("user_type", "body", m.UserType); err != nil {
 		return err
 	}
 

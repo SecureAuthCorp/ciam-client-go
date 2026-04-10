@@ -54,6 +54,12 @@ func (o *RequestAddWebAuthnReader) ReadResponse(response runtime.ClientResponse,
 			return nil, err
 		}
 		return nil, result
+	case 429:
+		result := NewRequestAddWebAuthnTooManyRequests()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	default:
 		return nil, runtime.NewAPIError("[POST /system/pools/{ipID}/user/webauthn/add/request] requestAddWebAuthn", response, response.Code())
 	}
@@ -263,7 +269,7 @@ func NewRequestAddWebAuthnPreconditionFailed() *RequestAddWebAuthnPreconditionFa
 /*
 RequestAddWebAuthnPreconditionFailed describes a response with status code 412, with default header values.
 
-Payload too large
+Precondition failed
 */
 type RequestAddWebAuthnPreconditionFailed struct {
 	Payload *models.Error
@@ -384,6 +390,76 @@ func (o *RequestAddWebAuthnUnprocessableEntity) GetPayload() *models.Error {
 }
 
 func (o *RequestAddWebAuthnUnprocessableEntity) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	o.Payload = new(models.Error)
+
+	// response payload
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+		return err
+	}
+
+	return nil
+}
+
+// NewRequestAddWebAuthnTooManyRequests creates a RequestAddWebAuthnTooManyRequests with default headers values
+func NewRequestAddWebAuthnTooManyRequests() *RequestAddWebAuthnTooManyRequests {
+	return &RequestAddWebAuthnTooManyRequests{}
+}
+
+/*
+RequestAddWebAuthnTooManyRequests describes a response with status code 429, with default header values.
+
+Too many requests
+*/
+type RequestAddWebAuthnTooManyRequests struct {
+	Payload *models.Error
+}
+
+// IsSuccess returns true when this request add web authn too many requests response has a 2xx status code
+func (o *RequestAddWebAuthnTooManyRequests) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this request add web authn too many requests response has a 3xx status code
+func (o *RequestAddWebAuthnTooManyRequests) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this request add web authn too many requests response has a 4xx status code
+func (o *RequestAddWebAuthnTooManyRequests) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this request add web authn too many requests response has a 5xx status code
+func (o *RequestAddWebAuthnTooManyRequests) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this request add web authn too many requests response a status code equal to that given
+func (o *RequestAddWebAuthnTooManyRequests) IsCode(code int) bool {
+	return code == 429
+}
+
+// Code gets the status code for the request add web authn too many requests response
+func (o *RequestAddWebAuthnTooManyRequests) Code() int {
+	return 429
+}
+
+func (o *RequestAddWebAuthnTooManyRequests) Error() string {
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /system/pools/{ipID}/user/webauthn/add/request][%d] requestAddWebAuthnTooManyRequests %s", 429, payload)
+}
+
+func (o *RequestAddWebAuthnTooManyRequests) String() string {
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /system/pools/{ipID}/user/webauthn/add/request][%d] requestAddWebAuthnTooManyRequests %s", 429, payload)
+}
+
+func (o *RequestAddWebAuthnTooManyRequests) GetPayload() *models.Error {
+	return o.Payload
+}
+
+func (o *RequestAddWebAuthnTooManyRequests) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.Error)
 

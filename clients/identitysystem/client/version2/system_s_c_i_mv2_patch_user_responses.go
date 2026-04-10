@@ -24,12 +24,18 @@ type SystemSCIMv2PatchUserReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *SystemSCIMv2PatchUserReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-	case 200:
-		result := NewSystemSCIMv2PatchUserOK()
+	case 204:
+		result := NewSystemSCIMv2PatchUserNoContent()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
+	case 400:
+		result := NewSystemSCIMv2PatchUserBadRequest()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	case 401:
 		result := NewSystemSCIMv2PatchUserUnauthorized()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -44,6 +50,12 @@ func (o *SystemSCIMv2PatchUserReader) ReadResponse(response runtime.ClientRespon
 		return nil, result
 	case 404:
 		result := NewSystemSCIMv2PatchUserNotFound()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
+	case 409:
+		result := NewSystemSCIMv2PatchUserConflict()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
@@ -65,109 +77,123 @@ func (o *SystemSCIMv2PatchUserReader) ReadResponse(response runtime.ClientRespon
 	}
 }
 
-// NewSystemSCIMv2PatchUserOK creates a SystemSCIMv2PatchUserOK with default headers values
-func NewSystemSCIMv2PatchUserOK() *SystemSCIMv2PatchUserOK {
-	return &SystemSCIMv2PatchUserOK{}
+// NewSystemSCIMv2PatchUserNoContent creates a SystemSCIMv2PatchUserNoContent with default headers values
+func NewSystemSCIMv2PatchUserNoContent() *SystemSCIMv2PatchUserNoContent {
+	return &SystemSCIMv2PatchUserNoContent{}
 }
 
 /*
-SystemSCIMv2PatchUserOK describes a response with status code 200, with default header values.
+SystemSCIMv2PatchUserNoContent describes a response with status code 204, with default header values.
 
-SCIMv2 User
+	OK
 */
-type SystemSCIMv2PatchUserOK struct {
-
-	/* The ETag HTTP header is an identifier for a specific version of a resource
-
-	in:header
-
-	     Format: etag
-	*/
-	Etag string
-
-	/* Indicates that a 5xx error was caused by tenant-provided code
-
-	in:header
-	*/
-	XExternalError string
-
-	/* OpenTelemetry trace identifier
-
-	in:header
-	*/
-	XTraceID string
-
-	Payload *models.UserGetResponse
+type SystemSCIMv2PatchUserNoContent struct {
 }
 
-// IsSuccess returns true when this system s c i mv2 patch user o k response has a 2xx status code
-func (o *SystemSCIMv2PatchUserOK) IsSuccess() bool {
+// IsSuccess returns true when this system s c i mv2 patch user no content response has a 2xx status code
+func (o *SystemSCIMv2PatchUserNoContent) IsSuccess() bool {
 	return true
 }
 
-// IsRedirect returns true when this system s c i mv2 patch user o k response has a 3xx status code
-func (o *SystemSCIMv2PatchUserOK) IsRedirect() bool {
+// IsRedirect returns true when this system s c i mv2 patch user no content response has a 3xx status code
+func (o *SystemSCIMv2PatchUserNoContent) IsRedirect() bool {
 	return false
 }
 
-// IsClientError returns true when this system s c i mv2 patch user o k response has a 4xx status code
-func (o *SystemSCIMv2PatchUserOK) IsClientError() bool {
+// IsClientError returns true when this system s c i mv2 patch user no content response has a 4xx status code
+func (o *SystemSCIMv2PatchUserNoContent) IsClientError() bool {
 	return false
 }
 
-// IsServerError returns true when this system s c i mv2 patch user o k response has a 5xx status code
-func (o *SystemSCIMv2PatchUserOK) IsServerError() bool {
+// IsServerError returns true when this system s c i mv2 patch user no content response has a 5xx status code
+func (o *SystemSCIMv2PatchUserNoContent) IsServerError() bool {
 	return false
 }
 
-// IsCode returns true when this system s c i mv2 patch user o k response a status code equal to that given
-func (o *SystemSCIMv2PatchUserOK) IsCode(code int) bool {
-	return code == 200
+// IsCode returns true when this system s c i mv2 patch user no content response a status code equal to that given
+func (o *SystemSCIMv2PatchUserNoContent) IsCode(code int) bool {
+	return code == 204
 }
 
-// Code gets the status code for the system s c i mv2 patch user o k response
-func (o *SystemSCIMv2PatchUserOK) Code() int {
-	return 200
+// Code gets the status code for the system s c i mv2 patch user no content response
+func (o *SystemSCIMv2PatchUserNoContent) Code() int {
+	return 204
 }
 
-func (o *SystemSCIMv2PatchUserOK) Error() string {
+func (o *SystemSCIMv2PatchUserNoContent) Error() string {
+	return fmt.Sprintf("[PATCH /system/pools/{ipID}/scim/v2/Users/{userID}][%d] systemSCIMv2PatchUserNoContent", 204)
+}
+
+func (o *SystemSCIMv2PatchUserNoContent) String() string {
+	return fmt.Sprintf("[PATCH /system/pools/{ipID}/scim/v2/Users/{userID}][%d] systemSCIMv2PatchUserNoContent", 204)
+}
+
+func (o *SystemSCIMv2PatchUserNoContent) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	return nil
+}
+
+// NewSystemSCIMv2PatchUserBadRequest creates a SystemSCIMv2PatchUserBadRequest with default headers values
+func NewSystemSCIMv2PatchUserBadRequest() *SystemSCIMv2PatchUserBadRequest {
+	return &SystemSCIMv2PatchUserBadRequest{}
+}
+
+/*
+SystemSCIMv2PatchUserBadRequest describes a response with status code 400, with default header values.
+
+Bad request
+*/
+type SystemSCIMv2PatchUserBadRequest struct {
+	Payload *models.SCIMv2ErrorResponse
+}
+
+// IsSuccess returns true when this system s c i mv2 patch user bad request response has a 2xx status code
+func (o *SystemSCIMv2PatchUserBadRequest) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this system s c i mv2 patch user bad request response has a 3xx status code
+func (o *SystemSCIMv2PatchUserBadRequest) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this system s c i mv2 patch user bad request response has a 4xx status code
+func (o *SystemSCIMv2PatchUserBadRequest) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this system s c i mv2 patch user bad request response has a 5xx status code
+func (o *SystemSCIMv2PatchUserBadRequest) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this system s c i mv2 patch user bad request response a status code equal to that given
+func (o *SystemSCIMv2PatchUserBadRequest) IsCode(code int) bool {
+	return code == 400
+}
+
+// Code gets the status code for the system s c i mv2 patch user bad request response
+func (o *SystemSCIMv2PatchUserBadRequest) Code() int {
+	return 400
+}
+
+func (o *SystemSCIMv2PatchUserBadRequest) Error() string {
 	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[PATCH /system/pools/{ipID}/scim/v2/Users/{userID}][%d] systemSCIMv2PatchUserOK %s", 200, payload)
+	return fmt.Sprintf("[PATCH /system/pools/{ipID}/scim/v2/Users/{userID}][%d] systemSCIMv2PatchUserBadRequest %s", 400, payload)
 }
 
-func (o *SystemSCIMv2PatchUserOK) String() string {
+func (o *SystemSCIMv2PatchUserBadRequest) String() string {
 	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[PATCH /system/pools/{ipID}/scim/v2/Users/{userID}][%d] systemSCIMv2PatchUserOK %s", 200, payload)
+	return fmt.Sprintf("[PATCH /system/pools/{ipID}/scim/v2/Users/{userID}][%d] systemSCIMv2PatchUserBadRequest %s", 400, payload)
 }
 
-func (o *SystemSCIMv2PatchUserOK) GetPayload() *models.UserGetResponse {
+func (o *SystemSCIMv2PatchUserBadRequest) GetPayload() *models.SCIMv2ErrorResponse {
 	return o.Payload
 }
 
-func (o *SystemSCIMv2PatchUserOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *SystemSCIMv2PatchUserBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	// hydrates response header etag
-	hdrEtag := response.GetHeader("etag")
-
-	if hdrEtag != "" {
-		o.Etag = hdrEtag
-	}
-
-	// hydrates response header x-external-error
-	hdrXExternalError := response.GetHeader("x-external-error")
-
-	if hdrXExternalError != "" {
-		o.XExternalError = hdrXExternalError
-	}
-
-	// hydrates response header x-trace-id
-	hdrXTraceID := response.GetHeader("x-trace-id")
-
-	if hdrXTraceID != "" {
-		o.XTraceID = hdrXTraceID
-	}
-
-	o.Payload = new(models.UserGetResponse)
+	o.Payload = new(models.SCIMv2ErrorResponse)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -188,7 +214,7 @@ SystemSCIMv2PatchUserUnauthorized describes a response with status code 401, wit
 Unauthorized
 */
 type SystemSCIMv2PatchUserUnauthorized struct {
-	Payload *models.Error
+	Payload *models.SCIMv2ErrorResponse
 }
 
 // IsSuccess returns true when this system s c i mv2 patch user unauthorized response has a 2xx status code
@@ -231,13 +257,13 @@ func (o *SystemSCIMv2PatchUserUnauthorized) String() string {
 	return fmt.Sprintf("[PATCH /system/pools/{ipID}/scim/v2/Users/{userID}][%d] systemSCIMv2PatchUserUnauthorized %s", 401, payload)
 }
 
-func (o *SystemSCIMv2PatchUserUnauthorized) GetPayload() *models.Error {
+func (o *SystemSCIMv2PatchUserUnauthorized) GetPayload() *models.SCIMv2ErrorResponse {
 	return o.Payload
 }
 
 func (o *SystemSCIMv2PatchUserUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.Error)
+	o.Payload = new(models.SCIMv2ErrorResponse)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -258,7 +284,7 @@ SystemSCIMv2PatchUserForbidden describes a response with status code 403, with d
 Forbidden
 */
 type SystemSCIMv2PatchUserForbidden struct {
-	Payload *models.Error
+	Payload *models.SCIMv2ErrorResponse
 }
 
 // IsSuccess returns true when this system s c i mv2 patch user forbidden response has a 2xx status code
@@ -301,13 +327,13 @@ func (o *SystemSCIMv2PatchUserForbidden) String() string {
 	return fmt.Sprintf("[PATCH /system/pools/{ipID}/scim/v2/Users/{userID}][%d] systemSCIMv2PatchUserForbidden %s", 403, payload)
 }
 
-func (o *SystemSCIMv2PatchUserForbidden) GetPayload() *models.Error {
+func (o *SystemSCIMv2PatchUserForbidden) GetPayload() *models.SCIMv2ErrorResponse {
 	return o.Payload
 }
 
 func (o *SystemSCIMv2PatchUserForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.Error)
+	o.Payload = new(models.SCIMv2ErrorResponse)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -328,7 +354,7 @@ SystemSCIMv2PatchUserNotFound describes a response with status code 404, with de
 Not found
 */
 type SystemSCIMv2PatchUserNotFound struct {
-	Payload *models.Error
+	Payload *models.SCIMv2ErrorResponse
 }
 
 // IsSuccess returns true when this system s c i mv2 patch user not found response has a 2xx status code
@@ -371,13 +397,83 @@ func (o *SystemSCIMv2PatchUserNotFound) String() string {
 	return fmt.Sprintf("[PATCH /system/pools/{ipID}/scim/v2/Users/{userID}][%d] systemSCIMv2PatchUserNotFound %s", 404, payload)
 }
 
-func (o *SystemSCIMv2PatchUserNotFound) GetPayload() *models.Error {
+func (o *SystemSCIMv2PatchUserNotFound) GetPayload() *models.SCIMv2ErrorResponse {
 	return o.Payload
 }
 
 func (o *SystemSCIMv2PatchUserNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.Error)
+	o.Payload = new(models.SCIMv2ErrorResponse)
+
+	// response payload
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+		return err
+	}
+
+	return nil
+}
+
+// NewSystemSCIMv2PatchUserConflict creates a SystemSCIMv2PatchUserConflict with default headers values
+func NewSystemSCIMv2PatchUserConflict() *SystemSCIMv2PatchUserConflict {
+	return &SystemSCIMv2PatchUserConflict{}
+}
+
+/*
+SystemSCIMv2PatchUserConflict describes a response with status code 409, with default header values.
+
+Conflict
+*/
+type SystemSCIMv2PatchUserConflict struct {
+	Payload *models.SCIMv2ErrorResponse
+}
+
+// IsSuccess returns true when this system s c i mv2 patch user conflict response has a 2xx status code
+func (o *SystemSCIMv2PatchUserConflict) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this system s c i mv2 patch user conflict response has a 3xx status code
+func (o *SystemSCIMv2PatchUserConflict) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this system s c i mv2 patch user conflict response has a 4xx status code
+func (o *SystemSCIMv2PatchUserConflict) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this system s c i mv2 patch user conflict response has a 5xx status code
+func (o *SystemSCIMv2PatchUserConflict) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this system s c i mv2 patch user conflict response a status code equal to that given
+func (o *SystemSCIMv2PatchUserConflict) IsCode(code int) bool {
+	return code == 409
+}
+
+// Code gets the status code for the system s c i mv2 patch user conflict response
+func (o *SystemSCIMv2PatchUserConflict) Code() int {
+	return 409
+}
+
+func (o *SystemSCIMv2PatchUserConflict) Error() string {
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PATCH /system/pools/{ipID}/scim/v2/Users/{userID}][%d] systemSCIMv2PatchUserConflict %s", 409, payload)
+}
+
+func (o *SystemSCIMv2PatchUserConflict) String() string {
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PATCH /system/pools/{ipID}/scim/v2/Users/{userID}][%d] systemSCIMv2PatchUserConflict %s", 409, payload)
+}
+
+func (o *SystemSCIMv2PatchUserConflict) GetPayload() *models.SCIMv2ErrorResponse {
+	return o.Payload
+}
+
+func (o *SystemSCIMv2PatchUserConflict) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	o.Payload = new(models.SCIMv2ErrorResponse)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -398,7 +494,7 @@ SystemSCIMv2PatchUserPreconditionFailed describes a response with status code 41
 Payload too large
 */
 type SystemSCIMv2PatchUserPreconditionFailed struct {
-	Payload *models.Error
+	Payload *models.SCIMv2ErrorResponse
 }
 
 // IsSuccess returns true when this system s c i mv2 patch user precondition failed response has a 2xx status code
@@ -441,13 +537,13 @@ func (o *SystemSCIMv2PatchUserPreconditionFailed) String() string {
 	return fmt.Sprintf("[PATCH /system/pools/{ipID}/scim/v2/Users/{userID}][%d] systemSCIMv2PatchUserPreconditionFailed %s", 412, payload)
 }
 
-func (o *SystemSCIMv2PatchUserPreconditionFailed) GetPayload() *models.Error {
+func (o *SystemSCIMv2PatchUserPreconditionFailed) GetPayload() *models.SCIMv2ErrorResponse {
 	return o.Payload
 }
 
 func (o *SystemSCIMv2PatchUserPreconditionFailed) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.Error)
+	o.Payload = new(models.SCIMv2ErrorResponse)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -468,7 +564,7 @@ SystemSCIMv2PatchUserTooManyRequests describes a response with status code 429, 
 Too many requests
 */
 type SystemSCIMv2PatchUserTooManyRequests struct {
-	Payload *models.Error
+	Payload *models.SCIMv2ErrorResponse
 }
 
 // IsSuccess returns true when this system s c i mv2 patch user too many requests response has a 2xx status code
@@ -511,13 +607,13 @@ func (o *SystemSCIMv2PatchUserTooManyRequests) String() string {
 	return fmt.Sprintf("[PATCH /system/pools/{ipID}/scim/v2/Users/{userID}][%d] systemSCIMv2PatchUserTooManyRequests %s", 429, payload)
 }
 
-func (o *SystemSCIMv2PatchUserTooManyRequests) GetPayload() *models.Error {
+func (o *SystemSCIMv2PatchUserTooManyRequests) GetPayload() *models.SCIMv2ErrorResponse {
 	return o.Payload
 }
 
 func (o *SystemSCIMv2PatchUserTooManyRequests) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.Error)
+	o.Payload = new(models.SCIMv2ErrorResponse)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

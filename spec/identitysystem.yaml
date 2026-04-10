@@ -21,6 +21,12 @@ definitions:
           $ref: '#/definitions/Credential'
         type: array
         x-nullable: false
+      webauthn_type:
+        enum:
+        - regular
+        - discoverable
+        type: string
+        x-nullable: false
     required:
     - code
     type: object
@@ -130,6 +136,13 @@ definitions:
         type: integer
         x-nullable: false
     type: object
+  AttestationFormat:
+    description: |-
+      Specification: §5.4 Options for Credential Creation (https://w3c.github.io/webauthn/#dom-publickeycredentialcreationoptions-attestationformats)
+      Registry: https://www.iana.org/assignments/webauthn/webauthn.xhtml
+    title: AttestationFormat is an internal representation of the relevant inputs
+      for registration.
+    type: string
   Attribute:
     properties:
       canonicalValues:
@@ -169,8 +182,7 @@ definitions:
         type: array
         x-nullable: false
       type:
-        type: string
-        x-nullable: false
+        $ref: '#/definitions/SCIMv2AttributeType'
       uniqueness:
         type: string
         x-nullable: false
@@ -195,7 +207,12 @@ definitions:
       - otp
       - email_otp
       - sms_otp
+      - voice_otp
       - webauthn
+      - usernameless_webauthn
+      - push
+      - symbol
+      - qr_code
       type: string
     type: array
   AuthenticationScheme:
@@ -289,9 +306,31 @@ definitions:
         x-nullable: false
     title: |-
       AuthenticatorAttestationResponse is the initial unpacked 'response' object received by the relying party. This
-      contains the clientDataJSON object, which will be marshalled into CollectedClientData, and the 'attestationObject',
+      contains the clientDataJSON object, which will be marshalled into [CollectedClientData], and the 'attestationObject',
       which contains information about the authenticator, and the newly minted public key credential. The information in
       both objects are used to verify the authenticity of the ceremony and new credential.
+    type: object
+  AuthenticatorSelection:
+    description: |-
+      WebAuthn Relying Parties may use the AuthenticatorSelectionCriteria dictionary to specify their requirements
+      regarding authenticator attributes.
+
+      Specification: §5.4.4. Authenticator Selection Criteria (https://www.w3.org/TR/webauthn/#dictionary-authenticatorSelection)
+    properties:
+      authenticatorAttachment:
+        $ref: '#/definitions/AuthenticatorAttachment'
+      requireResidentKey:
+        description: |-
+          RequireResidentKey this member describes the Relying Party's requirements regarding resident
+          credentials. If the parameter is set to true, the authenticator MUST create a client-side-resident
+          public key credential source when creating a public key credential.
+        type: boolean
+        x-nullable: false
+      residentKey:
+        $ref: '#/definitions/ResidentKeyRequirement'
+      userVerification:
+        $ref: '#/definitions/UserVerificationRequirement'
+    title: AuthenticatorSelection represents the AuthenticatorSelectionCriteria IDL.
     type: object
   AuthenticatorTransport:
     description: |-
@@ -304,6 +343,34 @@ definitions:
       Specification: §5.8.4. Authenticator Transport Enumeration (https://www.w3.org/TR/webauthn/#enumdef-authenticatortransport)
     title: AuthenticatorTransport represents the IDL enum with the same name.
     type: string
+  BaseGroup:
+    properties:
+      description:
+        type: string
+        x-nullable: false
+      id:
+        format: groupID
+        type: string
+        x-nullable: false
+      name:
+        type: string
+        x-nullable: false
+      parent_id:
+        format: groupID
+        type: string
+        x-nullable: false
+      tenant_id:
+        format: tenantID
+        type: string
+        x-nullable: false
+      user_pool_id:
+        example: default
+        format: poolID
+        type: string
+        x-nullable: false
+    required:
+    - user_pool_id
+    type: object
   BaseVerifyOTP:
     properties:
       code:
@@ -340,6 +407,14 @@ definitions:
         type: boolean
         x-nullable: false
     type: object
+  COSEAlgorithmIdentifier:
+    description: 'Specification: §5.8.5. Cryptographic Algorithm Identifier (https://www.w3.org/TR/webauthn/#sctn-alg-identifier)'
+    format: int64
+    title: |-
+      COSEAlgorithmIdentifier is a number identifying a cryptographic algorithm. The algorithm identifiers SHOULD be values
+      registered in the IANA COSE Algorithms registry [https://www.w3.org/TR/webauthn/#biblio-iana-cose-algs-reg], for
+      instance, -7 for "ES256" and -257 for "RS256".
+    type: integer
   ChangePassword:
     properties:
       new_password:
@@ -404,6 +479,7 @@ definitions:
         - challenge
         - verify_address
         - authentication
+        - pair_device
         example: active
         type: string
         x-nullable: false
@@ -467,6 +543,14 @@ definitions:
       new_web_authn:
         $ref: '#/definitions/Credential'
       userID:
+        type: string
+        x-nullable: false
+      webauthn_type:
+        default: regular
+        description: Webauthn credential type. When omitted, defaults to regular.
+        enum:
+        - regular
+        - discoverable
         type: string
         x-nullable: false
     required:
@@ -546,6 +630,15 @@ definitions:
     - code
     - new_password
     type: object
+  ConveyancePreference:
+    description: |-
+      WebAuthn Relying Parties may use AttestationConveyancePreference to specify their preference regarding attestation
+      conveyance during credential generation.
+
+      Specification: §5.4.7. Attestation Conveyance Preference Enumeration (https://www.w3.org/TR/webauthn/#enum-attestation-convey)
+    title: ConveyancePreference is the type representing the AttestationConveyancePreference
+      IDL.
+    type: string
   Credential:
     description: 'See: §4. Terminology: Credential Record (https://www.w3.org/TR/webauthn-3/#credential-record)'
     properties:
@@ -586,11 +679,6 @@ definitions:
       Credential contains all needed information about a WebAuthn credential for storage. This struct is effectively the
       Credential Record as described in the specification.
     type: object
-  CredentialAssertion:
-    properties:
-      publicKey:
-        $ref: '#/definitions/PublicKeyCredentialRequestOptions'
-    type: object
   CredentialAttestation:
     properties:
       authenticatorData:
@@ -621,6 +709,13 @@ definitions:
         format: int64
         type: integer
         x-nullable: false
+    type: object
+  CredentialCreation:
+    properties:
+      mediation:
+        $ref: '#/definitions/CredentialMediationRequirement'
+      publicKey:
+        $ref: '#/definitions/PublicKeyCredentialCreationOptions'
     type: object
   CredentialCreationResponse:
     properties:
@@ -690,6 +785,23 @@ definitions:
         type: boolean
         x-nullable: false
     type: object
+  CredentialMediationRequirement:
+    description: See https://www.w3.org/TR/credential-management-1/#mediation-requirements
+    title: |-
+      CredentialMediationRequirement represents mediation requirements for clients. When making a request via get(options)
+      or create(options), developers can set a case-by-case requirement for user mediation by choosing the appropriate
+      CredentialMediationRequirement enum value.
+    type: string
+  CredentialParameter:
+    description: |-
+      CredentialParameter is the credential type and algorithm
+      that the relying party wants the authenticator to create.
+    properties:
+      alg:
+        $ref: '#/definitions/COSEAlgorithmIdentifier'
+      type:
+        $ref: '#/definitions/CredentialType'
+    type: object
   CredentialType:
     description: |-
       This enumeration defines the valid credential types. It is an extension point; values can be added to it in the
@@ -723,6 +835,20 @@ definitions:
         x-nullable: false
     required:
     - address
+    type: object
+  DeviceToSet:
+    properties:
+      external_id:
+        type: string
+        x-nullable: false
+    type: object
+  DevicesToSet:
+    properties:
+      devices:
+        items:
+          $ref: '#/definitions/DeviceToSet'
+        type: array
+        x-nullable: false
     type: object
   Error:
     description: HTTP error response
@@ -823,6 +949,11 @@ definitions:
         type: string
         x-nullable: false
       user_type:
+        enum:
+        - jit
+        - standard
+        - scim
+        type: string
         x-nullable: false
       verified addresses:
         items:
@@ -833,6 +964,48 @@ definitions:
     - tenant_id
     - user_pool_id
     - status
+    type: object
+  ExtensionSchemaData:
+    properties:
+      additionalIdentifiers:
+        items:
+          $ref: '#/definitions/SCIMv2Identifier'
+        type: array
+        x-nullable: false
+      businessMetadata:
+        additionalProperties:
+          type: object
+        type: object
+        x-nullable: false
+      emails:
+        items:
+          $ref: '#/definitions/SCIMv2ExtensionEmail'
+        type: array
+        x-nullable: false
+      metadata:
+        additionalProperties:
+          type: object
+        type: object
+        x-nullable: false
+      payload:
+        additionalProperties:
+          type: object
+        type: object
+        x-nullable: false
+      phoneNumbers:
+        items:
+          $ref: '#/definitions/SCIMv2ExtensionPhoneNumber'
+        type: array
+        x-nullable: false
+    type: object
+  FieldMapping:
+    properties:
+      internal:
+        type: string
+        x-nullable: false
+      scim:
+        type: string
+        x-nullable: false
     type: object
   FilterSupport:
     properties:
@@ -855,6 +1028,10 @@ definitions:
     type: object
   Group:
     properties:
+      created_at:
+        format: date-time
+        type: string
+        x-nullable: false
       description:
         type: string
         x-nullable: false
@@ -873,6 +1050,10 @@ definitions:
         format: tenantID
         type: string
         x-nullable: false
+      updated_at:
+        format: date-time
+        type: string
+        x-nullable: false
       user_pool_id:
         example: default
         format: poolID
@@ -880,6 +1061,35 @@ definitions:
         x-nullable: false
     required:
     - user_pool_id
+    type: object
+  GroupGetResponse:
+    description: GroupGetResponse
+    properties:
+      displayName:
+        example: Some Group Name
+        type: string
+        x-nullable: false
+      externalId:
+        example: some-external-id
+        type: string
+        x-nullable: false
+      id:
+        type: string
+        x-nullable: false
+      members:
+        items:
+          $ref: '#/definitions/Member'
+        type: array
+        x-nullable: false
+      meta:
+        $ref: '#/definitions/SCIMv2Meta'
+      schemas:
+        example:
+        - urn:ietf:params:scim:schemas:core:2.0:Group
+        items:
+          type: string
+        type: array
+        x-nullable: false
     type: object
   GroupMember:
     properties:
@@ -898,6 +1108,32 @@ definitions:
       user_pool_id:
         format: poolID
         type: string
+        x-nullable: false
+    type: object
+  GroupMembershipType:
+    type: string
+  GroupUpsertRequest:
+    description: GroupUpsertRequest
+    properties:
+      displayName:
+        example: Some Group Name
+        type: string
+        x-nullable: false
+      externalId:
+        example: some-external-id
+        type: string
+        x-nullable: false
+      members:
+        items:
+          $ref: '#/definitions/Member'
+        type: array
+        x-nullable: false
+      schemas:
+        example:
+        - urn:ietf:params:scim:schemas:core:2.0:Group
+        items:
+          type: string
+        type: array
         x-nullable: false
     type: object
   Groups:
@@ -950,6 +1186,14 @@ definitions:
         type: string
         x-nullable: false
     type: object
+  IdentifiersToSet:
+    properties:
+      identifiers:
+        items:
+          $ref: '#/definitions/NewUserIdentifier'
+        type: array
+        x-nullable: false
+    type: object
   InspectOTP:
     properties:
       code:
@@ -969,6 +1213,7 @@ definitions:
         - challenge
         - verify_address
         - authentication
+        - pair_device
         type: string
         x-nullable: false
       password_set:
@@ -984,7 +1229,14 @@ definitions:
     type: object
   InternalGroup:
     properties:
+      created_at:
+        format: date-time
+        type: string
+        x-nullable: false
       description:
+        type: string
+        x-nullable: false
+      external_id:
         type: string
         x-nullable: false
       id:
@@ -1001,6 +1253,10 @@ definitions:
         format: tenantID
         type: string
         x-nullable: false
+      updated_at:
+        format: date-time
+        type: string
+        x-nullable: false
       user_pool_id:
         example: default
         format: poolID
@@ -1008,6 +1264,31 @@ definitions:
         x-nullable: false
     required:
     - user_pool_id
+    type: object
+  ListGroupsResponse:
+    properties:
+      Resources:
+        items:
+          $ref: '#/definitions/GroupGetResponse'
+        type: array
+        x-nullable: false
+      itemsPerPage:
+        format: int64
+        type: integer
+        x-nullable: false
+      schemas:
+        items:
+          type: string
+        type: array
+        x-nullable: false
+      startIndex:
+        format: int64
+        type: integer
+        x-nullable: false
+      totalResults:
+        format: int64
+        type: integer
+        x-nullable: false
     type: object
   ListUsersResponse:
     properties:
@@ -1056,10 +1337,28 @@ definitions:
         - otp
         - email_otp
         - sms_otp
+        - voice_otp
         - webauthn
+        - usernameless_webauthn
+        - push
+        - symbol
+        - qr_code
         type: string
         x-nullable: false
     type: object
+  Member:
+    properties:
+      $ref:
+        type: string
+        x-nullable: false
+      type:
+        $ref: '#/definitions/MemberType'
+      value:
+        type: string
+        x-nullable: false
+    type: object
+  MemberType:
+    type: string
   NameWebAuthnKey:
     properties:
       name:
@@ -1122,6 +1421,11 @@ definitions:
         type: string
         x-nullable: false
       user_type:
+        enum:
+        - jit
+        - standard
+        - scim
+        type: string
         x-nullable: false
       verifiable_addresses:
         items:
@@ -1160,6 +1464,7 @@ definitions:
         - password
         - webauthn
         - totp
+        - device
         example: password
         type: string
         x-nullable: false
@@ -1168,6 +1473,12 @@ definitions:
         items:
           $ref: '#/definitions/Credential'
         type: array
+        x-nullable: false
+      webauthn_type:
+        enum:
+        - regular
+        - discoverable
+        type: string
         x-nullable: false
     required:
     - type
@@ -1264,6 +1575,8 @@ definitions:
       challenge:
         $ref: '#/definitions/OtpConfig'
       enroll_webauthn:
+        $ref: '#/definitions/OtpConfig'
+      pair_device:
         $ref: '#/definitions/OtpConfig'
       reset_password:
         $ref: '#/definitions/OtpConfig'
@@ -1397,6 +1710,8 @@ definitions:
         format: schemaID
         type: string
         x-nullable: false
+      pool_limits:
+        $ref: '#/definitions/PoolLimits'
       preferred_authentication_mechanism:
         enum:
         - totp
@@ -1404,7 +1719,12 @@ definitions:
         - otp
         - email_otp
         - sms_otp
+        - voice_otp
         - webauthn
+        - usernameless_webauthn
+        - push
+        - symbol
+        - qr_code
         example: password
         type: string
         x-nullable: false
@@ -1413,6 +1733,8 @@ definitions:
         x-nullable: false
       reset_credentials_settings:
         $ref: '#/definitions/ResetCredentialsSettings'
+      scim_settings:
+        $ref: '#/definitions/SCIMSettings'
       second_factor_authentication_mechanisms:
         $ref: '#/definitions/AuthenticationMechanisms'
       second_factor_preferred_authentication_mechanism:
@@ -1422,7 +1744,12 @@ definitions:
         - otp
         - email_otp
         - sms_otp
+        - voice_otp
         - webauthn
+        - usernameless_webauthn
+        - push
+        - symbol
+        - qr_code
         example: password
         type: string
         x-nullable: false
@@ -1441,6 +1768,8 @@ definitions:
         x-nullable: false
       totp_settings:
         $ref: '#/definitions/TotpSettings'
+      webauthn_settings:
+        $ref: '#/definitions/WebAuthnSettings'
       workspace_id:
         format: serverID
         type: string
@@ -1448,6 +1777,31 @@ definitions:
     required:
     - tenant_id
     - name
+    type: object
+  PoolLimits:
+    description: All values are clamped to the range [1, 100] with sensible defaults.
+    properties:
+      max_addresses:
+        format: int64
+        type: integer
+        x-nullable: false
+      max_codes:
+        format: int64
+        type: integer
+        x-nullable: false
+      max_credentials:
+        format: int64
+        type: integer
+        x-nullable: false
+      max_identifiers:
+        format: int64
+        type: integer
+        x-nullable: false
+      webauthn_credentials_capacity:
+        format: int64
+        type: integer
+        x-nullable: false
+    title: PoolLimits defines limits for user sub-entries within a pool.
     type: object
   PoolResponse:
     properties:
@@ -1514,6 +1868,8 @@ definitions:
         format: schemaID
         type: string
         x-nullable: false
+      pool_limits:
+        $ref: '#/definitions/PoolLimits'
       preferred_authentication_mechanism:
         enum:
         - totp
@@ -1521,7 +1877,12 @@ definitions:
         - otp
         - email_otp
         - sms_otp
+        - voice_otp
         - webauthn
+        - usernameless_webauthn
+        - push
+        - symbol
+        - qr_code
         example: password
         type: string
         x-nullable: false
@@ -1530,6 +1891,8 @@ definitions:
         x-nullable: false
       reset_credentials_settings:
         $ref: '#/definitions/ResetCredentialsSettings'
+      scim_settings:
+        $ref: '#/definitions/SCIMSettings'
       second_factor_authentication_mechanisms:
         $ref: '#/definitions/AuthenticationMechanisms'
       second_factor_preferred_authentication_mechanism:
@@ -1539,7 +1902,12 @@ definitions:
         - otp
         - email_otp
         - sms_otp
+        - voice_otp
         - webauthn
+        - usernameless_webauthn
+        - push
+        - symbol
+        - qr_code
         example: password
         type: string
         x-nullable: false
@@ -1558,6 +1926,8 @@ definitions:
         x-nullable: false
       totp_settings:
         $ref: '#/definitions/TotpSettings'
+      webauthn_settings:
+        $ref: '#/definitions/WebAuthnSettings'
       workspace_id:
         format: serverID
         type: string
@@ -1574,21 +1944,31 @@ definitions:
         type: array
         x-nullable: false
     type: object
-  PublicKeyCredentialHints:
-    type: string
-  PublicKeyCredentialRequestOptions:
+  PublicKeyCredentialCreationOptions:
     description: |-
-      WebAuthn Level 3: hints.
+      In order to create a Credential via create(), the caller specifies a few parameters in a
+      PublicKeyCredentialCreationOptions object.
 
-      Specification: §5.5. Options for Assertion Generation (https://www.w3.org/TR/webauthn/#dictionary-assertion-options)
+      WebAuthn Level 3: hints,attestationFormats.
+
+      Specification: §5.4. Options for Credential Creation (https://www.w3.org/TR/webauthn/#dictionary-makecredentialoptions)
     properties:
-      allowCredentials:
+      attestation:
+        $ref: '#/definitions/ConveyancePreference'
+      attestationFormats:
+        items:
+          $ref: '#/definitions/AttestationFormat'
+        type: array
+        x-nullable: false
+      authenticatorSelection:
+        $ref: '#/definitions/AuthenticatorSelection'
+      challenge:
+        $ref: '#/definitions/URLEncodedBase64'
+      excludeCredentials:
         items:
           $ref: '#/definitions/CredentialDescriptor'
         type: array
         x-nullable: false
-      challenge:
-        $ref: '#/definitions/URLEncodedBase64'
       extensions:
         $ref: '#/definitions/AuthenticationExtensions'
       hints:
@@ -1596,18 +1976,47 @@ definitions:
           $ref: '#/definitions/PublicKeyCredentialHints'
         type: array
         x-nullable: false
-      rpId:
-        type: string
+      pubKeyCredParams:
+        items:
+          $ref: '#/definitions/CredentialParameter'
+        type: array
         x-nullable: false
+      rp:
+        $ref: '#/definitions/RelyingPartyEntity'
       timeout:
         format: int64
         type: integer
         x-nullable: false
-      userVerification:
-        $ref: '#/definitions/UserVerificationRequirement'
+      user:
+        $ref: '#/definitions/UserEntity'
+    title: PublicKeyCredentialCreationOptions represents the IDL of the same name.
+    type: object
+  PublicKeyCredentialHints:
+    type: string
+  RelyingPartyEntity:
+    description: 'Specification: §5.4.2. Relying Party Parameters for Credential Generation
+      (https://www.w3.org/TR/webauthn/#dictionary-rp-credential-params)'
+    properties:
+      id:
+        description: A unique identifier for the Relying Party entity, which sets
+          the RP ID.
+        type: string
+        x-nullable: false
+      name:
+        description: |-
+          A human-palatable name for the entity. Its function depends on what the PublicKeyCredentialEntity represents:
+
+          When inherited by PublicKeyCredentialRpEntity it is a human-palatable identifier for the Relying Party,
+          intended only for display. For example, "ACME Corporation", "Wonderful Widgets, Inc." or "ОАО Примертех".
+
+          When inherited by PublicKeyCredentialUserEntity, it is a human-palatable identifier for a user account. It is
+          intended only for display, i.e., aiding the user in determining the difference between user accounts with similar
+          displayNames. For example, "alexm", "alex.p.mueller@example.com" or "+14255551234".
+        type: string
+        x-nullable: false
     title: |-
-      The PublicKeyCredentialRequestOptions dictionary supplies get() with the data it needs to generate an assertion.
-      Its challenge member MUST be present, while its other members are OPTIONAL.
+      The RelyingPartyEntity represents the PublicKeyCredentialRpEntity IDL and is used to supply additional Relying Party
+      attributes when creating a new credential.
     type: object
   RequestActivation:
     properties:
@@ -1655,6 +2064,7 @@ definitions:
         - challenge
         - verify_address
         - authentication
+        - pair_device
         type: string
         x-nullable: false
     required:
@@ -1683,6 +2093,7 @@ definitions:
         - challenge
         - verify_address
         - authentication
+        - pair_device
         type: string
         x-nullable: false
       userID:
@@ -1730,6 +2141,22 @@ definitions:
         type: string
         x-nullable: false
     type: object
+  ResidentKeyRequirement:
+    description: |-
+      This enumeration’s values describe the Relying Party's requirements for client-side discoverable credentials
+      (formerly known as resident credentials or resident keys).
+
+      Specifies the extent to which the Relying Party desires to create a client-side discoverable credential. For
+      historical reasons the naming retains the deprecated “resident” terminology. The value SHOULD be a member of
+      ResidentKeyRequirement but client platforms MUST ignore unknown values, treating an unknown value as if the member
+      does not exist. If no value is given then the effective value is required if requireResidentKey is true or
+      discouraged if it is false or absent.
+
+      Specification: §5.4.4. Authenticator Selection Criteria (https://www.w3.org/TR/webauthn/#dom-authenticatorselectioncriteria-residentkey)
+
+      Specification: §5.4.6. Resident Key Requirement Enumeration (https://www.w3.org/TR/webauthn/#enumdef-residentkeyrequirement)
+    title: ResidentKeyRequirement represents the IDL of the same name.
+    type: string
   ResourceType:
     properties:
       description:
@@ -1819,6 +2246,16 @@ definitions:
     items:
       $ref: '#/definitions/Rfc6902PatchOperation'
     type: array
+  SCIMSettings:
+    properties:
+      inboundInputMapping:
+        items:
+          $ref: '#/definitions/FieldMapping'
+        type: array
+        x-nullable: false
+    type: object
+  SCIMv2AttributeType:
+    type: string
   SCIMv2Email:
     properties:
       primary:
@@ -1828,11 +2265,7 @@ definitions:
         type: string
         x-nullable: false
       value:
-        example: test@test.com
         type: string
-        x-nullable: false
-      verified:
-        type: boolean
         x-nullable: false
     type: object
   SCIMv2ErrorResponse:
@@ -1850,6 +2283,30 @@ definitions:
         x-nullable: false
       status:
         type: string
+        x-nullable: false
+    type: object
+  SCIMv2ExtensionEmail:
+    properties:
+      primary:
+        type: boolean
+        x-nullable: false
+      value:
+        type: string
+        x-nullable: false
+      verified:
+        type: boolean
+        x-nullable: false
+    type: object
+  SCIMv2ExtensionPhoneNumber:
+    properties:
+      primary:
+        type: boolean
+        x-nullable: false
+      value:
+        type: string
+        x-nullable: false
+      verified:
+        type: boolean
         x-nullable: false
     type: object
   SCIMv2Identifier:
@@ -1881,17 +2338,6 @@ definitions:
         type: string
         x-nullable: false
     type: object
-  SCIMv2Name:
-    properties:
-      familyName:
-        example: Doe
-        type: string
-        x-nullable: false
-      givenName:
-        example: John
-        type: string
-        x-nullable: false
-    type: object
   SCIMv2Patch:
     properties:
       Operations:
@@ -1912,11 +2358,7 @@ definitions:
         type: string
         x-nullable: false
       value:
-        example: tel:+1-201-555-0123
         type: string
-        x-nullable: false
-      verified:
-        type: boolean
         x-nullable: false
     type: object
   SCIMv2Schema:
@@ -1966,6 +2408,17 @@ definitions:
       totalResults:
         format: int64
         type: integer
+        x-nullable: false
+    type: object
+  SCIMv2UserGroup:
+    properties:
+      $ref:
+        type: string
+        x-nullable: false
+      type:
+        $ref: '#/definitions/GroupMembershipType'
+      value:
+        type: string
         x-nullable: false
     type: object
   SHAConfig:
@@ -2059,6 +2512,12 @@ definitions:
         items:
           $ref: '#/definitions/Credential'
         type: array
+        x-nullable: false
+      webauthn_type:
+        enum:
+        - regular
+        - discoverable
+        type: string
         x-nullable: false
     required:
     - identifier
@@ -2465,6 +2924,11 @@ definitions:
         type: string
         x-nullable: false
       user_type:
+        enum:
+        - jit
+        - standard
+        - scim
+        type: string
         x-nullable: false
     required:
     - tenant_id
@@ -2475,6 +2939,9 @@ definitions:
     properties:
       created_at:
         format: date-time
+        type: string
+        x-nullable: false
+      discoverable_id:
         type: string
         x-nullable: false
       expires_at:
@@ -2507,6 +2974,7 @@ definitions:
         - password
         - webauthn
         - totp
+        - device
         example: password
         type: string
         x-nullable: false
@@ -2532,16 +3000,45 @@ definitions:
     - created_at
     - updated_at
     type: object
+  UserEntity:
+    description: 'Specification: §5.4.3 User Account Parameters for Credential Generation
+      (https://www.w3.org/TR/webauthn/#dictdef-publickeycredentialuserentity)'
+    properties:
+      displayName:
+        description: |-
+          A human-palatable name for the user account, intended only for display.
+          For example, "Alex P. Müller" or "田中 倫". The Relying Party SHOULD let
+          the user choose this, and SHOULD NOT restrict the choice more than necessary.
+        type: string
+        x-nullable: false
+      id:
+        description: |-
+          ID is the user handle of the user account entity. To ensure secure operation,
+          authentication and authorization decisions MUST be made on the basis of this id
+          member, not the displayName nor name members. See Section 6.1 of
+          [RFC8266](https://www.w3.org/TR/webauthn/#biblio-rfc8266).
+        type: object
+        x-nullable: false
+      name:
+        description: |-
+          A human-palatable name for the entity. Its function depends on what the PublicKeyCredentialEntity represents:
+
+          When inherited by PublicKeyCredentialRpEntity it is a human-palatable identifier for the Relying Party,
+          intended only for display. For example, "ACME Corporation", "Wonderful Widgets, Inc." or "ОАО Примертех".
+
+          When inherited by PublicKeyCredentialUserEntity, it is a human-palatable identifier for a user account. It is
+          intended only for display, i.e., aiding the user in determining the difference between user accounts with similar
+          displayNames. For example, "alexm", "alex.p.mueller@example.com" or "+14255551234".
+        type: string
+        x-nullable: false
+    title: |-
+      The UserEntity represents the PublicKeyCredentialUserEntity IDL and is used to supply additional user account
+      attributes when creating a new credential.
+    type: object
   UserGetResponse:
-    description: UserGetResponse
     properties:
       active:
         type: boolean
-        x-nullable: false
-      additionalIdentifiers:
-        items:
-          $ref: '#/definitions/SCIMv2Identifier'
-        type: array
         x-nullable: false
       emails:
         items:
@@ -2552,13 +3049,16 @@ definitions:
         example: someExternalID
         type: string
         x-nullable: false
+      groups:
+        items:
+          $ref: '#/definitions/SCIMv2UserGroup'
+        type: array
+        x-nullable: false
       id:
         type: string
         x-nullable: false
       meta:
         $ref: '#/definitions/SCIMv2Meta'
-      name:
-        $ref: '#/definitions/SCIMv2Name'
       password:
         example: wIf@O&YWzdfFKSW
         type: string
@@ -2571,11 +3071,13 @@ definitions:
       schemas:
         example:
         - urn:ietf:params:scim:schemas:core:2.0:User
-        - urn:secureauthciam:params:scim:schemas:extension:custom:2.0:User
+        - urn:ietf:params:scim:schemas:extension:secureauthciam:2.0:User
         items:
           type: string
         type: array
         x-nullable: false
+      urn:ietf:params:scim:schemas:extension:secureauthciam:2.0:User:
+        $ref: '#/definitions/ExtensionSchemaData'
       userName:
         example: test@test.com
         type: string
@@ -2664,19 +3166,22 @@ definitions:
     type: object
   UserPreferences:
     properties:
+      locales:
+        description: Locale is the list of user's preferred languages/locales for
+          UI and communications
+        example: en-US, es-ES
+        items:
+          format: locale
+          type: string
+        type: array
+        x-nullable: false
       mfa:
         $ref: '#/definitions/MFAPreferences'
     type: object
   UserUpsertRequest:
-    description: UserUpsertRequest
     properties:
       active:
         type: boolean
-        x-nullable: false
-      additionalIdentifiers:
-        items:
-          $ref: '#/definitions/SCIMv2Identifier'
-        type: array
         x-nullable: false
       emails:
         items:
@@ -2687,8 +3192,6 @@ definitions:
         example: someExternalID
         type: string
         x-nullable: false
-      name:
-        $ref: '#/definitions/SCIMv2Name'
       password:
         example: wIf@O&YWzdfFKSW
         type: string
@@ -2701,11 +3204,13 @@ definitions:
       schemas:
         example:
         - urn:ietf:params:scim:schemas:core:2.0:User
-        - urn:secureauthciam:params:scim:schemas:extension:custom:2.0:User
+        - urn:ietf:params:scim:schemas:extension:secureauthciam:2.0:User
         items:
           type: string
         type: array
         x-nullable: false
+      urn:ietf:params:scim:schemas:extension:secureauthciam:2.0:User:
+        $ref: '#/definitions/ExtensionSchemaData'
       userName:
         example: test@test.com
         type: string
@@ -2881,6 +3386,13 @@ definitions:
         format: poolID
         type: string
         x-nullable: false
+      user_type:
+        enum:
+        - jit
+        - standard
+        - scim
+        type: string
+        x-nullable: false
       verifiable_addresses:
         items:
           $ref: '#/definitions/UserVerifiableAddress'
@@ -2897,6 +3409,14 @@ definitions:
       users:
         items:
           $ref: '#/definitions/ExtendedUser'
+        type: array
+        x-nullable: false
+    type: object
+  VerifiableAddressesToSet:
+    properties:
+      addresses:
+        items:
+          $ref: '#/definitions/NewUserVerifiableAddress'
         type: array
         x-nullable: false
     type: object
@@ -2980,18 +3500,21 @@ definitions:
     - state
     - result
     type: object
-  WebAuthnCredentials:
+  WebAuthnSettings:
     properties:
-      credentials:
+      rp_id:
+        type: string
+        x-nullable: false
+      rp_origins:
         items:
-          $ref: '#/definitions/Credential'
+          type: string
         type: array
         x-nullable: false
     type: object
 host: localhost:8443
 info:
   description: |-
-    Cloudentity Identity System API
+    SecureAuth Identity System API
 
     It is important for clients to note that system APIs return the `ETag` response header. When executing API flows which modify and retrieve a given resource, clients are expected to follow `ETag` protocols by:
     1. Caching the value of an `ETag` returned by the server when retrieving the resource, and
@@ -3011,7 +3534,7 @@ info:
     3. Retry failed requests with the same key within 1 minute.
 
     Responses for replayed requests will include the X-Idempotent-Replayed: true header.
-  title: Cloudentity API
+  title: SecureAuth API
   version: latest
 paths:
   /configuration:
@@ -3455,7 +3978,7 @@ paths:
       - in: body
         name: NewGroup
         schema:
-          $ref: '#/definitions/Group'
+          $ref: '#/definitions/BaseGroup'
       responses:
         "201":
           $ref: '#/responses/GroupResponse'
@@ -3552,7 +4075,7 @@ paths:
       - in: body
         name: UpdateGroup
         schema:
-          $ref: '#/definitions/Group'
+          $ref: '#/definitions/BaseGroup'
       responses:
         "200":
           $ref: '#/responses/GroupResponse'
@@ -3719,6 +4242,351 @@ paths:
       summary: Add user to a specific group
       tags:
       - Groups
+  /system/pools/{ipID}/scim/v2/Groups:
+    get:
+      description: |-
+        Returns a list of groups in SCIM format from the specified identity pool.
+
+        The only supported filter is `<fieldName> eq <value>` which returns a single group or empty set.
+        Allowed field names (case-insensitive) are `id`, `name` and `externalId`.
+        Please note that filtering by `name` is case-insensitive and may return multiple groups - totalResults may be invalid
+        in such case as it returns number of entries returned - not overall count.
+
+        Results are sorted ascending by group ID. No other sorting is supported, and the `sortBy` and `sortOrder` parameter is ignored.
+      operationId: systemSCIMv2ListGroups
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
+      - in: path
+        name: ipID
+        required: true
+        type: string
+      - description: SCIM filter expression
+        in: query
+        name: filter
+        type: string
+      - description: Comma-separated list of attributes to include
+        in: query
+        name: attributes
+        type: string
+      - description: Comma-separated list of attributes to exclude
+        in: query
+        name: excludedAttributes
+        type: string
+      - description: Attribute to sort by
+        in: query
+        name: sortBy
+        type: string
+      - description: Sort order (ascending or descending)
+        in: query
+        name: sortOrder
+        type: string
+      - description: Start index for pagination (1-based)
+        format: int64
+        in: query
+        name: startIndex
+        type: integer
+      - default: 10
+        description: Number of results to return
+        format: int64
+        in: query
+        name: count
+        type: integer
+      responses:
+        "200":
+          $ref: '#/responses/SCIMv2GroupsResponse'
+        "400":
+          $ref: '#/responses/badRequestSCIMv2HTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedSCIMv2HTTPError'
+        "403":
+          $ref: '#/responses/forbiddenSCIMv2HTTPError'
+        "404":
+          $ref: '#/responses/notFoundSCIMv2HTTPError'
+        "412":
+          $ref: '#/responses/payloadTooLargeSCIMv2HTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsSCIMv2HTTPError'
+      security:
+      - system:
+        - scim_v2
+      summary: List SCIM Groups
+      tags:
+      - SCIMv2Groups
+    post:
+      description: Creates a new group in SCIM format in the specified identity pool.
+      operationId: systemSCIMv2CreateGroup
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
+      - in: path
+        name: ipID
+        required: true
+        type: string
+      - in: body
+        name: NewGroup
+        schema:
+          $ref: '#/definitions/GroupUpsertRequest'
+      responses:
+        "201":
+          $ref: '#/responses/SystemSCIMv2GroupResponse'
+        "400":
+          $ref: '#/responses/badRequestSCIMv2HTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedSCIMv2HTTPError'
+        "403":
+          $ref: '#/responses/forbiddenSCIMv2HTTPError'
+        "404":
+          $ref: '#/responses/notFoundSCIMv2HTTPError'
+        "409":
+          $ref: '#/responses/conflictSCIMv2HTTPError'
+        "412":
+          $ref: '#/responses/payloadTooLargeSCIMv2HTTPError'
+        "422":
+          $ref: '#/responses/unprocessableEntitySCIMv2HTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsSCIMv2HTTPError'
+      security:
+      - system:
+        - scim_v2
+      summary: Create SCIM Group
+      tags:
+      - SCIMv2Groups
+  /system/pools/{ipID}/scim/v2/Groups/{groupID}:
+    delete:
+      description: Deletes a group using SCIM DELETE operations in the specified identity
+        pool.
+      operationId: systemSCIMv2DeleteGroup
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
+      - in: path
+        name: ipID
+        required: true
+        type: string
+      - in: path
+        name: groupID
+        required: true
+        type: string
+      responses:
+        "204":
+          $ref: '#/responses/SystemDeleteGroupResponse'
+        "401":
+          $ref: '#/responses/unauthorizedSCIMv2HTTPError'
+        "403":
+          $ref: '#/responses/forbiddenSCIMv2HTTPError'
+        "404":
+          $ref: '#/responses/notFoundSCIMv2HTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsSCIMv2HTTPError'
+      security:
+      - system:
+        - scim_v2
+      summary: Delete SCIM Group
+      tags:
+      - SCIMv2Groups
+    get:
+      description: Returns a specific group in SCIM format from the specified identity
+        pool.
+      operationId: systemSCIMv2GetGroup
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
+      - in: path
+        name: ipID
+        required: true
+        type: string
+      - in: path
+        name: groupID
+        required: true
+        type: string
+      - description: Comma-separated list of attributes to include
+        in: query
+        name: attributes
+        type: string
+      - description: Comma-separated list of attributes to exclude
+        in: query
+        name: excludedAttributes
+        type: string
+      produces:
+      - application/scim+json
+      responses:
+        "200":
+          $ref: '#/responses/SystemSCIMv2GroupResponse'
+        "401":
+          $ref: '#/responses/unauthorizedSCIMv2HTTPError'
+        "403":
+          $ref: '#/responses/forbiddenSCIMv2HTTPError'
+        "404":
+          $ref: '#/responses/notFoundSCIMv2HTTPError'
+        "412":
+          $ref: '#/responses/payloadTooLargeSCIMv2HTTPError'
+        "422":
+          $ref: '#/responses/unprocessableEntitySCIMv2HTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsSCIMv2HTTPError'
+      security:
+      - system:
+        - scim_v2
+      summary: Get SCIM Group
+      tags:
+      - SCIMv2Groups
+    patch:
+      description: Updates a group using SCIM PATCH operations in the specified identity
+        pool.
+      operationId: systemSCIMv2PatchGroup
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
+      - in: path
+        name: ipID
+        required: true
+        type: string
+      - in: path
+        name: groupID
+        required: true
+        type: string
+      - in: body
+        name: patch
+        schema:
+          $ref: '#/definitions/SCIMv2Patch'
+      responses:
+        "204":
+          description: ' OK'
+        "400":
+          $ref: '#/responses/badRequestSCIMv2HTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedSCIMv2HTTPError'
+        "403":
+          $ref: '#/responses/forbiddenSCIMv2HTTPError'
+        "404":
+          $ref: '#/responses/notFoundSCIMv2HTTPError'
+        "409":
+          $ref: '#/responses/conflictSCIMv2HTTPError'
+        "412":
+          $ref: '#/responses/payloadTooLargeSCIMv2HTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsSCIMv2HTTPError'
+      security:
+      - system:
+        - scim_v2
+      summary: Patch SCIM Group
+      tags:
+      - SCIMv2Groups
+    put:
+      description: Updates a group using SCIM format in the specified identity pool
+        (full replacement).
+      operationId: systemSCIMv2UpdateGroup
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
+      - in: path
+        name: ipID
+        required: true
+        type: string
+      - in: path
+        name: groupID
+        required: true
+        type: string
+      - in: body
+        name: Group
+        schema:
+          $ref: '#/definitions/GroupUpsertRequest'
+      responses:
+        "200":
+          $ref: '#/responses/SystemSCIMv2GroupResponse'
+        "400":
+          $ref: '#/responses/badRequestSCIMv2HTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedSCIMv2HTTPError'
+        "403":
+          $ref: '#/responses/forbiddenSCIMv2HTTPError'
+        "404":
+          $ref: '#/responses/notFoundSCIMv2HTTPError'
+        "409":
+          $ref: '#/responses/conflictSCIMv2HTTPError'
+        "412":
+          $ref: '#/responses/payloadTooLargeSCIMv2HTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsSCIMv2HTTPError'
+      security:
+      - system:
+        - scim_v2
+      summary: Update SCIM Group
+      tags:
+      - SCIMv2Groups
   /system/pools/{ipID}/scim/v2/ResourceTypes:
     get:
       description: Returns the supported SCIM Resource Types for the specified identity
@@ -3753,12 +4621,12 @@ paths:
         "404":
           $ref: '#/responses/notFoundHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "429":
           $ref: '#/responses/tooManyRequestsHTTPError'
       security:
       - system:
-        - identity
+        - scim_v2
       summary: List SCIM Resource Types
       tags:
       - SCIMv2Configuration
@@ -3800,12 +4668,12 @@ paths:
         "404":
           $ref: '#/responses/notFoundHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "429":
           $ref: '#/responses/tooManyRequestsHTTPError'
       security:
       - system:
-        - identity
+        - scim_v2
       summary: Get SCIM Resource Type
       tags:
       - SCIMv2Configuration
@@ -3842,12 +4710,12 @@ paths:
         "404":
           $ref: '#/responses/notFoundHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "429":
           $ref: '#/responses/tooManyRequestsHTTPError'
       security:
       - system:
-        - identity
+        - scim_v2
       summary: List SCIM Schemas
       tags:
       - SCIMv2Configuration
@@ -3888,12 +4756,12 @@ paths:
         "404":
           $ref: '#/responses/notFoundHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "429":
           $ref: '#/responses/tooManyRequestsHTTPError'
       security:
       - system:
-        - identity
+        - scim_v2
       summary: Get SCIM Schemas
       tags:
       - SCIMv2Configuration
@@ -3931,12 +4799,12 @@ paths:
         "404":
           $ref: '#/responses/notFoundHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "429":
           $ref: '#/responses/tooManyRequestsHTTPError'
       security:
       - system:
-        - identity
+        - scim_v2
       summary: Get SCIM Service Provider Configuration
       tags:
       - SCIMv2Configuration
@@ -3950,6 +4818,8 @@ paths:
         For emails and phone number subfilter [.*] is allowed but ignored.
 
         Only verified emails and phone numbers are searchable.
+
+        Results are sorted ascending by user ID. No other sorting is supported, and the `sortBy` and `sortOrder` parameter is ignored.
       operationId: systemSCIMv2ListUsers
       parameters:
       - description: A server will only return requested resources if the resource
@@ -4004,19 +4874,21 @@ paths:
       responses:
         "200":
           $ref: '#/responses/SCIMv2UsersResponse'
+        "400":
+          $ref: '#/responses/badRequestSCIMv2HTTPError'
         "401":
-          $ref: '#/responses/unauthorizedHTTPError'
+          $ref: '#/responses/unauthorizedSCIMv2HTTPError'
         "403":
-          $ref: '#/responses/forbiddenHTTPError'
+          $ref: '#/responses/forbiddenSCIMv2HTTPError'
         "404":
-          $ref: '#/responses/notFoundHTTPError'
+          $ref: '#/responses/notFoundSCIMv2HTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/payloadTooLargeSCIMv2HTTPError'
         "429":
-          $ref: '#/responses/tooManyRequestsHTTPError'
+          $ref: '#/responses/tooManyRequestsSCIMv2HTTPError'
       security:
       - system:
-        - identity
+        - scim_v2
       summary: List SCIM Users
       tags:
       - SCIMv2Users
@@ -4065,7 +4937,7 @@ paths:
           $ref: '#/responses/tooManyRequestsSCIMv2HTTPError'
       security:
       - system:
-        - identity
+        - scim_v2
       summary: Create SCIM User
       tags:
       - SCIMv2Users
@@ -4110,7 +4982,7 @@ paths:
           $ref: '#/responses/tooManyRequestsSCIMv2HTTPError'
       security:
       - system:
-        - identity
+        - scim_v2
       summary: Delete SCIM User
       tags:
       - SCIMv2Users
@@ -4168,15 +5040,13 @@ paths:
           $ref: '#/responses/tooManyRequestsSCIMv2HTTPError'
       security:
       - system:
-        - identity
+        - scim_v2
       summary: Get SCIM User
       tags:
       - SCIMv2Users
     patch:
-      description: |-
-        Updates a user using SCIM PATCH operations in the specified identity pool.
-
-        NOTE: this is very basic PATCH implementation that does not allow filtering in path and strictly follows RFC 6902 with some workarounds.
+      description: Updates a user using SCIM PATCH operations in the specified identity
+        pool.
       operationId: systemSCIMv2PatchUser
       parameters:
       - description: A server will only return requested resources if the resource
@@ -4201,27 +5071,30 @@ paths:
         name: userID
         required: true
         type: string
-      - description: Patch spec in RFC 6902 format
-        in: body
+      - in: body
         name: patch
         schema:
           $ref: '#/definitions/SCIMv2Patch'
       responses:
-        "200":
-          $ref: '#/responses/SystemSCIMv2UserResponse'
+        "204":
+          description: ' OK'
+        "400":
+          $ref: '#/responses/badRequestSCIMv2HTTPError'
         "401":
-          $ref: '#/responses/unauthorizedHTTPError'
+          $ref: '#/responses/unauthorizedSCIMv2HTTPError'
         "403":
-          $ref: '#/responses/forbiddenHTTPError'
+          $ref: '#/responses/forbiddenSCIMv2HTTPError'
         "404":
-          $ref: '#/responses/notFoundHTTPError'
+          $ref: '#/responses/notFoundSCIMv2HTTPError'
+        "409":
+          $ref: '#/responses/conflictSCIMv2HTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/payloadTooLargeSCIMv2HTTPError'
         "429":
-          $ref: '#/responses/tooManyRequestsHTTPError'
+          $ref: '#/responses/tooManyRequestsSCIMv2HTTPError'
       security:
       - system:
-        - identity
+        - scim_v2
       summary: Patch SCIM User
       tags:
       - SCIMv2Users
@@ -4275,7 +5148,7 @@ paths:
           $ref: '#/responses/tooManyRequestsSCIMv2HTTPError'
       security:
       - system:
-        - identity
+        - scim_v2
       summary: Update SCIM User
       tags:
       - SCIMv2Users
@@ -4326,7 +5199,7 @@ paths:
         "404":
           $ref: '#/responses/notFoundHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
         "429":
@@ -4375,7 +5248,7 @@ paths:
         "401":
           $ref: '#/responses/unauthorizedHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
       security:
@@ -4435,7 +5308,7 @@ paths:
         "404":
           $ref: '#/responses/notFoundHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
         "429":
@@ -4482,7 +5355,7 @@ paths:
         "401":
           $ref: '#/responses/unauthorizedHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
       security:
@@ -4539,7 +5412,7 @@ paths:
         "401":
           $ref: '#/responses/unauthorizedHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
         "429":
@@ -4591,7 +5464,7 @@ paths:
         "401":
           $ref: '#/responses/unauthorizedHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
       security:
@@ -4639,7 +5512,7 @@ paths:
         "401":
           $ref: '#/responses/unauthorizedHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
       security:
@@ -4688,7 +5561,7 @@ paths:
         "401":
           $ref: '#/responses/unauthorizedHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
       security:
@@ -4757,9 +5630,11 @@ paths:
         "401":
           $ref: '#/responses/unauthorizedHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
       security:
       - system:
         - identity
@@ -4806,7 +5681,7 @@ paths:
         "401":
           $ref: '#/responses/unauthorizedHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
       security:
@@ -4855,7 +5730,7 @@ paths:
         "401":
           $ref: '#/responses/unauthorizedHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
       security:
@@ -4935,7 +5810,7 @@ paths:
         "404":
           $ref: '#/responses/notFoundHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
         "429":
@@ -4985,7 +5860,7 @@ paths:
         "401":
           $ref: '#/responses/unauthorizedHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
       security:
@@ -5052,9 +5927,11 @@ paths:
         "401":
           $ref: '#/responses/unauthorizedHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
       security:
       - system:
         - identity
@@ -5086,7 +5963,7 @@ paths:
         "401":
           $ref: '#/responses/unauthorizedHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
       security:
@@ -5139,9 +6016,11 @@ paths:
         "401":
           $ref: '#/responses/unauthorizedHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
       security:
       - system:
         - identity
@@ -5282,7 +6161,7 @@ paths:
         "409":
           $ref: '#/responses/conflictHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
         "429":
@@ -5331,7 +6210,7 @@ paths:
         "404":
           $ref: '#/responses/notFoundHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "429":
           $ref: '#/responses/tooManyRequestsHTTPError'
       security:
@@ -5380,7 +6259,7 @@ paths:
         "404":
           $ref: '#/responses/notFoundHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "429":
           $ref: '#/responses/tooManyRequestsHTTPError'
       security:
@@ -5446,10 +6325,8 @@ paths:
           $ref: '#/responses/forbiddenHTTPError'
         "404":
           $ref: '#/responses/notFoundHTTPError'
-        "409":
-          $ref: '#/responses/conflictHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
         "429":
@@ -5515,7 +6392,7 @@ paths:
         "409":
           $ref: '#/responses/conflictHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
         "429":
@@ -5577,7 +6454,7 @@ paths:
         "404":
           $ref: '#/responses/notFoundHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
         "429":
@@ -5636,7 +6513,7 @@ paths:
         "404":
           $ref: '#/responses/notFoundHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
         "429":
@@ -5739,7 +6616,7 @@ paths:
         "404":
           $ref: '#/responses/notFoundHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
         "429":
@@ -5798,7 +6675,7 @@ paths:
         "409":
           $ref: '#/responses/conflictHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
       security:
@@ -5865,7 +6742,7 @@ paths:
         "409":
           $ref: '#/responses/conflictHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
         "429":
@@ -5919,7 +6796,7 @@ paths:
         "409":
           $ref: '#/responses/conflictHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
       security:
@@ -5970,13 +6847,65 @@ paths:
         "404":
           $ref: '#/responses/notFoundHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "429":
           $ref: '#/responses/tooManyRequestsHTTPError'
       security:
       - system:
         - identity
       summary: Delete Verifiable Address
+      tags:
+      - Users
+  /system/pools/{ipID}/users/{userID}/addresses/set:
+    post:
+      description: Overrides all verifiable addresses for the user account.
+      operationId: systemSetVerifiableAddresses
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
+      - in: path
+        name: ipID
+        required: true
+        type: string
+      - in: path
+        name: userID
+        required: true
+        type: string
+      - in: body
+        name: Addresses
+        schema:
+          $ref: '#/definitions/VerifiableAddressesToSet'
+      responses:
+        "200":
+          $ref: '#/responses/SystemUserResponse'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "409":
+          $ref: '#/responses/conflictHTTPError'
+        "412":
+          $ref: '#/responses/preconditionFailedHTTPError'
+        "422":
+          $ref: '#/responses/unprocessableEntityHTTPError'
+      security:
+      - system:
+        - identity
+      summary: Set Verifiable Addresses
       tags:
       - Users
   /system/pools/{ipID}/users/{userID}/addresses/update:
@@ -6022,7 +6951,7 @@ paths:
         "409":
           $ref: '#/responses/conflictHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
       security:
@@ -6077,7 +7006,7 @@ paths:
         "404":
           $ref: '#/responses/notFoundHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
         "429":
@@ -6135,7 +7064,7 @@ paths:
         "404":
           $ref: '#/responses/notFoundHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
         "429":
@@ -6199,7 +7128,7 @@ paths:
         "404":
           $ref: '#/responses/notFoundHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
         "429":
@@ -6208,6 +7137,58 @@ paths:
       - system:
         - identity_self_registration
       summary: Generate code of a specific type
+      tags:
+      - Users
+  /system/pools/{ipID}/users/{userID}/devices/set:
+    post:
+      description: Overrides all devices for the user account.
+      operationId: systemSetDevices
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
+      - in: path
+        name: ipID
+        required: true
+        type: string
+      - in: path
+        name: userID
+        required: true
+        type: string
+      - in: body
+        name: Devices
+        schema:
+          $ref: '#/definitions/DevicesToSet'
+      responses:
+        "200":
+          $ref: '#/responses/SystemUserResponse'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "409":
+          $ref: '#/responses/conflictHTTPError'
+        "412":
+          $ref: '#/responses/preconditionFailedHTTPError'
+        "422":
+          $ref: '#/responses/unprocessableEntityHTTPError'
+      security:
+      - system:
+        - identity
+      summary: Set Devices
       tags:
       - Users
   /system/pools/{ipID}/users/{userID}/groups:
@@ -6326,7 +7307,7 @@ paths:
       description: |-
         Add an identifier to the user account in the specified identity pool.
 
-        The identifier must be unique within the user's account.
+        The identifier must be unique across the identity pool.
       operationId: systemAddIdentifier
       parameters:
       - description: A server will only return requested resources if the resource
@@ -6367,7 +7348,7 @@ paths:
         "409":
           $ref: '#/responses/conflictHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
       security:
@@ -6417,13 +7398,68 @@ paths:
         "404":
           $ref: '#/responses/notFoundHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "429":
           $ref: '#/responses/tooManyRequestsHTTPError'
       security:
       - system:
         - identity
       summary: Remove Identifier
+      tags:
+      - Users
+  /system/pools/{ipID}/users/{userID}/identifiers/set:
+    post:
+      description: |-
+        Overrides all identifiers for the user account.
+
+        The identifier must be unique across the identity pool.
+      operationId: systemSetIdentifiers
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
+      - in: path
+        name: ipID
+        required: true
+        type: string
+      - in: path
+        name: userID
+        required: true
+        type: string
+      - in: body
+        name: Identifiers
+        schema:
+          $ref: '#/definitions/IdentifiersToSet'
+      responses:
+        "200":
+          $ref: '#/responses/SystemUserResponse'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "409":
+          $ref: '#/responses/conflictHTTPError'
+        "412":
+          $ref: '#/responses/preconditionFailedHTTPError'
+        "422":
+          $ref: '#/responses/unprocessableEntityHTTPError'
+      security:
+      - system:
+        - identity
+      summary: Set Identifiers
       tags:
       - Users
   /system/pools/{ipID}/users/{userID}/password/state:
@@ -6496,7 +7532,7 @@ paths:
         "404":
           $ref: '#/responses/notFoundHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
         "429":
@@ -6505,6 +7541,82 @@ paths:
       - system:
         - identity
       summary: Change Totp Secret
+      tags:
+      - Users
+  /system/pools/{ipID}/users/{userID}/usernameless-webauthn/create/begin:
+    post:
+      description: 'Begin usernameless WebAuthn credentials generation'
+      operationId: beginUsernamelessWebAuthnCredentialsGeneration
+      parameters:
+      - in: path
+        name: ipID
+        required: true
+        type: string
+      - in: path
+        name: userID
+        required: true
+        type: string
+      responses:
+        "200":
+          $ref: '#/responses/WebAuthnCredentialBeginResponse'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "412":
+          $ref: '#/responses/preconditionFailedHTTPError'
+        "422":
+          $ref: '#/responses/unprocessableEntityHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - system:
+        - identity
+      summary: Begin usernameless WebAuthn credentials generation
+      tags:
+      - Users
+  /system/pools/{ipID}/users/{userID}/usernameless-webauthn/create/complete:
+    post:
+      description: 'Finish usernameless WebAuthn credentials generation'
+      operationId: completeUsernamelessWebAuthnCredentialsGeneration
+      parameters:
+      - in: body
+        name: CompleteUsernamelessWebAuthnCreate
+        schema:
+          $ref: '#/definitions/CredentialCreationResponse'
+      - in: path
+        name: ipID
+        required: true
+        type: string
+      - in: path
+        name: userID
+        required: true
+        type: string
+      responses:
+        "200":
+          $ref: '#/responses/WebAuthnCredentialFinishResponse'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "412":
+          $ref: '#/responses/preconditionFailedHTTPError'
+        "422":
+          $ref: '#/responses/unprocessableEntityHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - system:
+        - identity
+      summary: Finish usernameless WebAuthn credentials generation
       tags:
       - Users
   /system/pools/{ipID}/users/{userID}/webauthn/{webAuthnCredentialID}:
@@ -6538,7 +7650,7 @@ paths:
         "404":
           $ref: '#/responses/notFoundHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
         "429":
@@ -6584,7 +7696,7 @@ paths:
         "404":
           $ref: '#/responses/notFoundHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
         "429":
@@ -6620,7 +7732,7 @@ paths:
         "404":
           $ref: '#/responses/notFoundHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
         "429":
@@ -6660,7 +7772,7 @@ paths:
         "404":
           $ref: '#/responses/notFoundHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
         "429":
@@ -6715,7 +7827,7 @@ paths:
         "404":
           $ref: '#/responses/notFoundHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "429":
           $ref: '#/responses/tooManyRequestsHTTPError'
       security:
@@ -7414,6 +8526,10 @@ responses:
         type: string
     schema:
       $ref: '#/definitions/ResourceTypes'
+  SCIMv2GroupsResponse:
+    description: SCIMv2 Groups
+    schema:
+      $ref: '#/definitions/ListGroupsResponse'
   SCIMv2SchemaResponse:
     description: SCIMv2 SCIMv2SchemaResponse
     headers:
@@ -7584,6 +8700,28 @@ responses:
         type: string
     schema:
       $ref: '#/definitions/UserVerifiableAddress'
+  SystemDeleteGroupResponse:
+    description: Group has been deleted
+    headers:
+      etag:
+        description: |-
+          The ETag HTTP header is an identifier for a specific version of a resource
+
+          in:header
+        format: etag
+        type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
   SystemDeleteUserResponse:
     description: User has been deleted
     headers:
@@ -7630,6 +8768,30 @@ responses:
         type: string
     schema:
       $ref: '#/definitions/UserIdentifier'
+  SystemSCIMv2GroupResponse:
+    description: SCIMv2 Group
+    headers:
+      etag:
+        description: |-
+          The ETag HTTP header is an identifier for a specific version of a resource
+
+          in:header
+        format: etag
+        type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
+    schema:
+      $ref: '#/definitions/GroupGetResponse'
   SystemSCIMv2UserResponse:
     description: SCIMv2 User
     headers:
@@ -7745,11 +8907,11 @@ responses:
   WebAuthnCredentialBeginResponse:
     description: User WebAuthn credential data
     schema:
-      $ref: '#/definitions/CredentialAssertion'
+      $ref: '#/definitions/CredentialCreation'
   WebAuthnCredentialFinishResponse:
     description: User WebAuthn credential data
     schema:
-      $ref: '#/definitions/WebAuthnCredentials'
+      $ref: '#/definitions/Credential'
   badRequestHTTPError:
     description: Bad request
     schema:
@@ -7836,6 +8998,7 @@ securityDefinitions:
       identity: identity
       identity_self_registration: identity_self_registration
       manage_configuration: manage_configuration
+      scim_v2: scim_v2
     tokenUrl: /default/system/oauth2/token
     type: oauth2
 swagger: "2.0"

@@ -54,12 +54,6 @@ func (o *RequestOTPChallengeReader) ReadResponse(response runtime.ClientResponse
 			return nil, err
 		}
 		return nil, result
-	case 429:
-		result := NewRequestOTPChallengeTooManyRequests()
-		if err := result.readResponse(response, consumer, o.formats); err != nil {
-			return nil, err
-		}
-		return nil, result
 	default:
 		return nil, runtime.NewAPIError("[POST /admin/pools/{ipID}/users/{userID}/otp/request] requestOTPChallenge", response, response.Code())
 	}
@@ -269,7 +263,7 @@ func NewRequestOTPChallengePreconditionFailed() *RequestOTPChallengePrecondition
 /*
 RequestOTPChallengePreconditionFailed describes a response with status code 412, with default header values.
 
-Payload too large
+Precondition failed
 */
 type RequestOTPChallengePreconditionFailed struct {
 	Payload *models.Error
@@ -390,76 +384,6 @@ func (o *RequestOTPChallengeUnprocessableEntity) GetPayload() *models.Error {
 }
 
 func (o *RequestOTPChallengeUnprocessableEntity) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
-	o.Payload = new(models.Error)
-
-	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
-		return err
-	}
-
-	return nil
-}
-
-// NewRequestOTPChallengeTooManyRequests creates a RequestOTPChallengeTooManyRequests with default headers values
-func NewRequestOTPChallengeTooManyRequests() *RequestOTPChallengeTooManyRequests {
-	return &RequestOTPChallengeTooManyRequests{}
-}
-
-/*
-RequestOTPChallengeTooManyRequests describes a response with status code 429, with default header values.
-
-Too many requests
-*/
-type RequestOTPChallengeTooManyRequests struct {
-	Payload *models.Error
-}
-
-// IsSuccess returns true when this request o t p challenge too many requests response has a 2xx status code
-func (o *RequestOTPChallengeTooManyRequests) IsSuccess() bool {
-	return false
-}
-
-// IsRedirect returns true when this request o t p challenge too many requests response has a 3xx status code
-func (o *RequestOTPChallengeTooManyRequests) IsRedirect() bool {
-	return false
-}
-
-// IsClientError returns true when this request o t p challenge too many requests response has a 4xx status code
-func (o *RequestOTPChallengeTooManyRequests) IsClientError() bool {
-	return true
-}
-
-// IsServerError returns true when this request o t p challenge too many requests response has a 5xx status code
-func (o *RequestOTPChallengeTooManyRequests) IsServerError() bool {
-	return false
-}
-
-// IsCode returns true when this request o t p challenge too many requests response a status code equal to that given
-func (o *RequestOTPChallengeTooManyRequests) IsCode(code int) bool {
-	return code == 429
-}
-
-// Code gets the status code for the request o t p challenge too many requests response
-func (o *RequestOTPChallengeTooManyRequests) Code() int {
-	return 429
-}
-
-func (o *RequestOTPChallengeTooManyRequests) Error() string {
-	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[POST /admin/pools/{ipID}/users/{userID}/otp/request][%d] requestOTPChallengeTooManyRequests %s", 429, payload)
-}
-
-func (o *RequestOTPChallengeTooManyRequests) String() string {
-	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[POST /admin/pools/{ipID}/users/{userID}/otp/request][%d] requestOTPChallengeTooManyRequests %s", 429, payload)
-}
-
-func (o *RequestOTPChallengeTooManyRequests) GetPayload() *models.Error {
-	return o.Payload
-}
-
-func (o *RequestOTPChallengeTooManyRequests) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.Error)
 

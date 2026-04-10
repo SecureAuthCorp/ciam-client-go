@@ -234,7 +234,7 @@ func NewRequestOTPChallengePreconditionFailed() *RequestOTPChallengePrecondition
 /*
 RequestOTPChallengePreconditionFailed describes a response with status code 412, with default header values.
 
-Payload too large
+Precondition failed
 */
 type RequestOTPChallengePreconditionFailed struct {
 	Payload *models.Error

@@ -16,6 +16,8 @@ definitions:
         type: array
         x-nullable: false
     type: object
+  AgentCapability:
+    type: string
   AuthenticationContext:
     additionalProperties:
       type: object
@@ -491,8 +493,24 @@ definitions:
     type: object
   FDXDynamicClientRegistrationRequest:
     properties:
+      agent_capability:
+        $ref: '#/definitions/AgentCapability'
       app_url:
         description: Application URL
+        type: string
+        x-nullable: false
+      application_purpose:
+        description: Application purpose
+        enum:
+        - single_page
+        - server_web
+        - mobile_desktop
+        - service
+        - legacy
+        - custom
+        - saml
+        - ai_agent
+        example: signle_page
         type: string
         x-nullable: false
       application_type:
@@ -796,7 +814,7 @@ definitions:
 
           If empty, the `token_endpoint_auth_method` is used.
 
-          Cloudentity supports the following client authentication methods:
+          SecureAuth supports the following client authentication methods:
           `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
           `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 
@@ -816,7 +834,7 @@ definitions:
         $ref: '#/definitions/ClientJWKs'
       jwks_uri:
         description: A URL of JSON Web Key Set with the public keys used by a client
-          application to authenticate to Cloudentity.
+          application to authenticate to SecureAuth.
         type: string
         x-nullable: false
       logo_uri:
@@ -890,7 +908,7 @@ definitions:
         description: |-
           Request object signing algorithm for the token endpoint
 
-          Cloudentity supports signing tokens with the RS256, ES256, and PS256 algorithms. If you do not want
+          SecureAuth supports signing tokens with the RS256, ES256, and PS256 algorithms. If you do not want
           to use a signing algorithm, set the value of this parameter to `none`.
         enum:
         - any
@@ -921,7 +939,7 @@ definitions:
           A revocation endpoint authentication method configured for the client application (read-only).
           If empty, the `token_endpoint_auth_method` is used.
 
-          Cloudentity supports the following client authentication methods:
+          SecureAuth supports the following client authentication methods:
           `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
           `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 
@@ -1023,7 +1041,7 @@ definitions:
         description: |-
           Token endpoint authentication method configured for a client application
 
-          Cloudentity supports the following client authentication methods:
+          SecureAuth supports the following client authentication methods:
           `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
           `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 
@@ -1094,8 +1112,24 @@ definitions:
     type: object
   FDXDynamicClientRegistrationResponse:
     properties:
+      agent_capability:
+        $ref: '#/definitions/AgentCapability'
       app_url:
         description: Application URL
+        type: string
+        x-nullable: false
+      application_purpose:
+        description: Application purpose
+        enum:
+        - single_page
+        - server_web
+        - mobile_desktop
+        - service
+        - legacy
+        - custom
+        - saml
+        - ai_agent
+        example: signle_page
         type: string
         x-nullable: false
       application_type:
@@ -1442,7 +1476,7 @@ definitions:
 
           If empty, the `token_endpoint_auth_method` is used.
 
-          Cloudentity supports the following client authentication methods:
+          SecureAuth supports the following client authentication methods:
           `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
           `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 
@@ -1462,7 +1496,7 @@ definitions:
         $ref: '#/definitions/ClientJWKs'
       jwks_uri:
         description: A URL of JSON Web Key Set with the public keys used by a client
-          application to authenticate to Cloudentity.
+          application to authenticate to SecureAuth.
         type: string
         x-nullable: false
       logo_uri:
@@ -1539,7 +1573,7 @@ definitions:
         description: |-
           Request object signing algorithm for the token endpoint
 
-          Cloudentity supports signing tokens with the RS256, ES256, and PS256 algorithms. If you do not want
+          SecureAuth supports signing tokens with the RS256, ES256, and PS256 algorithms. If you do not want
           to use a signing algorithm, set the value of this parameter to `none`.
         enum:
         - any
@@ -1570,7 +1604,7 @@ definitions:
           A revocation endpoint authentication method configured for the client application (read-only).
           If empty, the `token_endpoint_auth_method` is used.
 
-          Cloudentity supports the following client authentication methods:
+          SecureAuth supports the following client authentication methods:
           `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
           `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 
@@ -1686,7 +1720,7 @@ definitions:
         description: |-
           Token endpoint authentication method configured for a client application
 
-          Cloudentity supports the following client authentication methods:
+          SecureAuth supports the following client authentication methods:
           `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
           `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 
@@ -2199,6 +2233,9 @@ definitions:
       error_hint:
         type: string
         x-nullable: false
+      error_uri:
+        type: string
+        x-nullable: false
       status_code:
         format: int64
         type: integer
@@ -2206,7 +2243,7 @@ definitions:
     type: object
   RedirectURIs:
     description: |-
-      Cloudentity uses redirect URIs to redirect users back to the application after they authorized the application. Along
+      SecureAuth uses redirect URIs to redirect users back to the application after they authorized the application. Along
       with the redirection, an authorization code or access token is added to the URL.
 
       For backward compatibility reasons, it's also acceptable to pass `redirect_uris` as a string, for example:
@@ -2258,8 +2295,8 @@ definitions:
         x-nullable: false
       login_state:
         description: |-
-          Random string generated by Cloudentity used to mitigate cross-site request forgery (CSRF) attacks.
-          Cloudentity sends state as the `login_state` query parameter when redirecting to the consent page.
+          Random string generated by SecureAuth used to mitigate cross-site request forgery (CSRF) attacks.
+          SecureAuth sends state as the `login_state` query parameter when redirecting to the consent page.
         example: cauq8fonbud6q8806bf0
         format: loginState
         type: string
@@ -2409,6 +2446,12 @@ definitions:
         format: serverID
         type: string
         x-nullable: false
+      capabilities:
+        description: Service capabilities
+        items:
+          $ref: '#/definitions/ServiceCapability'
+        type: array
+        x-nullable: false
       custom_audience:
         description: Custom service audience
         example: https://api.example.com
@@ -2468,6 +2511,8 @@ definitions:
         type: boolean
         x-nullable: false
     type: object
+  ServiceCapability:
+    type: string
   TokenTTLs:
     properties:
       access_token_ttl:
@@ -2541,7 +2586,7 @@ info:
 
     This collection is compatible with the
     [FDX workspace](https://cloudentity.com/developers/howtos/fdx/fdx-security-profile-workspace/) available in
-    Cloudentity. It covers operations for
+    SecureAuth. It covers operations for
     [dynamic client registration](https://cloudentity.com/developers/howtos/applications/configuring-dcr/), client details
     update and deletion, as well as [consent management](https://cloudentity.com/developers/howtos/fdx/fdx-consent-apis/)
     options for a
@@ -2554,14 +2599,14 @@ info:
     [Enable](https://cloudentity.com/developers/howtos/access-control/creating-and-configuring-dynamic-scopes/#add-scope)
     necessary scopes for your client application in advance.
 
-    Learn more about the [pattern]((https://cloudentity.com/developers/howtos/fdx/fdx-consent-apis/)) Cloudentity
+    Learn more about the [pattern]((https://cloudentity.com/developers/howtos/fdx/fdx-consent-apis/)) SecureAuth
     provides for the customers to build and integrate consent pages with the Financial ecosystem
     and how FDX data providers can
     [protect their API](https://cloudentity.com/developers/howtos/fdx/fdx-data-api-protection/).
 
     Terms and abbreviations are clarified in the
     [Open Banking Glossary](https://cloudentity.com/developers/basics/openfinance/glossary-ob/).
-  title: Cloudentity Financial Data Exchange APIs
+  title: SecureAuth Financial Data Exchange APIs
   version: latest
 paths:
   /consents/{consentID}:
@@ -2896,11 +2941,11 @@ paths:
   /fdx/fdx/{login}/accept:
     post:
       description: |-
-        Used by a custom consent page to notify Cloudentity that a consumer accepted a consent.
+        Used by a custom consent page to notify SecureAuth that a consumer accepted a consent.
 
         The `login` path parameter accepts the `login_id` value—the login session identifier.
 
-        Cloudentity passes the login session identifier along with the `login_state` parameter when redirecting
+        SecureAuth passes the login session identifier along with the `login_state` parameter when redirecting
         a user to the consent page.
 
         Authorization: Bearer token.
@@ -2937,11 +2982,11 @@ paths:
   /fdx/fdx/{login}/reject:
     post:
       description: |-
-        Used by a consent page to notify Cloudentity that a consumer rejected a consent.
+        Used by a consent page to notify SecureAuth that a consumer rejected a consent.
 
         The `login` path parameter accepts the `login_id` value—the login session identifier.
 
-        Cloudentity passes the login session identifier along with the `login_state` parameter when redirecting
+        SecureAuth passes the login session identifier along with the `login_state` parameter when redirecting
         a user to the consent page.
 
         Authorization: Bearer token.

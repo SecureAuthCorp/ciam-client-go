@@ -50,7 +50,7 @@ type Attribute struct {
 	SubAttributes []*Attribute `json:"subAttributes" yaml:"subAttributes"`
 
 	// type
-	Type string `json:"type,omitempty" yaml:"type,omitempty"`
+	Type SCIMv2AttributeType `json:"type,omitempty" yaml:"type,omitempty"`
 
 	// uniqueness
 	Uniqueness string `json:"uniqueness,omitempty" yaml:"uniqueness,omitempty"`
@@ -61,6 +61,10 @@ func (m *Attribute) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateSubAttributes(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateType(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -96,11 +100,32 @@ func (m *Attribute) validateSubAttributes(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *Attribute) validateType(formats strfmt.Registry) error {
+	if swag.IsZero(m.Type) { // not required
+		return nil
+	}
+
+	if err := m.Type.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("type")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("type")
+		}
+		return err
+	}
+
+	return nil
+}
+
 // ContextValidate validate this attribute based on the context it is used
 func (m *Attribute) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.contextValidateSubAttributes(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateType(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -130,6 +155,24 @@ func (m *Attribute) contextValidateSubAttributes(ctx context.Context, formats st
 			}
 		}
 
+	}
+
+	return nil
+}
+
+func (m *Attribute) contextValidateType(ctx context.Context, formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Type) { // not required
+		return nil
+	}
+
+	if err := m.Type.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("type")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("type")
+		}
+		return err
 	}
 
 	return nil

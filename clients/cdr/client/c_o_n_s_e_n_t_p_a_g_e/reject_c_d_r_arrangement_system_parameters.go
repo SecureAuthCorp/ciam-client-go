@@ -75,7 +75,7 @@ type RejectCDRArrangementSystemParams struct {
 
 	     Login session identifier.
 
-	Cloudentity passes the login session identifier with the `login_id` query parameter when redirecting a user to the consent page.
+	SecureAuth passes the login session identifier with the `login_id` query parameter when redirecting a user to the consent page.
 	*/
 	Login string
 

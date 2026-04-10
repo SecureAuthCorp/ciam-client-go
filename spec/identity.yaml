@@ -90,7 +90,12 @@ definitions:
       - otp
       - email_otp
       - sms_otp
+      - voice_otp
       - webauthn
+      - usernameless_webauthn
+      - push
+      - symbol
+      - qr_code
       type: string
     type: array
   Authenticator:
@@ -225,6 +230,11 @@ definitions:
         type: string
         x-nullable: false
       user_type:
+        enum:
+        - jit
+        - standard
+        - scim
+        type: string
         x-nullable: false
       verified addresses:
         items:
@@ -235,6 +245,34 @@ definitions:
     - tenant_id
     - user_pool_id
     - status
+    type: object
+  BaseGroup:
+    properties:
+      description:
+        type: string
+        x-nullable: false
+      id:
+        format: groupID
+        type: string
+        x-nullable: false
+      name:
+        type: string
+        x-nullable: false
+      parent_id:
+        format: groupID
+        type: string
+        x-nullable: false
+      tenant_id:
+        format: tenantID
+        type: string
+        x-nullable: false
+      user_pool_id:
+        example: default
+        format: poolID
+        type: string
+        x-nullable: false
+    required:
+    - user_pool_id
     type: object
   BaseNewUserPayload:
     properties:
@@ -356,6 +394,13 @@ definitions:
       user_pool_id:
         example: default
         format: poolID
+        type: string
+        x-nullable: false
+      user_type:
+        enum:
+        - jit
+        - standard
+        - scim
         type: string
         x-nullable: false
       verifiable_addresses:
@@ -580,6 +625,11 @@ definitions:
         type: string
         x-nullable: false
       user_type:
+        enum:
+        - jit
+        - standard
+        - scim
+        type: string
         x-nullable: false
       verified addresses:
         items:
@@ -591,8 +641,21 @@ definitions:
     - user_pool_id
     - status
     type: object
+  FieldMapping:
+    properties:
+      internal:
+        type: string
+        x-nullable: false
+      scim:
+        type: string
+        x-nullable: false
+    type: object
   Group:
     properties:
+      created_at:
+        format: date-time
+        type: string
+        x-nullable: false
       description:
         type: string
         x-nullable: false
@@ -609,6 +672,10 @@ definitions:
         x-nullable: false
       tenant_id:
         format: tenantID
+        type: string
+        x-nullable: false
+      updated_at:
+        format: date-time
         type: string
         x-nullable: false
       user_pool_id:
@@ -656,7 +723,12 @@ definitions:
         - otp
         - email_otp
         - sms_otp
+        - voice_otp
         - webauthn
+        - usernameless_webauthn
+        - push
+        - symbol
+        - qr_code
         type: string
         x-nullable: false
     type: object
@@ -689,6 +761,7 @@ definitions:
         - password
         - webauthn
         - totp
+        - device
         example: password
         type: string
         x-nullable: false
@@ -697,6 +770,12 @@ definitions:
         items:
           $ref: '#/definitions/Credential'
         type: array
+        x-nullable: false
+      webauthn_type:
+        enum:
+        - regular
+        - discoverable
+        type: string
         x-nullable: false
     required:
     - type
@@ -855,6 +934,8 @@ definitions:
         $ref: '#/definitions/OtpConfig'
       enroll_webauthn:
         $ref: '#/definitions/OtpConfig'
+      pair_device:
+        $ref: '#/definitions/OtpConfig'
       reset_password:
         $ref: '#/definitions/OtpConfig'
       reset_totp:
@@ -966,6 +1047,8 @@ definitions:
         format: schemaID
         type: string
         x-nullable: false
+      pool_limits:
+        $ref: '#/definitions/PoolLimits'
       preferred_authentication_mechanism:
         enum:
         - totp
@@ -973,7 +1056,12 @@ definitions:
         - otp
         - email_otp
         - sms_otp
+        - voice_otp
         - webauthn
+        - usernameless_webauthn
+        - push
+        - symbol
+        - qr_code
         example: password
         type: string
         x-nullable: false
@@ -982,6 +1070,8 @@ definitions:
         x-nullable: false
       reset_credentials_settings:
         $ref: '#/definitions/ResetCredentialsSettings'
+      scim_settings:
+        $ref: '#/definitions/SCIMSettings'
       second_factor_authentication_mechanisms:
         $ref: '#/definitions/AuthenticationMechanisms'
       second_factor_preferred_authentication_mechanism:
@@ -991,7 +1081,12 @@ definitions:
         - otp
         - email_otp
         - sms_otp
+        - voice_otp
         - webauthn
+        - usernameless_webauthn
+        - push
+        - symbol
+        - qr_code
         example: password
         type: string
         x-nullable: false
@@ -1010,6 +1105,8 @@ definitions:
         x-nullable: false
       totp_settings:
         $ref: '#/definitions/TotpSettings'
+      webauthn_settings:
+        $ref: '#/definitions/WebAuthnSettings'
       workspace_id:
         format: serverID
         type: string
@@ -1017,6 +1114,31 @@ definitions:
     required:
     - tenant_id
     - name
+    type: object
+  PoolLimits:
+    description: All values are clamped to the range [1, 100] with sensible defaults.
+    properties:
+      max_addresses:
+        format: int64
+        type: integer
+        x-nullable: false
+      max_codes:
+        format: int64
+        type: integer
+        x-nullable: false
+      max_credentials:
+        format: int64
+        type: integer
+        x-nullable: false
+      max_identifiers:
+        format: int64
+        type: integer
+        x-nullable: false
+      webauthn_credentials_capacity:
+        format: int64
+        type: integer
+        x-nullable: false
+    title: PoolLimits defines limits for user sub-entries within a pool.
     type: object
   PoolPermissionsResponse:
     properties:
@@ -1149,6 +1271,8 @@ definitions:
         format: schemaID
         type: string
         x-nullable: false
+      pool_limits:
+        $ref: '#/definitions/PoolLimits'
       preferred_authentication_mechanism:
         enum:
         - totp
@@ -1156,7 +1280,12 @@ definitions:
         - otp
         - email_otp
         - sms_otp
+        - voice_otp
         - webauthn
+        - usernameless_webauthn
+        - push
+        - symbol
+        - qr_code
         example: password
         type: string
         x-nullable: false
@@ -1165,6 +1294,8 @@ definitions:
         x-nullable: false
       reset_credentials_settings:
         $ref: '#/definitions/ResetCredentialsSettings'
+      scim_settings:
+        $ref: '#/definitions/SCIMSettings'
       second_factor_authentication_mechanisms:
         $ref: '#/definitions/AuthenticationMechanisms'
       second_factor_preferred_authentication_mechanism:
@@ -1174,7 +1305,12 @@ definitions:
         - otp
         - email_otp
         - sms_otp
+        - voice_otp
         - webauthn
+        - usernameless_webauthn
+        - push
+        - symbol
+        - qr_code
         example: password
         type: string
         x-nullable: false
@@ -1193,6 +1329,8 @@ definitions:
         x-nullable: false
       totp_settings:
         $ref: '#/definitions/TotpSettings'
+      webauthn_settings:
+        $ref: '#/definitions/WebAuthnSettings'
       workspace_id:
         format: serverID
         type: string
@@ -1258,6 +1396,14 @@ definitions:
       reset_webauthn_older_than:
         format: date-time
         type: string
+        x-nullable: false
+    type: object
+  SCIMSettings:
+    properties:
+      inboundInputMapping:
+        items:
+          $ref: '#/definitions/FieldMapping'
+        type: array
         x-nullable: false
     type: object
   Schema:
@@ -1549,6 +1695,9 @@ definitions:
         format: date-time
         type: string
         x-nullable: false
+      discoverable_id:
+        type: string
+        x-nullable: false
       expires_at:
         format: date-time
         type: string
@@ -1579,6 +1728,7 @@ definitions:
         - password
         - webauthn
         - totp
+        - device
         example: password
         type: string
         x-nullable: false
@@ -1707,6 +1857,15 @@ definitions:
     type: object
   UserPreferences:
     properties:
+      locales:
+        description: Locale is the list of user's preferred languages/locales for
+          UI and communications
+        example: en-US, es-ES
+        items:
+          format: locale
+          type: string
+        type: array
+        x-nullable: false
       mfa:
         $ref: '#/definitions/MFAPreferences'
     type: object
@@ -1871,6 +2030,13 @@ definitions:
         format: poolID
         type: string
         x-nullable: false
+      user_type:
+        enum:
+        - jit
+        - standard
+        - scim
+        type: string
+        x-nullable: false
       verifiable_addresses:
         items:
           $ref: '#/definitions/UserVerifiableAddress'
@@ -1890,10 +2056,21 @@ definitions:
         type: array
         x-nullable: false
     type: object
+  WebAuthnSettings:
+    properties:
+      rp_id:
+        type: string
+        x-nullable: false
+      rp_origins:
+        items:
+          type: string
+        type: array
+        x-nullable: false
+    type: object
 host: localhost:8443
 info:
   description: |-
-    Cloudentity Identity Admin API
+    SecureAuth Identity Admin API
 
     The POST APIs support idempotency for safely retrying requests without accidentally performing the same operation twice.
 
@@ -1904,7 +2081,7 @@ info:
     3. Retry failed requests with the same key within 1 minute.
 
     Responses for replayed requests will include the X-Idempotent-Replayed: true header.
-  title: Cloudentity API
+  title: SecureAuth API
   version: latest
 paths:
   /admin/b2b/pools/{ipID}/users:
@@ -2150,8 +2327,6 @@ paths:
           $ref: '#/responses/forbiddenHTTPError'
         "404":
           $ref: '#/responses/notFoundHTTPError'
-        "409":
-          $ref: '#/responses/conflictHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
         "429":
@@ -2580,7 +2755,7 @@ paths:
       - in: body
         name: NewGroup
         schema:
-          $ref: '#/definitions/Group'
+          $ref: '#/definitions/BaseGroup'
       responses:
         "201":
           $ref: '#/responses/GroupResponse'
@@ -2674,7 +2849,7 @@ paths:
       - in: body
         name: UpdateGroup
         schema:
-          $ref: '#/definitions/Group'
+          $ref: '#/definitions/BaseGroup'
       responses:
         "200":
           $ref: '#/responses/GroupResponse'
@@ -3180,8 +3355,6 @@ paths:
           $ref: '#/responses/forbiddenHTTPError'
         "404":
           $ref: '#/responses/notFoundHTTPError'
-        "409":
-          $ref: '#/responses/conflictHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
         "429":
@@ -3347,8 +3520,6 @@ paths:
           $ref: '#/responses/notFoundHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
-        "429":
-          $ref: '#/responses/tooManyRequestsHTTPError'
       security:
       - admin: []
       summary: Send Activation Message
@@ -3396,11 +3567,9 @@ paths:
         "409":
           $ref: '#/responses/conflictHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
-        "429":
-          $ref: '#/responses/tooManyRequestsHTTPError'
       security:
       - admin: []
       summary: Request Address Verification
@@ -3907,11 +4076,9 @@ paths:
         "404":
           $ref: '#/responses/notFoundHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
-        "429":
-          $ref: '#/responses/tooManyRequestsHTTPError'
       security:
       - admin: []
       summary: Request OTP Challenge
@@ -3946,7 +4113,7 @@ paths:
         "401":
           $ref: '#/responses/unauthorizedHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
       security:

@@ -14,7 +14,7 @@ import (
 )
 
 // AuthenticatorAttestationResponse AuthenticatorAttestationResponse is the initial unpacked 'response' object received by the relying party. This
-// contains the clientDataJSON object, which will be marshalled into CollectedClientData, and the 'attestationObject',
+// contains the clientDataJSON object, which will be marshalled into [CollectedClientData], and the 'attestationObject',
 // which contains information about the authenticator, and the newly minted public key credential. The information in
 // both objects are used to verify the authenticity of the ceremony and new credential.
 //

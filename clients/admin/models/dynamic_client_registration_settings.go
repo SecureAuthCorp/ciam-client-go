@@ -22,7 +22,7 @@ type DynamicClientRegistrationSettings struct {
 	// Binds registration token to the certificate used to register client
 	CertBoundRegistrationToken bool `json:"cert_bound_registration_token,omitempty" yaml:"cert_bound_registration_token,omitempty"`
 
-	// An optional list of scopes to be granted to a client when no scopes are provided in the DCR registration request
+	// An optional list of scopes that are always included in client registrations, merged with any scopes requested by the client
 	//
 	// If not provided, the following default scopes are granted for the client application: openid, address, email, phone, profile.
 	DefaultScopes []string `json:"default_scopes" yaml:"default_scopes"`

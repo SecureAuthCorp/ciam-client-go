@@ -45,6 +45,13 @@ definitions:
         format: date-time
         type: string
         x-nullable: false
+      type:
+        description: license type
+        enum:
+        - trial
+        - enterprise
+        type: string
+        x-nullable: false
     type: object
   MetricUsage:
     properties:
@@ -67,7 +74,7 @@ definitions:
 host: localhost:8443
 info:
   description: |-
-    Cloudentity Licensing Admin API
+    SecureAuth Licensing Admin API
 
     The POST APIs support idempotency for safely retrying requests without accidentally performing the same operation twice.
 
@@ -78,7 +85,7 @@ info:
     3. Retry failed requests with the same key within 1 minute.
 
     Responses for replayed requests will include the X-Idempotent-Replayed: true header.
-  title: Cloudentity API
+  title: SecureAuth API
   version: latest
 paths:
   /admin/license:

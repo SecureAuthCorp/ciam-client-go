@@ -8,6 +8,7 @@ package models
 import (
 	"context"
 	"encoding/json"
+	"strconv"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
@@ -22,6 +23,9 @@ type TreeService struct {
 
 	// apis
 	Apis TreeAPIs `json:"apis,omitempty" yaml:"apis,omitempty"`
+
+	// Service capabilities
+	Capabilities []ServiceCapability `json:"capabilities" yaml:"capabilities"`
 
 	// Custom service audience
 	// Example: https://api.example.com
@@ -66,6 +70,10 @@ func (m *TreeService) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateCapabilities(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateScopes(formats); err != nil {
 		res = append(res, err)
 	}
@@ -98,6 +106,27 @@ func (m *TreeService) validateApis(formats strfmt.Registry) error {
 			}
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (m *TreeService) validateCapabilities(formats strfmt.Registry) error {
+	if swag.IsZero(m.Capabilities) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(m.Capabilities); i++ {
+
+		if err := m.Capabilities[i].Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("capabilities" + "." + strconv.Itoa(i))
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("capabilities" + "." + strconv.Itoa(i))
+			}
+			return err
+		}
+
 	}
 
 	return nil
@@ -193,6 +222,10 @@ func (m *TreeService) ContextValidate(ctx context.Context, formats strfmt.Regist
 		res = append(res, err)
 	}
 
+	if err := m.contextValidateCapabilities(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.contextValidateScopes(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -216,6 +249,28 @@ func (m *TreeService) contextValidateApis(ctx context.Context, formats strfmt.Re
 			return ce.ValidateName("apis")
 		}
 		return err
+	}
+
+	return nil
+}
+
+func (m *TreeService) contextValidateCapabilities(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(m.Capabilities); i++ {
+
+		if swag.IsZero(m.Capabilities[i]) { // not required
+			return nil
+		}
+
+		if err := m.Capabilities[i].ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("capabilities" + "." + strconv.Itoa(i))
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("capabilities" + "." + strconv.Itoa(i))
+			}
+			return err
+		}
+
 	}
 
 	return nil

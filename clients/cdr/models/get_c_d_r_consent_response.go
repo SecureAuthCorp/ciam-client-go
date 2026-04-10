@@ -34,7 +34,7 @@ type GetCDRConsentResponse struct {
 	// List of requested scopes
 	RequestedScopes []*RequestedScope `json:"requested_scopes" yaml:"requested_scopes"`
 
-	// Cloudentity internal consent status.
+	// SecureAuth internal consent status.
 	//
 	// This parameter is deprecated. The `status` value is available in the `cdr_arrangement` >
 	// `status` parameter received with the current response.

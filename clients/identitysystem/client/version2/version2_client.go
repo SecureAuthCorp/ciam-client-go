@@ -80,9 +80,15 @@ func WithAcceptApplicationScimJSON(r *runtime.ClientOperation) {
 
 // ClientService is the interface for Client methods
 type ClientService interface {
+	SystemSCIMv2CreateGroup(params *SystemSCIMv2CreateGroupParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*SystemSCIMv2CreateGroupCreated, error)
+
 	SystemSCIMv2CreateUser(params *SystemSCIMv2CreateUserParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*SystemSCIMv2CreateUserCreated, error)
 
+	SystemSCIMv2DeleteGroup(params *SystemSCIMv2DeleteGroupParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*SystemSCIMv2DeleteGroupNoContent, error)
+
 	SystemSCIMv2DeleteUser(params *SystemSCIMv2DeleteUserParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*SystemSCIMv2DeleteUserNoContent, error)
+
+	SystemSCIMv2GetGroup(params *SystemSCIMv2GetGroupParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*SystemSCIMv2GetGroupOK, error)
 
 	SystemSCIMv2GetResourceType(params *SystemSCIMv2GetResourceTypeParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*SystemSCIMv2GetResourceTypeOK, error)
 
@@ -96,13 +102,60 @@ type ClientService interface {
 
 	SystemSCIMv2GetUser(params *SystemSCIMv2GetUserParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*SystemSCIMv2GetUserOK, error)
 
+	SystemSCIMv2ListGroups(params *SystemSCIMv2ListGroupsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*SystemSCIMv2ListGroupsOK, error)
+
 	SystemSCIMv2ListUsers(params *SystemSCIMv2ListUsersParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*SystemSCIMv2ListUsersOK, error)
 
-	SystemSCIMv2PatchUser(params *SystemSCIMv2PatchUserParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*SystemSCIMv2PatchUserOK, error)
+	SystemSCIMv2PatchGroup(params *SystemSCIMv2PatchGroupParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*SystemSCIMv2PatchGroupNoContent, error)
+
+	SystemSCIMv2PatchUser(params *SystemSCIMv2PatchUserParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*SystemSCIMv2PatchUserNoContent, error)
+
+	SystemSCIMv2UpdateGroup(params *SystemSCIMv2UpdateGroupParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*SystemSCIMv2UpdateGroupOK, error)
 
 	SystemSCIMv2UpdateUser(params *SystemSCIMv2UpdateUserParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*SystemSCIMv2UpdateUserOK, error)
 
 	SetTransport(transport runtime.ClientTransport)
+}
+
+/*
+SystemSCIMv2CreateGroup creates s c i m group
+
+Creates a new group in SCIM format in the specified identity pool.
+*/
+func (a *Client) SystemSCIMv2CreateGroup(params *SystemSCIMv2CreateGroupParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*SystemSCIMv2CreateGroupCreated, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewSystemSCIMv2CreateGroupParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "systemSCIMv2CreateGroup",
+		Method:             "POST",
+		PathPattern:        "/system/pools/{ipID}/scim/v2/Groups",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &SystemSCIMv2CreateGroupReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*SystemSCIMv2CreateGroupCreated)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for systemSCIMv2CreateGroup: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
@@ -147,6 +200,47 @@ func (a *Client) SystemSCIMv2CreateUser(params *SystemSCIMv2CreateUserParams, au
 }
 
 /*
+SystemSCIMv2DeleteGroup deletes s c i m group
+
+Deletes a group using SCIM DELETE operations in the specified identity pool.
+*/
+func (a *Client) SystemSCIMv2DeleteGroup(params *SystemSCIMv2DeleteGroupParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*SystemSCIMv2DeleteGroupNoContent, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewSystemSCIMv2DeleteGroupParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "systemSCIMv2DeleteGroup",
+		Method:             "DELETE",
+		PathPattern:        "/system/pools/{ipID}/scim/v2/Groups/{groupID}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &SystemSCIMv2DeleteGroupReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*SystemSCIMv2DeleteGroupNoContent)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for systemSCIMv2DeleteGroup: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
 SystemSCIMv2DeleteUser deletes s c i m user
 
 Deletes a user using SCIM DELETE operations in the specified identity pool.
@@ -184,6 +278,47 @@ func (a *Client) SystemSCIMv2DeleteUser(params *SystemSCIMv2DeleteUserParams, au
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for systemSCIMv2DeleteUser: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+SystemSCIMv2GetGroup gets s c i m group
+
+Returns a specific group in SCIM format from the specified identity pool.
+*/
+func (a *Client) SystemSCIMv2GetGroup(params *SystemSCIMv2GetGroupParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*SystemSCIMv2GetGroupOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewSystemSCIMv2GetGroupParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "systemSCIMv2GetGroup",
+		Method:             "GET",
+		PathPattern:        "/system/pools/{ipID}/scim/v2/Groups/{groupID}",
+		ProducesMediaTypes: []string{"application/scim+json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &SystemSCIMv2GetGroupReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*SystemSCIMv2GetGroupOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for systemSCIMv2GetGroup: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 
@@ -434,6 +569,54 @@ func (a *Client) SystemSCIMv2GetUser(params *SystemSCIMv2GetUserParams, authInfo
 }
 
 /*
+	SystemSCIMv2ListGroups lists s c i m groups
+
+	Returns a list of groups in SCIM format from the specified identity pool.
+
+The only supported filter is `<fieldName> eq <value>` which returns a single group or empty set.
+Allowed field names (case-insensitive) are `id`, `name` and `externalId`.
+Please note that filtering by `name` is case-insensitive and may return multiple groups - totalResults may be invalid
+in such case as it returns number of entries returned - not overall count.
+
+Results are sorted ascending by group ID. No other sorting is supported, and the `sortBy` and `sortOrder` parameter is ignored.
+*/
+func (a *Client) SystemSCIMv2ListGroups(params *SystemSCIMv2ListGroupsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*SystemSCIMv2ListGroupsOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewSystemSCIMv2ListGroupsParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "systemSCIMv2ListGroups",
+		Method:             "GET",
+		PathPattern:        "/system/pools/{ipID}/scim/v2/Groups",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &SystemSCIMv2ListGroupsReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*SystemSCIMv2ListGroupsOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for systemSCIMv2ListGroups: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
 	SystemSCIMv2ListUsers lists s c i m users
 
 	Returns a list of users in SCIM format from the specified identity pool.
@@ -443,6 +626,8 @@ Allowed field names (case-insensitive) are `id`, `externalId`, `userName`, `emai
 For emails and phone number subfilter [.*] is allowed but ignored.
 
 Only verified emails and phone numbers are searchable.
+
+Results are sorted ascending by user ID. No other sorting is supported, and the `sortBy` and `sortOrder` parameter is ignored.
 */
 func (a *Client) SystemSCIMv2ListUsers(params *SystemSCIMv2ListUsersParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*SystemSCIMv2ListUsersOK, error) {
 	// TODO: Validate the params before sending
@@ -481,13 +666,52 @@ func (a *Client) SystemSCIMv2ListUsers(params *SystemSCIMv2ListUsersParams, auth
 }
 
 /*
-	SystemSCIMv2PatchUser patches s c i m user
+SystemSCIMv2PatchGroup patches s c i m group
 
-	Updates a user using SCIM PATCH operations in the specified identity pool.
-
-NOTE: this is very basic PATCH implementation that does not allow filtering in path and strictly follows RFC 6902 with some workarounds.
+Updates a group using SCIM PATCH operations in the specified identity pool.
 */
-func (a *Client) SystemSCIMv2PatchUser(params *SystemSCIMv2PatchUserParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*SystemSCIMv2PatchUserOK, error) {
+func (a *Client) SystemSCIMv2PatchGroup(params *SystemSCIMv2PatchGroupParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*SystemSCIMv2PatchGroupNoContent, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewSystemSCIMv2PatchGroupParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "systemSCIMv2PatchGroup",
+		Method:             "PATCH",
+		PathPattern:        "/system/pools/{ipID}/scim/v2/Groups/{groupID}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &SystemSCIMv2PatchGroupReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*SystemSCIMv2PatchGroupNoContent)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for systemSCIMv2PatchGroup: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+SystemSCIMv2PatchUser patches s c i m user
+
+Updates a user using SCIM PATCH operations in the specified identity pool.
+*/
+func (a *Client) SystemSCIMv2PatchUser(params *SystemSCIMv2PatchUserParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*SystemSCIMv2PatchUserNoContent, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewSystemSCIMv2PatchUserParams()
@@ -513,13 +737,54 @@ func (a *Client) SystemSCIMv2PatchUser(params *SystemSCIMv2PatchUserParams, auth
 	if err != nil {
 		return nil, err
 	}
-	success, ok := result.(*SystemSCIMv2PatchUserOK)
+	success, ok := result.(*SystemSCIMv2PatchUserNoContent)
 	if ok {
 		return success, nil
 	}
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for systemSCIMv2PatchUser: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+SystemSCIMv2UpdateGroup updates s c i m group
+
+Updates a group using SCIM format in the specified identity pool (full replacement).
+*/
+func (a *Client) SystemSCIMv2UpdateGroup(params *SystemSCIMv2UpdateGroupParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*SystemSCIMv2UpdateGroupOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewSystemSCIMv2UpdateGroupParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "systemSCIMv2UpdateGroup",
+		Method:             "PUT",
+		PathPattern:        "/system/pools/{ipID}/scim/v2/Groups/{groupID}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &SystemSCIMv2UpdateGroupReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*SystemSCIMv2UpdateGroupOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for systemSCIMv2UpdateGroup: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

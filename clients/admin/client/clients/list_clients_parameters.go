@@ -123,7 +123,7 @@ type ListClientsParams struct {
 
 	/* Sort.
 
-	     optional sort clients by given field, one of: name, client_id, issued_at
+	     optional sort clients by given field, one of: name, client_id, issued_at, updated_at
 	Sort
 	*/
 	Sort *string

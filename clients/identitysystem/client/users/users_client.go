@@ -60,6 +60,8 @@ type ClientService interface {
 
 	ActivateSelfRegisteredUserUsingExtendedCode(params *ActivateSelfRegisteredUserUsingExtendedCodeParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ActivateSelfRegisteredUserUsingExtendedCodeCreated, error)
 
+	BeginUsernamelessWebAuthnCredentialsGeneration(params *BeginUsernamelessWebAuthnCredentialsGenerationParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*BeginUsernamelessWebAuthnCredentialsGenerationOK, error)
+
 	BeginWebAuthnCredentialsGeneration(params *BeginWebAuthnCredentialsGenerationParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*BeginWebAuthnCredentialsGenerationOK, error)
 
 	ChangePassword(params *ChangePasswordParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ChangePasswordNoContent, error)
@@ -71,6 +73,8 @@ type ClientService interface {
 	CompleteResetPassword(params *CompleteResetPasswordParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*CompleteResetPasswordNoContent, error)
 
 	CompleteResetTotp(params *CompleteResetTotpParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*CompleteResetTotpNoContent, error)
+
+	CompleteUsernamelessWebAuthnCredentialsGeneration(params *CompleteUsernamelessWebAuthnCredentialsGenerationParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*CompleteUsernamelessWebAuthnCredentialsGenerationOK, error)
 
 	CompleteWebAuthnCredentialsGeneration(params *CompleteWebAuthnCredentialsGenerationParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*CompleteWebAuthnCredentialsGenerationOK, error)
 
@@ -119,6 +123,12 @@ type ClientService interface {
 	SystemListUsers(params *SystemListUsersParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*SystemListUsersOK, error)
 
 	SystemPatchUser(params *SystemPatchUserParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*SystemPatchUserOK, error)
+
+	SystemSetDevices(params *SystemSetDevicesParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*SystemSetDevicesOK, error)
+
+	SystemSetIdentifiers(params *SystemSetIdentifiersParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*SystemSetIdentifiersOK, error)
+
+	SystemSetVerifiableAddresses(params *SystemSetVerifiableAddressesParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*SystemSetVerifiableAddressesOK, error)
 
 	SystemUpdateUser(params *SystemUpdateUserParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*SystemUpdateUserOK, error)
 
@@ -232,6 +242,47 @@ func (a *Client) ActivateSelfRegisteredUserUsingExtendedCode(params *ActivateSel
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for activateSelfRegisteredUserUsingExtendedCode: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+BeginUsernamelessWebAuthnCredentialsGeneration begins usernameless web authn credentials generation
+
+Begin usernameless WebAuthn credentials generation
+*/
+func (a *Client) BeginUsernamelessWebAuthnCredentialsGeneration(params *BeginUsernamelessWebAuthnCredentialsGenerationParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*BeginUsernamelessWebAuthnCredentialsGenerationOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewBeginUsernamelessWebAuthnCredentialsGenerationParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "beginUsernamelessWebAuthnCredentialsGeneration",
+		Method:             "POST",
+		PathPattern:        "/system/pools/{ipID}/users/{userID}/usernameless-webauthn/create/begin",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &BeginUsernamelessWebAuthnCredentialsGenerationReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*BeginUsernamelessWebAuthnCredentialsGenerationOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for beginUsernamelessWebAuthnCredentialsGeneration: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 
@@ -502,6 +553,47 @@ func (a *Client) CompleteResetTotp(params *CompleteResetTotpParams, authInfo run
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for completeResetTotp: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+CompleteUsernamelessWebAuthnCredentialsGeneration finishes usernameless web authn credentials generation
+
+Finish usernameless WebAuthn credentials generation
+*/
+func (a *Client) CompleteUsernamelessWebAuthnCredentialsGeneration(params *CompleteUsernamelessWebAuthnCredentialsGenerationParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*CompleteUsernamelessWebAuthnCredentialsGenerationOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewCompleteUsernamelessWebAuthnCredentialsGenerationParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "completeUsernamelessWebAuthnCredentialsGeneration",
+		Method:             "POST",
+		PathPattern:        "/system/pools/{ipID}/users/{userID}/usernameless-webauthn/create/complete",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &CompleteUsernamelessWebAuthnCredentialsGenerationReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*CompleteUsernamelessWebAuthnCredentialsGenerationOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for completeUsernamelessWebAuthnCredentialsGeneration: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 
@@ -1192,7 +1284,7 @@ func (a *Client) SetPasswordState(params *SetPasswordStateParams, authInfo runti
 
 	Add an identifier to the user account in the specified identity pool.
 
-The identifier must be unique within the user's account.
+The identifier must be unique across the identity pool.
 */
 func (a *Client) SystemAddIdentifier(params *SystemAddIdentifierParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*SystemAddIdentifierOK, error) {
 	// TODO: Validate the params before sending
@@ -1628,6 +1720,131 @@ func (a *Client) SystemPatchUser(params *SystemPatchUserParams, authInfo runtime
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for systemPatchUser: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+SystemSetDevices sets devices
+
+Overrides all devices for the user account.
+*/
+func (a *Client) SystemSetDevices(params *SystemSetDevicesParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*SystemSetDevicesOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewSystemSetDevicesParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "systemSetDevices",
+		Method:             "POST",
+		PathPattern:        "/system/pools/{ipID}/users/{userID}/devices/set",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &SystemSetDevicesReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*SystemSetDevicesOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for systemSetDevices: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+	SystemSetIdentifiers sets identifiers
+
+	Overrides all identifiers for the user account.
+
+The identifier must be unique across the identity pool.
+*/
+func (a *Client) SystemSetIdentifiers(params *SystemSetIdentifiersParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*SystemSetIdentifiersOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewSystemSetIdentifiersParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "systemSetIdentifiers",
+		Method:             "POST",
+		PathPattern:        "/system/pools/{ipID}/users/{userID}/identifiers/set",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &SystemSetIdentifiersReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*SystemSetIdentifiersOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for systemSetIdentifiers: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+SystemSetVerifiableAddresses sets verifiable addresses
+
+Overrides all verifiable addresses for the user account.
+*/
+func (a *Client) SystemSetVerifiableAddresses(params *SystemSetVerifiableAddressesParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*SystemSetVerifiableAddressesOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewSystemSetVerifiableAddressesParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "systemSetVerifiableAddresses",
+		Method:             "POST",
+		PathPattern:        "/system/pools/{ipID}/users/{userID}/addresses/set",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &SystemSetVerifiableAddressesReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*SystemSetVerifiableAddressesOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for systemSetVerifiableAddresses: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

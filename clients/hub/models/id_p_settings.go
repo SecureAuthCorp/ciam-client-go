@@ -18,6 +18,9 @@ import (
 // swagger:model IDPSettings
 type IDPSettings struct {
 
+	// active directory
+	ActiveDirectory *ActiveDirectorySettings `json:"active_directory,omitempty" yaml:"active_directory,omitempty"`
+
 	// apple
 	Apple *AppleSettings `json:"apple,omitempty" yaml:"apple,omitempty"`
 
@@ -81,6 +84,9 @@ type IDPSettings struct {
 	// static
 	Static *StaticSettings `json:"static,omitempty" yaml:"static,omitempty"`
 
+	// workforce
+	Workforce *WorkforceSettings `json:"workforce,omitempty" yaml:"workforce,omitempty"`
+
 	// x
 	X *XSettings `json:"x,omitempty" yaml:"x,omitempty"`
 }
@@ -88,6 +94,10 @@ type IDPSettings struct {
 // Validate validates this ID p settings
 func (m *IDPSettings) Validate(formats strfmt.Registry) error {
 	var res []error
+
+	if err := m.validateActiveDirectory(formats); err != nil {
+		res = append(res, err)
+	}
 
 	if err := m.validateApple(formats); err != nil {
 		res = append(res, err)
@@ -173,6 +183,10 @@ func (m *IDPSettings) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateWorkforce(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateX(formats); err != nil {
 		res = append(res, err)
 	}
@@ -180,6 +194,25 @@ func (m *IDPSettings) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *IDPSettings) validateActiveDirectory(formats strfmt.Registry) error {
+	if swag.IsZero(m.ActiveDirectory) { // not required
+		return nil
+	}
+
+	if m.ActiveDirectory != nil {
+		if err := m.ActiveDirectory.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("active_directory")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("active_directory")
+			}
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -582,6 +615,25 @@ func (m *IDPSettings) validateStatic(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *IDPSettings) validateWorkforce(formats strfmt.Registry) error {
+	if swag.IsZero(m.Workforce) { // not required
+		return nil
+	}
+
+	if m.Workforce != nil {
+		if err := m.Workforce.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("workforce")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("workforce")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (m *IDPSettings) validateX(formats strfmt.Registry) error {
 	if swag.IsZero(m.X) { // not required
 		return nil
@@ -604,6 +656,10 @@ func (m *IDPSettings) validateX(formats strfmt.Registry) error {
 // ContextValidate validate this ID p settings based on the context it is used
 func (m *IDPSettings) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
+
+	if err := m.contextValidateActiveDirectory(ctx, formats); err != nil {
+		res = append(res, err)
+	}
 
 	if err := m.contextValidateApple(ctx, formats); err != nil {
 		res = append(res, err)
@@ -689,6 +745,10 @@ func (m *IDPSettings) ContextValidate(ctx context.Context, formats strfmt.Regist
 		res = append(res, err)
 	}
 
+	if err := m.contextValidateWorkforce(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.contextValidateX(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -696,6 +756,27 @@ func (m *IDPSettings) ContextValidate(ctx context.Context, formats strfmt.Regist
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *IDPSettings) contextValidateActiveDirectory(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.ActiveDirectory != nil {
+
+		if swag.IsZero(m.ActiveDirectory) { // not required
+			return nil
+		}
+
+		if err := m.ActiveDirectory.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("active_directory")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("active_directory")
+			}
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -1132,6 +1213,27 @@ func (m *IDPSettings) contextValidateStatic(ctx context.Context, formats strfmt.
 				return ve.ValidateName("static")
 			} else if ce, ok := err.(*errors.CompositeError); ok {
 				return ce.ValidateName("static")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *IDPSettings) contextValidateWorkforce(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Workforce != nil {
+
+		if swag.IsZero(m.Workforce) { // not required
+			return nil
+		}
+
+		if err := m.Workforce.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("workforce")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("workforce")
 			}
 			return err
 		}

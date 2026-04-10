@@ -54,6 +54,12 @@ func (o *RequestResetTotpReader) ReadResponse(response runtime.ClientResponse, c
 			return nil, err
 		}
 		return nil, result
+	case 429:
+		result := NewRequestResetTotpTooManyRequests()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	default:
 		return nil, runtime.NewAPIError("[POST /system/pools/{ipID}/user/totp/reset/request] requestResetTotp", response, response.Code())
 	}
@@ -263,7 +269,7 @@ func NewRequestResetTotpPreconditionFailed() *RequestResetTotpPreconditionFailed
 /*
 RequestResetTotpPreconditionFailed describes a response with status code 412, with default header values.
 
-Payload too large
+Precondition failed
 */
 type RequestResetTotpPreconditionFailed struct {
 	Payload *models.Error
@@ -384,6 +390,76 @@ func (o *RequestResetTotpUnprocessableEntity) GetPayload() *models.Error {
 }
 
 func (o *RequestResetTotpUnprocessableEntity) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	o.Payload = new(models.Error)
+
+	// response payload
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+		return err
+	}
+
+	return nil
+}
+
+// NewRequestResetTotpTooManyRequests creates a RequestResetTotpTooManyRequests with default headers values
+func NewRequestResetTotpTooManyRequests() *RequestResetTotpTooManyRequests {
+	return &RequestResetTotpTooManyRequests{}
+}
+
+/*
+RequestResetTotpTooManyRequests describes a response with status code 429, with default header values.
+
+Too many requests
+*/
+type RequestResetTotpTooManyRequests struct {
+	Payload *models.Error
+}
+
+// IsSuccess returns true when this request reset totp too many requests response has a 2xx status code
+func (o *RequestResetTotpTooManyRequests) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this request reset totp too many requests response has a 3xx status code
+func (o *RequestResetTotpTooManyRequests) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this request reset totp too many requests response has a 4xx status code
+func (o *RequestResetTotpTooManyRequests) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this request reset totp too many requests response has a 5xx status code
+func (o *RequestResetTotpTooManyRequests) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this request reset totp too many requests response a status code equal to that given
+func (o *RequestResetTotpTooManyRequests) IsCode(code int) bool {
+	return code == 429
+}
+
+// Code gets the status code for the request reset totp too many requests response
+func (o *RequestResetTotpTooManyRequests) Code() int {
+	return 429
+}
+
+func (o *RequestResetTotpTooManyRequests) Error() string {
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /system/pools/{ipID}/user/totp/reset/request][%d] requestResetTotpTooManyRequests %s", 429, payload)
+}
+
+func (o *RequestResetTotpTooManyRequests) String() string {
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /system/pools/{ipID}/user/totp/reset/request][%d] requestResetTotpTooManyRequests %s", 429, payload)
+}
+
+func (o *RequestResetTotpTooManyRequests) GetPayload() *models.Error {
+	return o.Payload
+}
+
+func (o *RequestResetTotpTooManyRequests) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.Error)
 

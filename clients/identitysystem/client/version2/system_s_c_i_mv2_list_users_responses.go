@@ -30,6 +30,12 @@ func (o *SystemSCIMv2ListUsersReader) ReadResponse(response runtime.ClientRespon
 			return nil, err
 		}
 		return result, nil
+	case 400:
+		result := NewSystemSCIMv2ListUsersBadRequest()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	case 401:
 		result := NewSystemSCIMv2ListUsersUnauthorized()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -135,6 +141,76 @@ func (o *SystemSCIMv2ListUsersOK) readResponse(response runtime.ClientResponse, 
 	return nil
 }
 
+// NewSystemSCIMv2ListUsersBadRequest creates a SystemSCIMv2ListUsersBadRequest with default headers values
+func NewSystemSCIMv2ListUsersBadRequest() *SystemSCIMv2ListUsersBadRequest {
+	return &SystemSCIMv2ListUsersBadRequest{}
+}
+
+/*
+SystemSCIMv2ListUsersBadRequest describes a response with status code 400, with default header values.
+
+Bad request
+*/
+type SystemSCIMv2ListUsersBadRequest struct {
+	Payload *models.SCIMv2ErrorResponse
+}
+
+// IsSuccess returns true when this system s c i mv2 list users bad request response has a 2xx status code
+func (o *SystemSCIMv2ListUsersBadRequest) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this system s c i mv2 list users bad request response has a 3xx status code
+func (o *SystemSCIMv2ListUsersBadRequest) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this system s c i mv2 list users bad request response has a 4xx status code
+func (o *SystemSCIMv2ListUsersBadRequest) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this system s c i mv2 list users bad request response has a 5xx status code
+func (o *SystemSCIMv2ListUsersBadRequest) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this system s c i mv2 list users bad request response a status code equal to that given
+func (o *SystemSCIMv2ListUsersBadRequest) IsCode(code int) bool {
+	return code == 400
+}
+
+// Code gets the status code for the system s c i mv2 list users bad request response
+func (o *SystemSCIMv2ListUsersBadRequest) Code() int {
+	return 400
+}
+
+func (o *SystemSCIMv2ListUsersBadRequest) Error() string {
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /system/pools/{ipID}/scim/v2/Users][%d] systemSCIMv2ListUsersBadRequest %s", 400, payload)
+}
+
+func (o *SystemSCIMv2ListUsersBadRequest) String() string {
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /system/pools/{ipID}/scim/v2/Users][%d] systemSCIMv2ListUsersBadRequest %s", 400, payload)
+}
+
+func (o *SystemSCIMv2ListUsersBadRequest) GetPayload() *models.SCIMv2ErrorResponse {
+	return o.Payload
+}
+
+func (o *SystemSCIMv2ListUsersBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	o.Payload = new(models.SCIMv2ErrorResponse)
+
+	// response payload
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+		return err
+	}
+
+	return nil
+}
+
 // NewSystemSCIMv2ListUsersUnauthorized creates a SystemSCIMv2ListUsersUnauthorized with default headers values
 func NewSystemSCIMv2ListUsersUnauthorized() *SystemSCIMv2ListUsersUnauthorized {
 	return &SystemSCIMv2ListUsersUnauthorized{}
@@ -146,7 +222,7 @@ SystemSCIMv2ListUsersUnauthorized describes a response with status code 401, wit
 Unauthorized
 */
 type SystemSCIMv2ListUsersUnauthorized struct {
-	Payload *models.Error
+	Payload *models.SCIMv2ErrorResponse
 }
 
 // IsSuccess returns true when this system s c i mv2 list users unauthorized response has a 2xx status code
@@ -189,13 +265,13 @@ func (o *SystemSCIMv2ListUsersUnauthorized) String() string {
 	return fmt.Sprintf("[GET /system/pools/{ipID}/scim/v2/Users][%d] systemSCIMv2ListUsersUnauthorized %s", 401, payload)
 }
 
-func (o *SystemSCIMv2ListUsersUnauthorized) GetPayload() *models.Error {
+func (o *SystemSCIMv2ListUsersUnauthorized) GetPayload() *models.SCIMv2ErrorResponse {
 	return o.Payload
 }
 
 func (o *SystemSCIMv2ListUsersUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.Error)
+	o.Payload = new(models.SCIMv2ErrorResponse)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -216,7 +292,7 @@ SystemSCIMv2ListUsersForbidden describes a response with status code 403, with d
 Forbidden
 */
 type SystemSCIMv2ListUsersForbidden struct {
-	Payload *models.Error
+	Payload *models.SCIMv2ErrorResponse
 }
 
 // IsSuccess returns true when this system s c i mv2 list users forbidden response has a 2xx status code
@@ -259,13 +335,13 @@ func (o *SystemSCIMv2ListUsersForbidden) String() string {
 	return fmt.Sprintf("[GET /system/pools/{ipID}/scim/v2/Users][%d] systemSCIMv2ListUsersForbidden %s", 403, payload)
 }
 
-func (o *SystemSCIMv2ListUsersForbidden) GetPayload() *models.Error {
+func (o *SystemSCIMv2ListUsersForbidden) GetPayload() *models.SCIMv2ErrorResponse {
 	return o.Payload
 }
 
 func (o *SystemSCIMv2ListUsersForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.Error)
+	o.Payload = new(models.SCIMv2ErrorResponse)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -286,7 +362,7 @@ SystemSCIMv2ListUsersNotFound describes a response with status code 404, with de
 Not found
 */
 type SystemSCIMv2ListUsersNotFound struct {
-	Payload *models.Error
+	Payload *models.SCIMv2ErrorResponse
 }
 
 // IsSuccess returns true when this system s c i mv2 list users not found response has a 2xx status code
@@ -329,13 +405,13 @@ func (o *SystemSCIMv2ListUsersNotFound) String() string {
 	return fmt.Sprintf("[GET /system/pools/{ipID}/scim/v2/Users][%d] systemSCIMv2ListUsersNotFound %s", 404, payload)
 }
 
-func (o *SystemSCIMv2ListUsersNotFound) GetPayload() *models.Error {
+func (o *SystemSCIMv2ListUsersNotFound) GetPayload() *models.SCIMv2ErrorResponse {
 	return o.Payload
 }
 
 func (o *SystemSCIMv2ListUsersNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.Error)
+	o.Payload = new(models.SCIMv2ErrorResponse)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -356,7 +432,7 @@ SystemSCIMv2ListUsersPreconditionFailed describes a response with status code 41
 Payload too large
 */
 type SystemSCIMv2ListUsersPreconditionFailed struct {
-	Payload *models.Error
+	Payload *models.SCIMv2ErrorResponse
 }
 
 // IsSuccess returns true when this system s c i mv2 list users precondition failed response has a 2xx status code
@@ -399,13 +475,13 @@ func (o *SystemSCIMv2ListUsersPreconditionFailed) String() string {
 	return fmt.Sprintf("[GET /system/pools/{ipID}/scim/v2/Users][%d] systemSCIMv2ListUsersPreconditionFailed %s", 412, payload)
 }
 
-func (o *SystemSCIMv2ListUsersPreconditionFailed) GetPayload() *models.Error {
+func (o *SystemSCIMv2ListUsersPreconditionFailed) GetPayload() *models.SCIMv2ErrorResponse {
 	return o.Payload
 }
 
 func (o *SystemSCIMv2ListUsersPreconditionFailed) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.Error)
+	o.Payload = new(models.SCIMv2ErrorResponse)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -426,7 +502,7 @@ SystemSCIMv2ListUsersTooManyRequests describes a response with status code 429, 
 Too many requests
 */
 type SystemSCIMv2ListUsersTooManyRequests struct {
-	Payload *models.Error
+	Payload *models.SCIMv2ErrorResponse
 }
 
 // IsSuccess returns true when this system s c i mv2 list users too many requests response has a 2xx status code
@@ -469,13 +545,13 @@ func (o *SystemSCIMv2ListUsersTooManyRequests) String() string {
 	return fmt.Sprintf("[GET /system/pools/{ipID}/scim/v2/Users][%d] systemSCIMv2ListUsersTooManyRequests %s", 429, payload)
 }
 
-func (o *SystemSCIMv2ListUsersTooManyRequests) GetPayload() *models.Error {
+func (o *SystemSCIMv2ListUsersTooManyRequests) GetPayload() *models.SCIMv2ErrorResponse {
 	return o.Payload
 }
 
 func (o *SystemSCIMv2ListUsersTooManyRequests) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.Error)
+	o.Payload = new(models.SCIMv2ErrorResponse)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

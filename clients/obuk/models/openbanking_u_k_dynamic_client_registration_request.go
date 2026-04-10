@@ -22,8 +22,16 @@ import (
 // swagger:model OpenbankingUKDynamicClientRegistrationRequest
 type OpenbankingUKDynamicClientRegistrationRequest struct {
 
+	// agent capability
+	AgentCapability AgentCapability `json:"agent_capability,omitempty" yaml:"agent_capability,omitempty"`
+
 	// Application URL
 	AppURL string `json:"app_url,omitempty" yaml:"app_url,omitempty"`
+
+	// Application purpose
+	// Example: signle_page
+	// Enum: ["single_page","server_web","mobile_desktop","service","legacy","custom","saml","ai_agent"]
+	ApplicationPurpose string `json:"application_purpose,omitempty" yaml:"application_purpose,omitempty"`
 
 	// The client application type.
 	//
@@ -195,7 +203,7 @@ type OpenbankingUKDynamicClientRegistrationRequest struct {
 	//
 	// If empty, the `token_endpoint_auth_method` is used.
 	//
-	// Cloudentity supports the following client authentication methods:
+	// SecureAuth supports the following client authentication methods:
 	// `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
 	// `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 	//
@@ -218,7 +226,7 @@ type OpenbankingUKDynamicClientRegistrationRequest struct {
 	// jwks
 	Jwks *ClientJWKs `json:"jwks,omitempty" yaml:"jwks,omitempty"`
 
-	// A URL of JSON Web Key Set with the public keys used by a client application to authenticate to Cloudentity.
+	// A URL of JSON Web Key Set with the public keys used by a client application to authenticate to SecureAuth.
 	JwksURI string `json:"jwks_uri,omitempty" yaml:"jwks_uri,omitempty"`
 
 	// Logo URI.
@@ -257,7 +265,7 @@ type OpenbankingUKDynamicClientRegistrationRequest struct {
 
 	// Request object signing algorithm for the token endpoint
 	//
-	// Cloudentity supports signing tokens with the RS256, ES256, and PS256 algorithms. If you do not want
+	// SecureAuth supports signing tokens with the RS256, ES256, and PS256 algorithms. If you do not want
 	// to use a signing algorithm, set the value of this parameter to `none`.
 	// Example: none
 	// Enum: ["any","none","RS256","ES256","PS256"]
@@ -275,7 +283,7 @@ type OpenbankingUKDynamicClientRegistrationRequest struct {
 	// A revocation endpoint authentication method configured for the client application (read-only).
 	// If empty, the `token_endpoint_auth_method` is used.
 	//
-	// Cloudentity supports the following client authentication methods:
+	// SecureAuth supports the following client authentication methods:
 	// `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
 	// `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 	//
@@ -368,7 +376,7 @@ type OpenbankingUKDynamicClientRegistrationRequest struct {
 
 	// Token endpoint authentication method configured for a client application
 	//
-	// Cloudentity supports the following client authentication methods:
+	// SecureAuth supports the following client authentication methods:
 	// `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
 	// `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 	//
@@ -417,6 +425,14 @@ type OpenbankingUKDynamicClientRegistrationRequest struct {
 // Validate validates this openbanking u k dynamic client registration request
 func (m *OpenbankingUKDynamicClientRegistrationRequest) Validate(formats strfmt.Registry) error {
 	var res []error
+
+	if err := m.validateAgentCapability(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateApplicationPurpose(formats); err != nil {
+		res = append(res, err)
+	}
 
 	if err := m.validateApplicationTypes(formats); err != nil {
 		res = append(res, err)
@@ -529,6 +545,83 @@ func (m *OpenbankingUKDynamicClientRegistrationRequest) Validate(formats strfmt.
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *OpenbankingUKDynamicClientRegistrationRequest) validateAgentCapability(formats strfmt.Registry) error {
+	if swag.IsZero(m.AgentCapability) { // not required
+		return nil
+	}
+
+	if err := m.AgentCapability.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("agent_capability")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("agent_capability")
+		}
+		return err
+	}
+
+	return nil
+}
+
+var openbankingUKDynamicClientRegistrationRequestTypeApplicationPurposePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["single_page","server_web","mobile_desktop","service","legacy","custom","saml","ai_agent"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		openbankingUKDynamicClientRegistrationRequestTypeApplicationPurposePropEnum = append(openbankingUKDynamicClientRegistrationRequestTypeApplicationPurposePropEnum, v)
+	}
+}
+
+const (
+
+	// OpenbankingUKDynamicClientRegistrationRequestApplicationPurposeSinglePage captures enum value "single_page"
+	OpenbankingUKDynamicClientRegistrationRequestApplicationPurposeSinglePage string = "single_page"
+
+	// OpenbankingUKDynamicClientRegistrationRequestApplicationPurposeServerWeb captures enum value "server_web"
+	OpenbankingUKDynamicClientRegistrationRequestApplicationPurposeServerWeb string = "server_web"
+
+	// OpenbankingUKDynamicClientRegistrationRequestApplicationPurposeMobileDesktop captures enum value "mobile_desktop"
+	OpenbankingUKDynamicClientRegistrationRequestApplicationPurposeMobileDesktop string = "mobile_desktop"
+
+	// OpenbankingUKDynamicClientRegistrationRequestApplicationPurposeService captures enum value "service"
+	OpenbankingUKDynamicClientRegistrationRequestApplicationPurposeService string = "service"
+
+	// OpenbankingUKDynamicClientRegistrationRequestApplicationPurposeLegacy captures enum value "legacy"
+	OpenbankingUKDynamicClientRegistrationRequestApplicationPurposeLegacy string = "legacy"
+
+	// OpenbankingUKDynamicClientRegistrationRequestApplicationPurposeCustom captures enum value "custom"
+	OpenbankingUKDynamicClientRegistrationRequestApplicationPurposeCustom string = "custom"
+
+	// OpenbankingUKDynamicClientRegistrationRequestApplicationPurposeSaml captures enum value "saml"
+	OpenbankingUKDynamicClientRegistrationRequestApplicationPurposeSaml string = "saml"
+
+	// OpenbankingUKDynamicClientRegistrationRequestApplicationPurposeAiAgent captures enum value "ai_agent"
+	OpenbankingUKDynamicClientRegistrationRequestApplicationPurposeAiAgent string = "ai_agent"
+)
+
+// prop value enum
+func (m *OpenbankingUKDynamicClientRegistrationRequest) validateApplicationPurposeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, openbankingUKDynamicClientRegistrationRequestTypeApplicationPurposePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *OpenbankingUKDynamicClientRegistrationRequest) validateApplicationPurpose(formats strfmt.Registry) error {
+	if swag.IsZero(m.ApplicationPurpose) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateApplicationPurposeEnum("application_purpose", "body", m.ApplicationPurpose); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -1440,6 +1533,10 @@ func (m *OpenbankingUKDynamicClientRegistrationRequest) validateUserinfoSignedRe
 func (m *OpenbankingUKDynamicClientRegistrationRequest) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.contextValidateAgentCapability(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.contextValidateApplicationTypes(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -1471,6 +1568,24 @@ func (m *OpenbankingUKDynamicClientRegistrationRequest) ContextValidate(ctx cont
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *OpenbankingUKDynamicClientRegistrationRequest) contextValidateAgentCapability(ctx context.Context, formats strfmt.Registry) error {
+
+	if swag.IsZero(m.AgentCapability) { // not required
+		return nil
+	}
+
+	if err := m.AgentCapability.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("agent_capability")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("agent_capability")
+		}
+		return err
+	}
+
 	return nil
 }
 

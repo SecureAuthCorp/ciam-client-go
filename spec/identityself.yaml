@@ -2,6 +2,13 @@ basePath: /default/default/identity
 consumes:
 - application/json
 definitions:
+  AttestationFormat:
+    description: |-
+      Specification: §5.4 Options for Credential Creation (https://w3c.github.io/webauthn/#dom-publickeycredentialcreationoptions-attestationformats)
+      Registry: https://www.iana.org/assignments/webauthn/webauthn.xhtml
+    title: AttestationFormat is an internal representation of the relevant inputs
+      for registration.
+    type: string
   AuthenticationExtensions:
     additionalProperties:
       type: object
@@ -22,7 +29,12 @@ definitions:
       - otp
       - email_otp
       - sms_otp
+      - voice_otp
       - webauthn
+      - usernameless_webauthn
+      - push
+      - symbol
+      - qr_code
       type: string
     type: array
   Authenticator:
@@ -95,9 +107,31 @@ definitions:
         x-nullable: false
     title: |-
       AuthenticatorAttestationResponse is the initial unpacked 'response' object received by the relying party. This
-      contains the clientDataJSON object, which will be marshalled into CollectedClientData, and the 'attestationObject',
+      contains the clientDataJSON object, which will be marshalled into [CollectedClientData], and the 'attestationObject',
       which contains information about the authenticator, and the newly minted public key credential. The information in
       both objects are used to verify the authenticity of the ceremony and new credential.
+    type: object
+  AuthenticatorSelection:
+    description: |-
+      WebAuthn Relying Parties may use the AuthenticatorSelectionCriteria dictionary to specify their requirements
+      regarding authenticator attributes.
+
+      Specification: §5.4.4. Authenticator Selection Criteria (https://www.w3.org/TR/webauthn/#dictionary-authenticatorSelection)
+    properties:
+      authenticatorAttachment:
+        $ref: '#/definitions/AuthenticatorAttachment'
+      requireResidentKey:
+        description: |-
+          RequireResidentKey this member describes the Relying Party's requirements regarding resident
+          credentials. If the parameter is set to true, the authenticator MUST create a client-side-resident
+          public key credential source when creating a public key credential.
+        type: boolean
+        x-nullable: false
+      residentKey:
+        $ref: '#/definitions/ResidentKeyRequirement'
+      userVerification:
+        $ref: '#/definitions/UserVerificationRequirement'
+    title: AuthenticatorSelection represents the AuthenticatorSelectionCriteria IDL.
     type: object
   AuthenticatorTransport:
     description: |-
@@ -110,6 +144,14 @@ definitions:
       Specification: §5.8.4. Authenticator Transport Enumeration (https://www.w3.org/TR/webauthn/#enumdef-authenticatortransport)
     title: AuthenticatorTransport represents the IDL enum with the same name.
     type: string
+  COSEAlgorithmIdentifier:
+    description: 'Specification: §5.8.5. Cryptographic Algorithm Identifier (https://www.w3.org/TR/webauthn/#sctn-alg-identifier)'
+    format: int64
+    title: |-
+      COSEAlgorithmIdentifier is a number identifying a cryptographic algorithm. The algorithm identifiers SHOULD be values
+      registered in the IANA COSE Algorithms registry [https://www.w3.org/TR/webauthn/#biblio-iana-cose-algs-reg], for
+      instance, -7 for "ES256" and -257 for "RS256".
+    type: integer
   ChangePassword:
     properties:
       new_password:
@@ -147,6 +189,15 @@ definitions:
     - address
     - code
     type: object
+  ConveyancePreference:
+    description: |-
+      WebAuthn Relying Parties may use AttestationConveyancePreference to specify their preference regarding attestation
+      conveyance during credential generation.
+
+      Specification: §5.4.7. Attestation Conveyance Preference Enumeration (https://www.w3.org/TR/webauthn/#enum-attestation-convey)
+    title: ConveyancePreference is the type representing the AttestationConveyancePreference
+      IDL.
+    type: string
   Credential:
     description: 'See: §4. Terminology: Credential Record (https://www.w3.org/TR/webauthn-3/#credential-record)'
     properties:
@@ -187,11 +238,6 @@ definitions:
       Credential contains all needed information about a WebAuthn credential for storage. This struct is effectively the
       Credential Record as described in the specification.
     type: object
-  CredentialAssertion:
-    properties:
-      publicKey:
-        $ref: '#/definitions/PublicKeyCredentialRequestOptions'
-    type: object
   CredentialAttestation:
     properties:
       authenticatorData:
@@ -222,6 +268,13 @@ definitions:
         format: int64
         type: integer
         x-nullable: false
+    type: object
+  CredentialCreation:
+    properties:
+      mediation:
+        $ref: '#/definitions/CredentialMediationRequirement'
+      publicKey:
+        $ref: '#/definitions/PublicKeyCredentialCreationOptions'
     type: object
   CredentialCreationResponse:
     properties:
@@ -290,6 +343,23 @@ definitions:
         description: Flag UV indicates the user performed verification.
         type: boolean
         x-nullable: false
+    type: object
+  CredentialMediationRequirement:
+    description: See https://www.w3.org/TR/credential-management-1/#mediation-requirements
+    title: |-
+      CredentialMediationRequirement represents mediation requirements for clients. When making a request via get(options)
+      or create(options), developers can set a case-by-case requirement for user mediation by choosing the appropriate
+      CredentialMediationRequirement enum value.
+    type: string
+  CredentialParameter:
+    description: |-
+      CredentialParameter is the credential type and algorithm
+      that the relying party wants the authenticator to create.
+    properties:
+      alg:
+        $ref: '#/definitions/COSEAlgorithmIdentifier'
+      type:
+        $ref: '#/definitions/CredentialType'
     type: object
   CredentialType:
     description: |-
@@ -361,7 +431,12 @@ definitions:
         - otp
         - email_otp
         - sms_otp
+        - voice_otp
         - webauthn
+        - usernameless_webauthn
+        - push
+        - symbol
+        - qr_code
         type: string
         x-nullable: false
     type: object
@@ -373,21 +448,31 @@ definitions:
     required:
     - name
     type: object
-  PublicKeyCredentialHints:
-    type: string
-  PublicKeyCredentialRequestOptions:
+  PublicKeyCredentialCreationOptions:
     description: |-
-      WebAuthn Level 3: hints.
+      In order to create a Credential via create(), the caller specifies a few parameters in a
+      PublicKeyCredentialCreationOptions object.
 
-      Specification: §5.5. Options for Assertion Generation (https://www.w3.org/TR/webauthn/#dictionary-assertion-options)
+      WebAuthn Level 3: hints,attestationFormats.
+
+      Specification: §5.4. Options for Credential Creation (https://www.w3.org/TR/webauthn/#dictionary-makecredentialoptions)
     properties:
-      allowCredentials:
+      attestation:
+        $ref: '#/definitions/ConveyancePreference'
+      attestationFormats:
+        items:
+          $ref: '#/definitions/AttestationFormat'
+        type: array
+        x-nullable: false
+      authenticatorSelection:
+        $ref: '#/definitions/AuthenticatorSelection'
+      challenge:
+        $ref: '#/definitions/URLEncodedBase64'
+      excludeCredentials:
         items:
           $ref: '#/definitions/CredentialDescriptor'
         type: array
         x-nullable: false
-      challenge:
-        $ref: '#/definitions/URLEncodedBase64'
       extensions:
         $ref: '#/definitions/AuthenticationExtensions'
       hints:
@@ -395,18 +480,47 @@ definitions:
           $ref: '#/definitions/PublicKeyCredentialHints'
         type: array
         x-nullable: false
-      rpId:
-        type: string
+      pubKeyCredParams:
+        items:
+          $ref: '#/definitions/CredentialParameter'
+        type: array
         x-nullable: false
+      rp:
+        $ref: '#/definitions/RelyingPartyEntity'
       timeout:
         format: int64
         type: integer
         x-nullable: false
-      userVerification:
-        $ref: '#/definitions/UserVerificationRequirement'
+      user:
+        $ref: '#/definitions/UserEntity'
+    title: PublicKeyCredentialCreationOptions represents the IDL of the same name.
+    type: object
+  PublicKeyCredentialHints:
+    type: string
+  RelyingPartyEntity:
+    description: 'Specification: §5.4.2. Relying Party Parameters for Credential Generation
+      (https://www.w3.org/TR/webauthn/#dictionary-rp-credential-params)'
+    properties:
+      id:
+        description: A unique identifier for the Relying Party entity, which sets
+          the RP ID.
+        type: string
+        x-nullable: false
+      name:
+        description: |-
+          A human-palatable name for the entity. Its function depends on what the PublicKeyCredentialEntity represents:
+
+          When inherited by PublicKeyCredentialRpEntity it is a human-palatable identifier for the Relying Party,
+          intended only for display. For example, "ACME Corporation", "Wonderful Widgets, Inc." or "ОАО Примертех".
+
+          When inherited by PublicKeyCredentialUserEntity, it is a human-palatable identifier for a user account. It is
+          intended only for display, i.e., aiding the user in determining the difference between user accounts with similar
+          displayNames. For example, "alexm", "alex.p.mueller@example.com" or "+14255551234".
+        type: string
+        x-nullable: false
     title: |-
-      The PublicKeyCredentialRequestOptions dictionary supplies get() with the data it needs to generate an assertion.
-      Its challenge member MUST be present, while its other members are OPTIONAL.
+      The RelyingPartyEntity represents the PublicKeyCredentialRpEntity IDL and is used to supply additional Relying Party
+      attributes when creating a new credential.
     type: object
   ResetPasswordConfirm:
     properties:
@@ -423,6 +537,22 @@ definitions:
     - code
     - new_password
     type: object
+  ResidentKeyRequirement:
+    description: |-
+      This enumeration’s values describe the Relying Party's requirements for client-side discoverable credentials
+      (formerly known as resident credentials or resident keys).
+
+      Specifies the extent to which the Relying Party desires to create a client-side discoverable credential. For
+      historical reasons the naming retains the deprecated “resident” terminology. The value SHOULD be a member of
+      ResidentKeyRequirement but client platforms MUST ignore unknown values, treating an unknown value as if the member
+      does not exist. If no value is given then the effective value is required if requireResidentKey is true or
+      discouraged if it is false or absent.
+
+      Specification: §5.4.4. Authenticator Selection Criteria (https://www.w3.org/TR/webauthn/#dom-authenticatorselectioncriteria-residentkey)
+
+      Specification: §5.4.6. Resident Key Requirement Enumeration (https://www.w3.org/TR/webauthn/#enumdef-residentkeyrequirement)
+    title: ResidentKeyRequirement represents the IDL of the same name.
+    type: string
   SelfUserCredentials:
     properties:
       expires_after:
@@ -453,11 +583,18 @@ definitions:
         - password
         - webauthn
         - totp
+        - device
         example: password
         type: string
         x-nullable: false
       updated_at:
         format: date-time
+        type: string
+        x-nullable: false
+      webauthn_type:
+        enum:
+        - regular
+        - discoverable
         type: string
         x-nullable: false
     required:
@@ -595,7 +732,12 @@ definitions:
           - otp
           - email_otp
           - sms_otp
+          - voice_otp
           - webauthn
+          - usernameless_webauthn
+          - push
+          - symbol
+          - qr_code
           type: string
         type: array
         x-nullable: false
@@ -646,7 +788,12 @@ definitions:
         - otp
         - email_otp
         - sms_otp
+        - voice_otp
         - webauthn
+        - usernameless_webauthn
+        - push
+        - symbol
+        - qr_code
         example: password
         type: string
         x-nullable: false
@@ -659,7 +806,12 @@ definitions:
         - otp
         - email_otp
         - sms_otp
+        - voice_otp
         - webauthn
+        - usernameless_webauthn
+        - push
+        - symbol
+        - qr_code
         example: password
         type: string
         x-nullable: false
@@ -693,6 +845,12 @@ definitions:
     properties:
       new_webauthn:
         $ref: '#/definitions/Credential'
+      type:
+        enum:
+        - regular
+        - discoverable
+        type: string
+        x-nullable: false
     required:
     - new_webauthn
     type: object
@@ -850,6 +1008,41 @@ definitions:
       type: integer
     title: URLEncodedBase64 represents a byte slice holding URL-encoded base64 data.
     type: array
+  UserEntity:
+    description: 'Specification: §5.4.3 User Account Parameters for Credential Generation
+      (https://www.w3.org/TR/webauthn/#dictdef-publickeycredentialuserentity)'
+    properties:
+      displayName:
+        description: |-
+          A human-palatable name for the user account, intended only for display.
+          For example, "Alex P. Müller" or "田中 倫". The Relying Party SHOULD let
+          the user choose this, and SHOULD NOT restrict the choice more than necessary.
+        type: string
+        x-nullable: false
+      id:
+        description: |-
+          ID is the user handle of the user account entity. To ensure secure operation,
+          authentication and authorization decisions MUST be made on the basis of this id
+          member, not the displayName nor name members. See Section 6.1 of
+          [RFC8266](https://www.w3.org/TR/webauthn/#biblio-rfc8266).
+        type: object
+        x-nullable: false
+      name:
+        description: |-
+          A human-palatable name for the entity. Its function depends on what the PublicKeyCredentialEntity represents:
+
+          When inherited by PublicKeyCredentialRpEntity it is a human-palatable identifier for the Relying Party,
+          intended only for display. For example, "ACME Corporation", "Wonderful Widgets, Inc." or "ОАО Примертех".
+
+          When inherited by PublicKeyCredentialUserEntity, it is a human-palatable identifier for a user account. It is
+          intended only for display, i.e., aiding the user in determining the difference between user accounts with similar
+          displayNames. For example, "alexm", "alex.p.mueller@example.com" or "+14255551234".
+        type: string
+        x-nullable: false
+    title: |-
+      The UserEntity represents the PublicKeyCredentialUserEntity IDL and is used to supply additional user account
+      attributes when creating a new credential.
+    type: object
   UserMFASession:
     properties:
       id:
@@ -872,6 +1065,15 @@ definitions:
     type: object
   UserPreferences:
     properties:
+      locales:
+        description: Locale is the list of user's preferred languages/locales for
+          UI and communications
+        example: en-US, es-ES
+        items:
+          format: locale
+          type: string
+        type: array
+        x-nullable: false
       mfa:
         $ref: '#/definitions/MFAPreferences'
     type: object
@@ -884,18 +1086,10 @@ definitions:
     title: UserVerificationRequirement is a representation of the UserVerificationRequirement
       IDL enum.
     type: string
-  WebAuthnCredentials:
-    properties:
-      credentials:
-        items:
-          $ref: '#/definitions/Credential'
-        type: array
-        x-nullable: false
-    type: object
 host: localhost:8443
 info:
   description: |-
-    Cloudentity Identity API
+    SecureAuth Identity API
 
     It is important for clients to note that most APIs return the `ETag` response header. When executing API flows which modify and retrieve a given resource, clients are expected to follow `ETag` protocols by:
     1. Caching the value of an `ETag` returned by the server when retrieving the resource, and
@@ -915,7 +1109,7 @@ info:
     3. Retry failed requests with the same key within 1 minute.
 
     Responses for replayed requests will include the X-Idempotent-Replayed: true header.
-  title: Cloudentity API
+  title: SecureAuth API
   version: latest
 paths:
   /public/pools/{ipID}/reset-password/confirm:
@@ -962,7 +1156,7 @@ paths:
         "403":
           $ref: '#/responses/forbiddenHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
       summary: Confirm Reset Password
@@ -1010,7 +1204,7 @@ paths:
         "409":
           $ref: '#/responses/conflictHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
       summary: Complete Address Verification
@@ -1053,7 +1247,7 @@ paths:
         "404":
           $ref: '#/responses/notFoundHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
         "429":
@@ -1095,7 +1289,7 @@ paths:
         "404":
           $ref: '#/responses/notFoundHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "429":
           $ref: '#/responses/tooManyRequestsHTTPError'
       security:
@@ -1144,7 +1338,7 @@ paths:
         "409":
           $ref: '#/responses/conflictHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
         "429":
@@ -1190,7 +1384,7 @@ paths:
         "404":
           $ref: '#/responses/notFoundHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
         "429":
@@ -1222,7 +1416,7 @@ paths:
         "404":
           $ref: '#/responses/notFoundHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
         "429":
@@ -1249,7 +1443,7 @@ paths:
         "404":
           $ref: '#/responses/notFoundHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "429":
           $ref: '#/responses/tooManyRequestsHTTPError'
       security:
@@ -1298,7 +1492,7 @@ paths:
         "409":
           $ref: '#/responses/conflictHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
         "429":
@@ -1395,7 +1589,7 @@ paths:
         "404":
           $ref: '#/responses/notFoundHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
         "429":
@@ -1444,7 +1638,7 @@ paths:
         "404":
           $ref: '#/responses/notFoundHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
         "429":
@@ -1479,7 +1673,7 @@ paths:
         "404":
           $ref: '#/responses/notFoundHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
         "429":
@@ -1488,6 +1682,71 @@ paths:
       - self:
         - manage_ss_profile
       summary: Set WebAuthn
+      tags:
+      - Users
+  /v2/self/usernameless-webauthn/create/begin:
+    post:
+      description: |-
+        Begin usernameless WebAuthn credentials generation
+
+        This API requires authentication to happen within the last 5 minutes.
+      operationId: beginUsernamelessWebAuthnCredentialsGeneration
+      responses:
+        "200":
+          $ref: '#/responses/WebAuthnCredentialBeginResponse'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "412":
+          $ref: '#/responses/preconditionFailedHTTPError'
+        "422":
+          $ref: '#/responses/unprocessableEntityHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - self:
+        - manage_ss_profile
+      summary: Begin usernameless WebAuthn credentials generation
+      tags:
+      - Users
+  /v2/self/usernameless-webauthn/create/complete:
+    post:
+      description: |-
+        Finish usernameless WebAuthn credentials generation
+
+        This API requires authentication to happen within the last 5 minutes.
+      operationId: completeUsernamelessWebAuthnCredentialsGeneration
+      parameters:
+      - in: body
+        name: SelfCompleteUsernamelessWebAuthnCreate
+        schema:
+          $ref: '#/definitions/CredentialCreationResponse'
+      responses:
+        "200":
+          $ref: '#/responses/WebAuthnCredentialFinishResponse'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "412":
+          $ref: '#/responses/preconditionFailedHTTPError'
+        "422":
+          $ref: '#/responses/unprocessableEntityHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - self:
+        - manage_ss_profile
+      summary: Finish usernameless WebAuthn credentials generation
       tags:
       - Users
   /v2/self/webauthn/{webAuthnCredentialID}:
@@ -1515,7 +1774,7 @@ paths:
         "404":
           $ref: '#/responses/notFoundHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
         "429":
@@ -1553,7 +1812,7 @@ paths:
         "404":
           $ref: '#/responses/notFoundHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
         "429":
@@ -1583,7 +1842,7 @@ paths:
         "404":
           $ref: '#/responses/notFoundHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
         "429":
@@ -1618,7 +1877,7 @@ paths:
         "404":
           $ref: '#/responses/notFoundHTTPError'
         "412":
-          $ref: '#/responses/payloadTooLargeHTTPError'
+          $ref: '#/responses/preconditionFailedHTTPError'
         "422":
           $ref: '#/responses/unprocessableEntityHTTPError'
         "429":
@@ -1775,11 +2034,11 @@ responses:
   WebAuthnCredentialBeginResponse:
     description: User WebAuthn credential data
     schema:
-      $ref: '#/definitions/CredentialAssertion'
+      $ref: '#/definitions/CredentialCreation'
   WebAuthnCredentialFinishResponse:
     description: User WebAuthn credential data
     schema:
-      $ref: '#/definitions/WebAuthnCredentials'
+      $ref: '#/definitions/Credential'
   badRequestHTTPError:
     description: Bad request
     schema:

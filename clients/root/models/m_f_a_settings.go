@@ -23,6 +23,9 @@ type MFASettings struct {
 
 	// sms
 	Sms *SMSSettings `json:"sms,omitempty" yaml:"sms,omitempty"`
+
+	// voice
+	Voice *VoiceSettings `json:"voice,omitempty" yaml:"voice,omitempty"`
 }
 
 // Validate validates this m f a settings
@@ -34,6 +37,10 @@ func (m *MFASettings) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateSms(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateVoice(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -81,6 +88,25 @@ func (m *MFASettings) validateSms(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *MFASettings) validateVoice(formats strfmt.Registry) error {
+	if swag.IsZero(m.Voice) { // not required
+		return nil
+	}
+
+	if m.Voice != nil {
+		if err := m.Voice.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("voice")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("voice")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
 // ContextValidate validate this m f a settings based on the context it is used
 func (m *MFASettings) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
@@ -90,6 +116,10 @@ func (m *MFASettings) ContextValidate(ctx context.Context, formats strfmt.Regist
 	}
 
 	if err := m.contextValidateSms(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateVoice(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -133,6 +163,27 @@ func (m *MFASettings) contextValidateSms(ctx context.Context, formats strfmt.Reg
 				return ve.ValidateName("sms")
 			} else if ce, ok := err.(*errors.CompositeError); ok {
 				return ce.ValidateName("sms")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *MFASettings) contextValidateVoice(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Voice != nil {
+
+		if swag.IsZero(m.Voice) { // not required
+			return nil
+		}
+
+		if err := m.Voice.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("voice")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("voice")
 			}
 			return err
 		}

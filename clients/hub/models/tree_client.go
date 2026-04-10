@@ -21,8 +21,16 @@ import (
 // swagger:model TreeClient
 type TreeClient struct {
 
+	// agent capability
+	AgentCapability AgentCapability `json:"agent_capability,omitempty" yaml:"agent_capability,omitempty"`
+
 	// Application URL
 	AppURL string `json:"app_url,omitempty" yaml:"app_url,omitempty"`
+
+	// Application purpose
+	// Example: signle_page
+	// Enum: ["single_page","server_web","mobile_desktop","service","legacy","custom","saml","ai_agent"]
+	ApplicationPurpose string `json:"application_purpose,omitempty" yaml:"application_purpose,omitempty"`
 
 	// The client application type.
 	//
@@ -217,7 +225,7 @@ type TreeClient struct {
 	//
 	// If empty, the `token_endpoint_auth_method` is used.
 	//
-	// Cloudentity supports the following client authentication methods:
+	// SecureAuth supports the following client authentication methods:
 	// `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
 	// `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 	//
@@ -229,7 +237,7 @@ type TreeClient struct {
 	// jwks
 	Jwks *ClientJWKs `json:"jwks,omitempty" yaml:"jwks,omitempty"`
 
-	// A URL of JSON Web Key Set with the public keys used by a client application to authenticate to Cloudentity.
+	// A URL of JSON Web Key Set with the public keys used by a client application to authenticate to SecureAuth.
 	JwksURI string `json:"jwks_uri,omitempty" yaml:"jwks_uri,omitempty"`
 
 	// Logo URI.
@@ -280,7 +288,7 @@ type TreeClient struct {
 
 	// Request object signing algorithm for the token endpoint
 	//
-	// Cloudentity supports signing tokens with the RS256, ES256, and PS256 algorithms. If you do not want
+	// SecureAuth supports signing tokens with the RS256, ES256, and PS256 algorithms. If you do not want
 	// to use a signing algorithm, set the value of this parameter to `none`.
 	// Example: none
 	// Enum: ["any","none","RS256","ES256","PS256"]
@@ -298,7 +306,7 @@ type TreeClient struct {
 	// A revocation endpoint authentication method configured for the client application (read-only).
 	// If empty, the `token_endpoint_auth_method` is used.
 	//
-	// Cloudentity supports the following client authentication methods:
+	// SecureAuth supports the following client authentication methods:
 	// `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
 	// `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 	//
@@ -312,6 +320,9 @@ type TreeClient struct {
 
 	// Allowed SAML attributes
 	SamlAllowedAttributes []string `json:"saml_allowed_attributes" yaml:"saml_allowed_attributes"`
+
+	// accept ACS from SamlRequest even if it's not registered in the metadata
+	SamlIdpAcceptAcsFromRequest bool `json:"saml_idp_accept_acs_from_request,omitempty" yaml:"saml_idp_accept_acs_from_request,omitempty"`
 
 	// saml idp attributes override
 	SamlIdpAttributesOverride SAMLIDPAttributesOverride `json:"saml_idp_attributes_override,omitempty" yaml:"saml_idp_attributes_override,omitempty"`
@@ -446,7 +457,7 @@ type TreeClient struct {
 
 	// Token endpoint authentication method configured for a client application
 	//
-	// Cloudentity supports the following client authentication methods:
+	// SecureAuth supports the following client authentication methods:
 	// `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
 	// `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 	//
@@ -506,6 +517,14 @@ type TreeClient struct {
 // Validate validates this tree client
 func (m *TreeClient) Validate(formats strfmt.Registry) error {
 	var res []error
+
+	if err := m.validateAgentCapability(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateApplicationPurpose(formats); err != nil {
+		res = append(res, err)
+	}
 
 	if err := m.validateApplicationTypes(formats); err != nil {
 		res = append(res, err)
@@ -678,6 +697,83 @@ func (m *TreeClient) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *TreeClient) validateAgentCapability(formats strfmt.Registry) error {
+	if swag.IsZero(m.AgentCapability) { // not required
+		return nil
+	}
+
+	if err := m.AgentCapability.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("agent_capability")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("agent_capability")
+		}
+		return err
+	}
+
+	return nil
+}
+
+var treeClientTypeApplicationPurposePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["single_page","server_web","mobile_desktop","service","legacy","custom","saml","ai_agent"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		treeClientTypeApplicationPurposePropEnum = append(treeClientTypeApplicationPurposePropEnum, v)
+	}
+}
+
+const (
+
+	// TreeClientApplicationPurposeSinglePage captures enum value "single_page"
+	TreeClientApplicationPurposeSinglePage string = "single_page"
+
+	// TreeClientApplicationPurposeServerWeb captures enum value "server_web"
+	TreeClientApplicationPurposeServerWeb string = "server_web"
+
+	// TreeClientApplicationPurposeMobileDesktop captures enum value "mobile_desktop"
+	TreeClientApplicationPurposeMobileDesktop string = "mobile_desktop"
+
+	// TreeClientApplicationPurposeService captures enum value "service"
+	TreeClientApplicationPurposeService string = "service"
+
+	// TreeClientApplicationPurposeLegacy captures enum value "legacy"
+	TreeClientApplicationPurposeLegacy string = "legacy"
+
+	// TreeClientApplicationPurposeCustom captures enum value "custom"
+	TreeClientApplicationPurposeCustom string = "custom"
+
+	// TreeClientApplicationPurposeSaml captures enum value "saml"
+	TreeClientApplicationPurposeSaml string = "saml"
+
+	// TreeClientApplicationPurposeAiAgent captures enum value "ai_agent"
+	TreeClientApplicationPurposeAiAgent string = "ai_agent"
+)
+
+// prop value enum
+func (m *TreeClient) validateApplicationPurposeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, treeClientTypeApplicationPurposePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *TreeClient) validateApplicationPurpose(formats strfmt.Registry) error {
+	if swag.IsZero(m.ApplicationPurpose) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateApplicationPurposeEnum("application_purpose", "body", m.ApplicationPurpose); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -1980,6 +2076,10 @@ func (m *TreeClient) validateUserinfoSignedResponseAlg(formats strfmt.Registry) 
 func (m *TreeClient) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.contextValidateAgentCapability(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.contextValidateApplicationTypes(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -2059,6 +2159,24 @@ func (m *TreeClient) ContextValidate(ctx context.Context, formats strfmt.Registr
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *TreeClient) contextValidateAgentCapability(ctx context.Context, formats strfmt.Registry) error {
+
+	if swag.IsZero(m.AgentCapability) { // not required
+		return nil
+	}
+
+	if err := m.AgentCapability.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("agent_capability")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("agent_capability")
+		}
+		return err
+	}
+
 	return nil
 }
 

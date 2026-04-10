@@ -20,6 +20,15 @@ import (
 // swagger:model PublicEnvironment
 type PublicEnvironment struct {
 
+	// If ai_security is enabled
+	AiSecurity bool `json:"ai_security,omitempty" yaml:"ai_security,omitempty"`
+
+	// ai security manifest url
+	AiSecurityManifestURL string `json:"ai_security_manifest_url,omitempty" yaml:"ai_security_manifest_url,omitempty"`
+
+	// ai security public url
+	AiSecurityPublicURL string `json:"ai_security_public_url,omitempty" yaml:"ai_security_public_url,omitempty"`
+
 	// If application_launch_dashboard is enabled
 	ApplicationLaunchDashboard bool `json:"application_launch_dashboard,omitempty" yaml:"application_launch_dashboard,omitempty"`
 
@@ -33,8 +42,17 @@ type PublicEnvironment struct {
 	ImageProxyURL string `json:"image_proxy_url,omitempty" yaml:"image_proxy_url,omitempty"`
 
 	// server profile
-	// Enum: ["default","demo","workforce","workforce_v2","consumer","partners","third_party","fapi_advanced","fapi_rw","fapi_ro","openbanking_uk_fapi_advanced","openbanking_uk","openbanking_br","openbanking_br_unico","cdr_australia","cdr_australia_fapi_rw","fdx","openbanking_ksa","fapi_20_security","fapi_20_message_signing","connect_id","agentic_ai"]
+	// Enum: ["default","demo","workforce","workforce_v2","consumer","partners","third_party","fapi_advanced","fapi_rw","fapi_ro","openbanking_uk_fapi_advanced","openbanking_uk","openbanking_br","openbanking_br_unico","cdr_australia","cdr_australia_fapi_rw","fdx","openbanking_ksa","fapi_20_security","fapi_20_message_signing","connect_id","agentic_ai","saidp_legacy"]
 	ServerProfile string `json:"server_profile,omitempty" yaml:"server_profile,omitempty"`
+
+	// translations default locale
+	TranslationsDefaultLocale string `json:"translations_default_locale,omitempty" yaml:"translations_default_locale,omitempty"`
+
+	// translations
+	TranslationsEnabled bool `json:"translations_enabled,omitempty" yaml:"translations_enabled,omitempty"`
+
+	// translations locales
+	TranslationsLocales []string `json:"translations_locales" yaml:"translations_locales"`
 
 	// workforce integration
 	Workforce bool `json:"workforce,omitempty" yaml:"workforce,omitempty"`
@@ -44,6 +62,9 @@ type PublicEnvironment struct {
 
 	// workforce manifest url
 	WorkforceManifestURL string `json:"workforce_manifest_url,omitempty" yaml:"workforce_manifest_url,omitempty"`
+
+	// workforce status
+	WorkforceStatus WorkforceProvisioningStatus `json:"workforce_status,omitempty" yaml:"workforce_status,omitempty"`
 
 	// workforce tenant slug
 	WorkforceTenantSlug string `json:"workforce_tenant_slug,omitempty" yaml:"workforce_tenant_slug,omitempty"`
@@ -63,6 +84,10 @@ func (m *PublicEnvironment) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateWorkforceStatus(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
@@ -73,7 +98,7 @@ var publicEnvironmentTypeServerProfilePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["default","demo","workforce","workforce_v2","consumer","partners","third_party","fapi_advanced","fapi_rw","fapi_ro","openbanking_uk_fapi_advanced","openbanking_uk","openbanking_br","openbanking_br_unico","cdr_australia","cdr_australia_fapi_rw","fdx","openbanking_ksa","fapi_20_security","fapi_20_message_signing","connect_id","agentic_ai"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["default","demo","workforce","workforce_v2","consumer","partners","third_party","fapi_advanced","fapi_rw","fapi_ro","openbanking_uk_fapi_advanced","openbanking_uk","openbanking_br","openbanking_br_unico","cdr_australia","cdr_australia_fapi_rw","fdx","openbanking_ksa","fapi_20_security","fapi_20_message_signing","connect_id","agentic_ai","saidp_legacy"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -148,6 +173,9 @@ const (
 
 	// PublicEnvironmentServerProfileAgenticAi captures enum value "agentic_ai"
 	PublicEnvironmentServerProfileAgenticAi string = "agentic_ai"
+
+	// PublicEnvironmentServerProfileSaidpLegacy captures enum value "saidp_legacy"
+	PublicEnvironmentServerProfileSaidpLegacy string = "saidp_legacy"
 )
 
 // prop value enum
@@ -171,8 +199,52 @@ func (m *PublicEnvironment) validateServerProfile(formats strfmt.Registry) error
 	return nil
 }
 
-// ContextValidate validates this public environment based on context it is used
+func (m *PublicEnvironment) validateWorkforceStatus(formats strfmt.Registry) error {
+	if swag.IsZero(m.WorkforceStatus) { // not required
+		return nil
+	}
+
+	if err := m.WorkforceStatus.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("workforce_status")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("workforce_status")
+		}
+		return err
+	}
+
+	return nil
+}
+
+// ContextValidate validate this public environment based on the context it is used
 func (m *PublicEnvironment) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateWorkforceStatus(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *PublicEnvironment) contextValidateWorkforceStatus(ctx context.Context, formats strfmt.Registry) error {
+
+	if swag.IsZero(m.WorkforceStatus) { // not required
+		return nil
+	}
+
+	if err := m.WorkforceStatus.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("workforce_status")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("workforce_status")
+		}
+		return err
+	}
+
 	return nil
 }
 

@@ -14,7 +14,7 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// UserUpsertRequest UserUpsertRequest
+// UserUpsertRequest user upsert request
 //
 // swagger:model UserUpsertRequest
 type UserUpsertRequest struct {
@@ -22,18 +22,12 @@ type UserUpsertRequest struct {
 	// active
 	Active bool `json:"active,omitempty" yaml:"active,omitempty"`
 
-	// additional identifiers
-	AdditionalIdentifiers []*SCIMv2Identifier `json:"additionalIdentifiers" yaml:"additionalIdentifiers"`
-
 	// emails
 	Emails []*SCIMv2Email `json:"emails" yaml:"emails"`
 
 	// external Id
 	// Example: someExternalID
 	ExternalID string `json:"externalId,omitempty" yaml:"externalId,omitempty"`
-
-	// name
-	Name *SCIMv2Name `json:"name,omitempty" yaml:"name,omitempty"`
 
 	// password
 	// Example: wIf@O\u0026YWzdfFKSW
@@ -43,8 +37,11 @@ type UserUpsertRequest struct {
 	PhoneNumbers []*SCIMv2PhoneNumber `json:"phoneNumbers" yaml:"phoneNumbers"`
 
 	// schemas
-	// Example: ["urn:ietf:params:scim:schemas:core:2.0:User","urn:secureauthciam:params:scim:schemas:extension:custom:2.0:User"]
+	// Example: ["urn:ietf:params:scim:schemas:core:2.0:User","urn:ietf:params:scim:schemas:extension:secureauthciam:2.0:User"]
 	Schemas []string `json:"schemas" yaml:"schemas"`
+
+	// urn ietf params scim schemas extension secureauthciam 2 0 user
+	UrnIetfParamsScimSchemasExtensionSecureauthciam20User *ExtensionSchemaData `json:"urn:ietf:params:scim:schemas:extension:secureauthciam:2.0:User,omitempty" yaml:"urn:ietf:params:scim:schemas:extension:secureauthciam:2.0:User,omitempty"`
 
 	// user name
 	// Example: test@test.com
@@ -55,15 +52,7 @@ type UserUpsertRequest struct {
 func (m *UserUpsertRequest) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateAdditionalIdentifiers(formats); err != nil {
-		res = append(res, err)
-	}
-
 	if err := m.validateEmails(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateName(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -71,35 +60,13 @@ func (m *UserUpsertRequest) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateUrnIetfParamsScimSchemasExtensionSecureauthciam20User(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
-	return nil
-}
-
-func (m *UserUpsertRequest) validateAdditionalIdentifiers(formats strfmt.Registry) error {
-	if swag.IsZero(m.AdditionalIdentifiers) { // not required
-		return nil
-	}
-
-	for i := 0; i < len(m.AdditionalIdentifiers); i++ {
-		if swag.IsZero(m.AdditionalIdentifiers[i]) { // not required
-			continue
-		}
-
-		if m.AdditionalIdentifiers[i] != nil {
-			if err := m.AdditionalIdentifiers[i].Validate(formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("additionalIdentifiers" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
-					return ce.ValidateName("additionalIdentifiers" + "." + strconv.Itoa(i))
-				}
-				return err
-			}
-		}
-
-	}
-
 	return nil
 }
 
@@ -124,25 +91,6 @@ func (m *UserUpsertRequest) validateEmails(formats strfmt.Registry) error {
 			}
 		}
 
-	}
-
-	return nil
-}
-
-func (m *UserUpsertRequest) validateName(formats strfmt.Registry) error {
-	if swag.IsZero(m.Name) { // not required
-		return nil
-	}
-
-	if m.Name != nil {
-		if err := m.Name.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("name")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("name")
-			}
-			return err
-		}
 	}
 
 	return nil
@@ -174,19 +122,30 @@ func (m *UserUpsertRequest) validatePhoneNumbers(formats strfmt.Registry) error 
 	return nil
 }
 
+func (m *UserUpsertRequest) validateUrnIetfParamsScimSchemasExtensionSecureauthciam20User(formats strfmt.Registry) error {
+	if swag.IsZero(m.UrnIetfParamsScimSchemasExtensionSecureauthciam20User) { // not required
+		return nil
+	}
+
+	if m.UrnIetfParamsScimSchemasExtensionSecureauthciam20User != nil {
+		if err := m.UrnIetfParamsScimSchemasExtensionSecureauthciam20User.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("urn:ietf:params:scim:schemas:extension:secureauthciam:2.0:User")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("urn:ietf:params:scim:schemas:extension:secureauthciam:2.0:User")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
 // ContextValidate validate this user upsert request based on the context it is used
 func (m *UserUpsertRequest) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.contextValidateAdditionalIdentifiers(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
 	if err := m.contextValidateEmails(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.contextValidateName(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -194,34 +153,13 @@ func (m *UserUpsertRequest) ContextValidate(ctx context.Context, formats strfmt.
 		res = append(res, err)
 	}
 
+	if err := m.contextValidateUrnIetfParamsScimSchemasExtensionSecureauthciam20User(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
-	return nil
-}
-
-func (m *UserUpsertRequest) contextValidateAdditionalIdentifiers(ctx context.Context, formats strfmt.Registry) error {
-
-	for i := 0; i < len(m.AdditionalIdentifiers); i++ {
-
-		if m.AdditionalIdentifiers[i] != nil {
-
-			if swag.IsZero(m.AdditionalIdentifiers[i]) { // not required
-				return nil
-			}
-
-			if err := m.AdditionalIdentifiers[i].ContextValidate(ctx, formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("additionalIdentifiers" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
-					return ce.ValidateName("additionalIdentifiers" + "." + strconv.Itoa(i))
-				}
-				return err
-			}
-		}
-
-	}
-
 	return nil
 }
 
@@ -250,27 +188,6 @@ func (m *UserUpsertRequest) contextValidateEmails(ctx context.Context, formats s
 	return nil
 }
 
-func (m *UserUpsertRequest) contextValidateName(ctx context.Context, formats strfmt.Registry) error {
-
-	if m.Name != nil {
-
-		if swag.IsZero(m.Name) { // not required
-			return nil
-		}
-
-		if err := m.Name.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("name")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("name")
-			}
-			return err
-		}
-	}
-
-	return nil
-}
-
 func (m *UserUpsertRequest) contextValidatePhoneNumbers(ctx context.Context, formats strfmt.Registry) error {
 
 	for i := 0; i < len(m.PhoneNumbers); i++ {
@@ -291,6 +208,27 @@ func (m *UserUpsertRequest) contextValidatePhoneNumbers(ctx context.Context, for
 			}
 		}
 
+	}
+
+	return nil
+}
+
+func (m *UserUpsertRequest) contextValidateUrnIetfParamsScimSchemasExtensionSecureauthciam20User(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.UrnIetfParamsScimSchemasExtensionSecureauthciam20User != nil {
+
+		if swag.IsZero(m.UrnIetfParamsScimSchemasExtensionSecureauthciam20User) { // not required
+			return nil
+		}
+
+		if err := m.UrnIetfParamsScimSchemasExtensionSecureauthciam20User.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("urn:ietf:params:scim:schemas:extension:secureauthciam:2.0:User")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("urn:ietf:params:scim:schemas:extension:secureauthciam:2.0:User")
+			}
+			return err
+		}
 	}
 
 	return nil

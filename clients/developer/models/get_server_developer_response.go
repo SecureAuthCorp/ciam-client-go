@@ -175,7 +175,7 @@ var getServerDeveloperResponseSupportedApplicationPurposesItemsEnum []interface{
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["single_page","server_web","mobile_desktop","service","legacy","custom","saml"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["single_page","server_web","mobile_desktop","service","legacy","custom","saml","ai_agent"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {

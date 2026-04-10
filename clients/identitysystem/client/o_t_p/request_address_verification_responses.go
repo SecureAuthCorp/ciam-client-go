@@ -462,7 +462,7 @@ func NewRequestAddressVerificationPreconditionFailed() *RequestAddressVerificati
 /*
 RequestAddressVerificationPreconditionFailed describes a response with status code 412, with default header values.
 
-Payload too large
+Precondition failed
 */
 type RequestAddressVerificationPreconditionFailed struct {
 	Payload *models.Error

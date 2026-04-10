@@ -21,8 +21,16 @@ import (
 // swagger:model CDRDynamicClientRegistrationRequest
 type CDRDynamicClientRegistrationRequest struct {
 
+	// agent capability
+	AgentCapability AgentCapability `json:"agent_capability,omitempty" yaml:"agent_capability,omitempty"`
+
 	// Application URL
 	AppURL string `json:"app_url,omitempty" yaml:"app_url,omitempty"`
+
+	// Application purpose
+	// Example: signle_page
+	// Enum: ["single_page","server_web","mobile_desktop","service","legacy","custom","saml","ai_agent"]
+	ApplicationPurpose string `json:"application_purpose,omitempty" yaml:"application_purpose,omitempty"`
 
 	// The client application type.
 	//
@@ -194,7 +202,7 @@ type CDRDynamicClientRegistrationRequest struct {
 	//
 	// If empty, the `token_endpoint_auth_method` is used.
 	//
-	// Cloudentity supports the following client authentication methods:
+	// SecureAuth supports the following client authentication methods:
 	// `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
 	// `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 	//
@@ -217,7 +225,7 @@ type CDRDynamicClientRegistrationRequest struct {
 	// jwks
 	Jwks *ClientJWKs `json:"jwks,omitempty" yaml:"jwks,omitempty"`
 
-	// A URL of JSON Web Key Set with the public keys used by a client application to authenticate to Cloudentity.
+	// A URL of JSON Web Key Set with the public keys used by a client application to authenticate to SecureAuth.
 	JwksURI string `json:"jwks_uri,omitempty" yaml:"jwks_uri,omitempty"`
 
 	// Logo URI.
@@ -256,7 +264,7 @@ type CDRDynamicClientRegistrationRequest struct {
 
 	// Request object signing algorithm for the token endpoint
 	//
-	// Cloudentity supports signing tokens with the RS256, ES256, and PS256 algorithms. If you do not want
+	// SecureAuth supports signing tokens with the RS256, ES256, and PS256 algorithms. If you do not want
 	// to use a signing algorithm, set the value of this parameter to `none`.
 	// Example: none
 	// Enum: ["any","none","RS256","ES256","PS256"]
@@ -274,7 +282,7 @@ type CDRDynamicClientRegistrationRequest struct {
 	// A revocation endpoint authentication method configured for the client application (read-only).
 	// If empty, the `token_endpoint_auth_method` is used.
 	//
-	// Cloudentity supports the following client authentication methods:
+	// SecureAuth supports the following client authentication methods:
 	// `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
 	// `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 	//
@@ -367,7 +375,7 @@ type CDRDynamicClientRegistrationRequest struct {
 
 	// Token endpoint authentication method configured for a client application
 	//
-	// Cloudentity supports the following client authentication methods:
+	// SecureAuth supports the following client authentication methods:
 	// `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
 	// `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 	//
@@ -416,6 +424,14 @@ type CDRDynamicClientRegistrationRequest struct {
 // Validate validates this c d r dynamic client registration request
 func (m *CDRDynamicClientRegistrationRequest) Validate(formats strfmt.Registry) error {
 	var res []error
+
+	if err := m.validateAgentCapability(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateApplicationPurpose(formats); err != nil {
+		res = append(res, err)
+	}
 
 	if err := m.validateApplicationTypes(formats); err != nil {
 		res = append(res, err)
@@ -528,6 +544,83 @@ func (m *CDRDynamicClientRegistrationRequest) Validate(formats strfmt.Registry) 
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *CDRDynamicClientRegistrationRequest) validateAgentCapability(formats strfmt.Registry) error {
+	if swag.IsZero(m.AgentCapability) { // not required
+		return nil
+	}
+
+	if err := m.AgentCapability.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("agent_capability")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("agent_capability")
+		}
+		return err
+	}
+
+	return nil
+}
+
+var cDRDynamicClientRegistrationRequestTypeApplicationPurposePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["single_page","server_web","mobile_desktop","service","legacy","custom","saml","ai_agent"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		cDRDynamicClientRegistrationRequestTypeApplicationPurposePropEnum = append(cDRDynamicClientRegistrationRequestTypeApplicationPurposePropEnum, v)
+	}
+}
+
+const (
+
+	// CDRDynamicClientRegistrationRequestApplicationPurposeSinglePage captures enum value "single_page"
+	CDRDynamicClientRegistrationRequestApplicationPurposeSinglePage string = "single_page"
+
+	// CDRDynamicClientRegistrationRequestApplicationPurposeServerWeb captures enum value "server_web"
+	CDRDynamicClientRegistrationRequestApplicationPurposeServerWeb string = "server_web"
+
+	// CDRDynamicClientRegistrationRequestApplicationPurposeMobileDesktop captures enum value "mobile_desktop"
+	CDRDynamicClientRegistrationRequestApplicationPurposeMobileDesktop string = "mobile_desktop"
+
+	// CDRDynamicClientRegistrationRequestApplicationPurposeService captures enum value "service"
+	CDRDynamicClientRegistrationRequestApplicationPurposeService string = "service"
+
+	// CDRDynamicClientRegistrationRequestApplicationPurposeLegacy captures enum value "legacy"
+	CDRDynamicClientRegistrationRequestApplicationPurposeLegacy string = "legacy"
+
+	// CDRDynamicClientRegistrationRequestApplicationPurposeCustom captures enum value "custom"
+	CDRDynamicClientRegistrationRequestApplicationPurposeCustom string = "custom"
+
+	// CDRDynamicClientRegistrationRequestApplicationPurposeSaml captures enum value "saml"
+	CDRDynamicClientRegistrationRequestApplicationPurposeSaml string = "saml"
+
+	// CDRDynamicClientRegistrationRequestApplicationPurposeAiAgent captures enum value "ai_agent"
+	CDRDynamicClientRegistrationRequestApplicationPurposeAiAgent string = "ai_agent"
+)
+
+// prop value enum
+func (m *CDRDynamicClientRegistrationRequest) validateApplicationPurposeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, cDRDynamicClientRegistrationRequestTypeApplicationPurposePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *CDRDynamicClientRegistrationRequest) validateApplicationPurpose(formats strfmt.Registry) error {
+	if swag.IsZero(m.ApplicationPurpose) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateApplicationPurposeEnum("application_purpose", "body", m.ApplicationPurpose); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -1439,6 +1532,10 @@ func (m *CDRDynamicClientRegistrationRequest) validateUserinfoSignedResponseAlg(
 func (m *CDRDynamicClientRegistrationRequest) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.contextValidateAgentCapability(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.contextValidateApplicationTypes(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -1470,6 +1567,24 @@ func (m *CDRDynamicClientRegistrationRequest) ContextValidate(ctx context.Contex
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *CDRDynamicClientRegistrationRequest) contextValidateAgentCapability(ctx context.Context, formats strfmt.Registry) error {
+
+	if swag.IsZero(m.AgentCapability) { // not required
+		return nil
+	}
+
+	if err := m.AgentCapability.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("agent_capability")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("agent_capability")
+		}
+		return err
+	}
+
 	return nil
 }
 

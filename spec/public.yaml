@@ -703,6 +703,16 @@ definitions:
     type: object
   PublicEnvironment:
     properties:
+      ai_security:
+        description: If ai_security is enabled
+        type: boolean
+        x-nullable: false
+      ai_security_manifest_url:
+        type: string
+        x-nullable: false
+      ai_security_public_url:
+        type: string
+        x-nullable: false
       application_launch_dashboard:
         description: If application_launch_dashboard is enabled
         type: boolean
@@ -742,7 +752,22 @@ definitions:
         - fapi_20_message_signing
         - connect_id
         - agentic_ai
+        - saidp_legacy
         type: string
+        x-nullable: false
+      translations_default_locale:
+        format: locale
+        type: string
+        x-nullable: false
+      translations_enabled:
+        description: translations
+        type: boolean
+        x-nullable: false
+      translations_locales:
+        items:
+          format: locale
+          type: string
+        type: array
         x-nullable: false
       workforce:
         description: workforce integration
@@ -754,6 +779,8 @@ definitions:
       workforce_manifest_url:
         type: string
         x-nullable: false
+      workforce_status:
+        $ref: '#/definitions/WorkforceProvisioningStatus'
       workforce_tenant_slug:
         type: string
         x-nullable: false
@@ -833,6 +860,7 @@ definitions:
         enum:
         - sms
         - email
+        - voice
         example: email
         type: string
         x-nullable: false
@@ -873,6 +901,7 @@ definitions:
         enum:
         - sms
         - email
+        - voice
         example: email
         type: string
         x-nullable: false
@@ -943,10 +972,12 @@ definitions:
         type: string
         x-nullable: false
     type: object
+  WorkforceProvisioningStatus:
+    type: string
 host: localhost:8443
 info:
   description: |-
-    Cloudentity Public API
+    SecureAuth Public API
 
     The POST APIs support idempotency for safely retrying requests without accidentally performing the same operation twice.
 
@@ -957,7 +988,7 @@ info:
     3. Retry failed requests with the same key within 1 minute.
 
     Responses for replayed requests will include the X-Idempotent-Replayed: true header.
-  title: Cloudentity API
+  title: SecureAuth API
   version: latest
 paths:
   /applications:

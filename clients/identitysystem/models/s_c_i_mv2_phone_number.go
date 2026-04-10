@@ -24,11 +24,7 @@ type SCIMv2PhoneNumber struct {
 	Type string `json:"type,omitempty" yaml:"type,omitempty"`
 
 	// value
-	// Example: tel:+1-201-555-0123
 	Value string `json:"value,omitempty" yaml:"value,omitempty"`
-
-	// verified
-	Verified bool `json:"verified,omitempty" yaml:"verified,omitempty"`
 }
 
 // Validate validates this s c i mv2 phone number

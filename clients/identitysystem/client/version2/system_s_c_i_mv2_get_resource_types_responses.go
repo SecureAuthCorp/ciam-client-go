@@ -395,7 +395,7 @@ func NewSystemSCIMv2GetResourceTypesPreconditionFailed() *SystemSCIMv2GetResourc
 /*
 SystemSCIMv2GetResourceTypesPreconditionFailed describes a response with status code 412, with default header values.
 
-Payload too large
+Precondition failed
 */
 type SystemSCIMv2GetResourceTypesPreconditionFailed struct {
 	Payload *models.Error

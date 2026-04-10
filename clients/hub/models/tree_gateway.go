@@ -39,7 +39,7 @@ type TreeGateway struct {
 	LastActive strfmt.DateTime `json:"last_active,omitempty" yaml:"last_active,omitempty"`
 
 	// gateway name
-	// Example: Cloudentity Pyron
+	// Example: SecureAuth Pyron
 	Name string `json:"name,omitempty" yaml:"name,omitempty"`
 
 	// token exchange

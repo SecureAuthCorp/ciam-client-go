@@ -21,8 +21,16 @@ import (
 // swagger:model CreateClientDeveloperRequest
 type CreateClientDeveloperRequest struct {
 
+	// agent capability
+	AgentCapability AgentCapability `json:"agent_capability,omitempty" yaml:"agent_capability,omitempty"`
+
 	// Application URL
 	AppURL string `json:"app_url,omitempty" yaml:"app_url,omitempty"`
+
+	// Application purpose
+	// Example: signle_page
+	// Enum: ["single_page","server_web","mobile_desktop","service","legacy","custom","saml","ai_agent"]
+	ApplicationPurpose string `json:"application_purpose,omitempty" yaml:"application_purpose,omitempty"`
 
 	// The client application type.
 	//
@@ -182,7 +190,7 @@ type CreateClientDeveloperRequest struct {
 	//
 	// If empty, the `token_endpoint_auth_method` is used.
 	//
-	// Cloudentity supports the following client authentication methods:
+	// SecureAuth supports the following client authentication methods:
 	// `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
 	// `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 	//
@@ -194,7 +202,7 @@ type CreateClientDeveloperRequest struct {
 	// jwks
 	Jwks *ClientJWKs `json:"jwks,omitempty" yaml:"jwks,omitempty"`
 
-	// A URL of JSON Web Key Set with the public keys used by a client application to authenticate to Cloudentity.
+	// A URL of JSON Web Key Set with the public keys used by a client application to authenticate to SecureAuth.
 	JwksURI string `json:"jwks_uri,omitempty" yaml:"jwks_uri,omitempty"`
 
 	// Logo URI.
@@ -233,7 +241,7 @@ type CreateClientDeveloperRequest struct {
 
 	// Request object signing algorithm for the token endpoint
 	//
-	// Cloudentity supports signing tokens with the RS256, ES256, and PS256 algorithms. If you do not want
+	// SecureAuth supports signing tokens with the RS256, ES256, and PS256 algorithms. If you do not want
 	// to use a signing algorithm, set the value of this parameter to `none`.
 	// Example: none
 	// Enum: ["any","none","RS256","ES256","PS256"]
@@ -251,7 +259,7 @@ type CreateClientDeveloperRequest struct {
 	// A revocation endpoint authentication method configured for the client application (read-only).
 	// If empty, the `token_endpoint_auth_method` is used.
 	//
-	// Cloudentity supports the following client authentication methods:
+	// SecureAuth supports the following client authentication methods:
 	// `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
 	// `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 	//
@@ -319,7 +327,7 @@ type CreateClientDeveloperRequest struct {
 
 	// Token endpoint authentication method configured for a client application
 	//
-	// Cloudentity supports the following client authentication methods:
+	// SecureAuth supports the following client authentication methods:
 	// `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
 	// `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 	//
@@ -368,6 +376,14 @@ type CreateClientDeveloperRequest struct {
 // Validate validates this create client developer request
 func (m *CreateClientDeveloperRequest) Validate(formats strfmt.Registry) error {
 	var res []error
+
+	if err := m.validateAgentCapability(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateApplicationPurpose(formats); err != nil {
+		res = append(res, err)
+	}
 
 	if err := m.validateApplicationTypes(formats); err != nil {
 		res = append(res, err)
@@ -476,6 +492,83 @@ func (m *CreateClientDeveloperRequest) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *CreateClientDeveloperRequest) validateAgentCapability(formats strfmt.Registry) error {
+	if swag.IsZero(m.AgentCapability) { // not required
+		return nil
+	}
+
+	if err := m.AgentCapability.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("agent_capability")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("agent_capability")
+		}
+		return err
+	}
+
+	return nil
+}
+
+var createClientDeveloperRequestTypeApplicationPurposePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["single_page","server_web","mobile_desktop","service","legacy","custom","saml","ai_agent"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		createClientDeveloperRequestTypeApplicationPurposePropEnum = append(createClientDeveloperRequestTypeApplicationPurposePropEnum, v)
+	}
+}
+
+const (
+
+	// CreateClientDeveloperRequestApplicationPurposeSinglePage captures enum value "single_page"
+	CreateClientDeveloperRequestApplicationPurposeSinglePage string = "single_page"
+
+	// CreateClientDeveloperRequestApplicationPurposeServerWeb captures enum value "server_web"
+	CreateClientDeveloperRequestApplicationPurposeServerWeb string = "server_web"
+
+	// CreateClientDeveloperRequestApplicationPurposeMobileDesktop captures enum value "mobile_desktop"
+	CreateClientDeveloperRequestApplicationPurposeMobileDesktop string = "mobile_desktop"
+
+	// CreateClientDeveloperRequestApplicationPurposeService captures enum value "service"
+	CreateClientDeveloperRequestApplicationPurposeService string = "service"
+
+	// CreateClientDeveloperRequestApplicationPurposeLegacy captures enum value "legacy"
+	CreateClientDeveloperRequestApplicationPurposeLegacy string = "legacy"
+
+	// CreateClientDeveloperRequestApplicationPurposeCustom captures enum value "custom"
+	CreateClientDeveloperRequestApplicationPurposeCustom string = "custom"
+
+	// CreateClientDeveloperRequestApplicationPurposeSaml captures enum value "saml"
+	CreateClientDeveloperRequestApplicationPurposeSaml string = "saml"
+
+	// CreateClientDeveloperRequestApplicationPurposeAiAgent captures enum value "ai_agent"
+	CreateClientDeveloperRequestApplicationPurposeAiAgent string = "ai_agent"
+)
+
+// prop value enum
+func (m *CreateClientDeveloperRequest) validateApplicationPurposeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, createClientDeveloperRequestTypeApplicationPurposePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *CreateClientDeveloperRequest) validateApplicationPurpose(formats strfmt.Registry) error {
+	if swag.IsZero(m.ApplicationPurpose) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateApplicationPurposeEnum("application_purpose", "body", m.ApplicationPurpose); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -1369,6 +1462,10 @@ func (m *CreateClientDeveloperRequest) validateUserinfoSignedResponseAlg(formats
 func (m *CreateClientDeveloperRequest) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.contextValidateAgentCapability(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.contextValidateApplicationTypes(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -1400,6 +1497,24 @@ func (m *CreateClientDeveloperRequest) ContextValidate(ctx context.Context, form
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *CreateClientDeveloperRequest) contextValidateAgentCapability(ctx context.Context, formats strfmt.Registry) error {
+
+	if swag.IsZero(m.AgentCapability) { // not required
+		return nil
+	}
+
+	if err := m.AgentCapability.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("agent_capability")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("agent_capability")
+		}
+		return err
+	}
+
 	return nil
 }
 

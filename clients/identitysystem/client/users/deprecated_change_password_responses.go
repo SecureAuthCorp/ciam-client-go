@@ -462,7 +462,7 @@ func NewDeprecatedChangePasswordPreconditionFailed() *DeprecatedChangePasswordPr
 /*
 DeprecatedChangePasswordPreconditionFailed describes a response with status code 412, with default header values.
 
-Payload too large
+Precondition failed
 */
 type DeprecatedChangePasswordPreconditionFailed struct {
 	Payload *models.Error

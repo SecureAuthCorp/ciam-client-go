@@ -28,12 +28,12 @@ type TreeCustomApp struct {
 
 	// Type of the custom app
 	// Example: post-authn
-	// Enum: ["post-authn"]
+	// Enum: ["post-authn","scim"]
 	Type string `json:"type,omitempty" yaml:"type,omitempty"`
 
-	// url of the CustomApp
-	// Required: true
-	URL string `json:"url" yaml:"url"`
+	// URL of the CustomApp.
+	// Required for type 'post-authn'. Not allowed for type 'scim'.
+	URL string `json:"url,omitempty" yaml:"url,omitempty"`
 }
 
 // Validate validates this tree custom app
@@ -45,10 +45,6 @@ func (m *TreeCustomApp) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateType(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateURL(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -81,7 +77,7 @@ var treeCustomAppTypeTypePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["post-authn"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["post-authn","scim"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -93,6 +89,9 @@ const (
 
 	// TreeCustomAppTypePostDashAuthn captures enum value "post-authn"
 	TreeCustomAppTypePostDashAuthn string = "post-authn"
+
+	// TreeCustomAppTypeScim captures enum value "scim"
+	TreeCustomAppTypeScim string = "scim"
 )
 
 // prop value enum
@@ -110,15 +109,6 @@ func (m *TreeCustomApp) validateType(formats strfmt.Registry) error {
 
 	// value enum
 	if err := m.validateTypeEnum("type", "body", m.Type); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *TreeCustomApp) validateURL(formats strfmt.Registry) error {
-
-	if err := validate.RequiredString("url", "body", m.URL); err != nil {
 		return err
 	}
 

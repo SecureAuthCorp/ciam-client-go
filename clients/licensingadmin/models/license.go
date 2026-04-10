@@ -7,6 +7,7 @@ package models
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
@@ -37,6 +38,10 @@ type License struct {
 	// Example: 2023-03-01T09:02:27.127932Z
 	// Format: date-time
 	StartDate strfmt.DateTime `json:"start_date,omitempty" yaml:"start_date,omitempty"`
+
+	// license type
+	// Enum: ["trial","enterprise"]
+	Type string `json:"type,omitempty" yaml:"type,omitempty"`
 }
 
 // Validate validates this license
@@ -48,6 +53,10 @@ func (m *License) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateStartDate(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateType(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -75,6 +84,48 @@ func (m *License) validateStartDate(formats strfmt.Registry) error {
 	}
 
 	if err := validate.FormatOf("start_date", "body", "date-time", m.StartDate.String(), formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+var licenseTypeTypePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["trial","enterprise"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		licenseTypeTypePropEnum = append(licenseTypeTypePropEnum, v)
+	}
+}
+
+const (
+
+	// LicenseTypeTrial captures enum value "trial"
+	LicenseTypeTrial string = "trial"
+
+	// LicenseTypeEnterprise captures enum value "enterprise"
+	LicenseTypeEnterprise string = "enterprise"
+)
+
+// prop value enum
+func (m *License) validateTypeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, licenseTypeTypePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *License) validateType(formats strfmt.Registry) error {
+	if swag.IsZero(m.Type) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateTypeEnum("type", "body", m.Type); err != nil {
 		return err
 	}
 

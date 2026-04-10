@@ -2,6 +2,8 @@ basePath: /default/default
 consumes:
 - application/json
 definitions:
+  AgentCapability:
+    type: string
   AuthorizationDetailType:
     type: string
   BackchannelAuthenticationError:
@@ -248,8 +250,24 @@ definitions:
     type: object
   DynamicClientRegistrationRequest:
     properties:
+      agent_capability:
+        $ref: '#/definitions/AgentCapability'
       app_url:
         description: Application URL
+        type: string
+        x-nullable: false
+      application_purpose:
+        description: Application purpose
+        enum:
+        - single_page
+        - server_web
+        - mobile_desktop
+        - service
+        - legacy
+        - custom
+        - saml
+        - ai_agent
+        example: signle_page
         type: string
         x-nullable: false
       application_type:
@@ -516,7 +534,7 @@ definitions:
 
           If empty, the `token_endpoint_auth_method` is used.
 
-          Cloudentity supports the following client authentication methods:
+          SecureAuth supports the following client authentication methods:
           `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
           `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 
@@ -536,7 +554,7 @@ definitions:
         $ref: '#/definitions/ClientJWKs'
       jwks_uri:
         description: A URL of JSON Web Key Set with the public keys used by a client
-          application to authenticate to Cloudentity.
+          application to authenticate to SecureAuth.
         type: string
         x-nullable: false
       logo_uri:
@@ -592,7 +610,7 @@ definitions:
         description: |-
           Request object signing algorithm for the token endpoint
 
-          Cloudentity supports signing tokens with the RS256, ES256, and PS256 algorithms. If you do not want
+          SecureAuth supports signing tokens with the RS256, ES256, and PS256 algorithms. If you do not want
           to use a signing algorithm, set the value of this parameter to `none`.
         enum:
         - any
@@ -623,7 +641,7 @@ definitions:
           A revocation endpoint authentication method configured for the client application (read-only).
           If empty, the `token_endpoint_auth_method` is used.
 
-          Cloudentity supports the following client authentication methods:
+          SecureAuth supports the following client authentication methods:
           `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
           `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 
@@ -761,7 +779,7 @@ definitions:
         description: |-
           Token endpoint authentication method configured for a client application
 
-          Cloudentity supports the following client authentication methods:
+          SecureAuth supports the following client authentication methods:
           `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
           `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 
@@ -832,8 +850,24 @@ definitions:
     type: object
   DynamicClientRegistrationResponse:
     properties:
+      agent_capability:
+        $ref: '#/definitions/AgentCapability'
       app_url:
         description: Application URL
+        type: string
+        x-nullable: false
+      application_purpose:
+        description: Application purpose
+        enum:
+        - single_page
+        - server_web
+        - mobile_desktop
+        - service
+        - legacy
+        - custom
+        - saml
+        - ai_agent
+        example: signle_page
         type: string
         x-nullable: false
       application_type:
@@ -1133,7 +1167,7 @@ definitions:
 
           If empty, the `token_endpoint_auth_method` is used.
 
-          Cloudentity supports the following client authentication methods:
+          SecureAuth supports the following client authentication methods:
           `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
           `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 
@@ -1153,7 +1187,7 @@ definitions:
         $ref: '#/definitions/ClientJWKs'
       jwks_uri:
         description: A URL of JSON Web Key Set with the public keys used by a client
-          application to authenticate to Cloudentity.
+          application to authenticate to SecureAuth.
         type: string
         x-nullable: false
       logo_uri:
@@ -1223,7 +1257,7 @@ definitions:
         description: |-
           Request object signing algorithm for the token endpoint
 
-          Cloudentity supports signing tokens with the RS256, ES256, and PS256 algorithms. If you do not want
+          SecureAuth supports signing tokens with the RS256, ES256, and PS256 algorithms. If you do not want
           to use a signing algorithm, set the value of this parameter to `none`.
         enum:
         - any
@@ -1254,7 +1288,7 @@ definitions:
           A revocation endpoint authentication method configured for the client application (read-only).
           If empty, the `token_endpoint_auth_method` is used.
 
-          Cloudentity supports the following client authentication methods:
+          SecureAuth supports the following client authentication methods:
           `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
           `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 
@@ -1385,7 +1419,7 @@ definitions:
         description: |-
           Token endpoint authentication method configured for a client application
 
-          Cloudentity supports the following client authentication methods:
+          SecureAuth supports the following client authentication methods:
           `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
           `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 
@@ -1683,6 +1717,9 @@ definitions:
       error_hint:
         type: string
         x-nullable: false
+      error_uri:
+        type: string
+        x-nullable: false
       status_code:
         format: int64
         type: integer
@@ -1690,7 +1727,7 @@ definitions:
     type: object
   RedirectURIs:
     description: |-
-      Cloudentity uses redirect URIs to redirect users back to the application after they authorized the application. Along
+      SecureAuth uses redirect URIs to redirect users back to the application after they authorized the application. Along
       with the redirection, an authorization code or access token is added to the URL.
 
       For backward compatibility reasons, it's also acceptable to pass `redirect_uris` as a string, for example:
@@ -1785,19 +1822,31 @@ definitions:
   genericError:
     description: Error response
     properties:
+      cause:
+        description: error cause
+        type: string
+        x-nullable: false
+      details:
+        description: error details
+        type: object
+        x-nullable: false
       error:
         example: The requested resource could not be found
         type: string
         x-nullable: false
-      error_code:
-        description: Code represents the error status code (404, 403, 401, ...).
-        example: 404
-        format: int64
-        type: integer
+      error_description:
+        description: error description
+        type: string
         x-nullable: false
       error_hint:
         example: Object with ID 12345 does not exist
         type: string
+        x-nullable: false
+      status_code:
+        description: Code represents the error status code (404, 403, 401, ...).
+        example: 404
+        format: int64
+        type: integer
         x-nullable: false
     required:
     - error
@@ -2472,7 +2521,7 @@ definitions:
 host: localhost:8443
 info:
   description: |-
-    Cloudentity OAuth2 API
+    SecureAuth OAuth2 API
 
     The POST APIs support idempotency for safely retrying requests without accidentally performing the same operation twice.
 
@@ -2483,7 +2532,7 @@ info:
     3. Retry failed requests with the same key within 1 minute.
 
     Responses for replayed requests will include the X-Idempotent-Replayed: true header.
-  title: Cloudentity  API
+  title: SecureAuth  API
   version: latest
 paths:
   /.well-known/jwks.json:
@@ -2727,7 +2776,7 @@ paths:
         authorization decision appropriately.
 
         Client applications that call the OAuth 2.0 Introspection Endpoint must authenticate with the
-        Cloudentity authorization server either with a valid access token provided as the value of
+        SecureAuth authorization server either with a valid access token provided as the value of
         the `Authorization: Bearer $AT` request header or using the client authentication method
         configured for the client application.
 
@@ -2764,10 +2813,10 @@ paths:
     post:
       description: |-
         Dynamic Client Registration endpoint allows to dynamically register OAuth 2.0 client applications
-        with the Cloudentity Platform. When a request with all required registration metadata
-        values reaches the Cloudentity authorization server, the server issues a client
+        with the SecureAuth Platform. When a request with all required registration metadata
+        values reaches the SecureAuth authorization server, the server issues a client
         identifier and provides client metadata values registered for the client.
-        Client applications can use their registration data to communicate with the Cloudentity
+        Client applications can use their registration data to communicate with the SecureAuth
         platform using the OAuth 2.0 protocol.
       operationId: dynamicClientRegistration
       parameters:
@@ -2887,7 +2936,7 @@ paths:
         exchange a refresh token to an access token.
 
         Client applications that call the OAuth 2.0 Revocation Endpoint must authenticate with the
-        Cloudentity authorization server either
+        SecureAuth authorization server either
         with a valid access token provided as the value of the `Authorization: Bearer $AT` request header
         or using the client authentication method configured for the client application.
 

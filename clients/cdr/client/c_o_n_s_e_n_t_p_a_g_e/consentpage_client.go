@@ -68,7 +68,7 @@ type ClientService interface {
 /*
 	AcceptCDRArrangementSystem accepts c d r arrangement
 
-	Notify Cloudentity that the user has authorized the client application to access their resources on their own behalf.
+	Notify SecureAuth that the user has authorized the client application to access their resources on their own behalf.
 
 It's sent once the user gives consent on the consent page.
 
@@ -157,7 +157,7 @@ func (a *Client) GetCDRArrangementSystem(params *GetCDRArrangementSystemParams, 
 /*
 	RejectCDRArrangementSystem rejects c d r arrangement
 
-	Notify Cloudentity that the client application isn't authorized to access user resources. It's sent when the user
+	Notify SecureAuth that the client application isn't authorized to access user resources. It's sent when the user
 
 rejected a consent on the consent page.
 
