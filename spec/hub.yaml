@@ -28,6 +28,13 @@ definitions:
         type: string
         x-nullable: false
     type: object
+  ActiveDirectoryCredentials:
+    type: object
+  ActiveDirectorySettings:
+    properties:
+      directory_id:
+        $ref: '#/definitions/DirectoryID'
+    type: object
   AdvancedConfiguration:
     properties:
       acr_values:
@@ -40,6 +47,10 @@ definitions:
       advertise_only_mtls_aliases_in_well_known:
         description: This option overrides all urls advertised by the well known endpoint
           with their mtls alias
+        type: boolean
+        x-nullable: false
+      auto_request_recovery:
+        description: auto request recovery
         type: boolean
         x-nullable: false
       block_response_modes:
@@ -146,6 +157,8 @@ definitions:
         x-nullable: false
     title: AffiliationDescriptor represents the SAML AffiliationDescriptor object.
     type: object
+  AgentCapability:
+    type: string
   ApigeeMetadata:
     properties:
       environment_name:
@@ -449,7 +462,12 @@ definitions:
       - otp
       - email_otp
       - sms_otp
+      - voice_otp
       - webauthn
+      - usernameless_webauthn
+      - push
+      - symbol
+      - qr_code
       type: string
     type: array
   AuthnAuthorityDescriptor:
@@ -1015,13 +1033,18 @@ definitions:
         example: https://example.com/login
         type: string
         x-nullable: false
+      recovery_methods:
+        description: List of supported recovery methods by this custom idp
+        items: {}
+        type: array
+        x-nullable: false
       type:
         description: |-
           Type metadata
 
           There are two type metadatas: `generic` and `cloudentity`. If you choose `cloudentity` and do
           not provide authentication context attributes, it defaults to using the attributes from
-          Cloudentity Cloud Identity Plane (CIP).
+          SecureAuth Cloud Identity Plane (CIP).
 
           If not provided, the `generic` type is set.
         format: customIDPType
@@ -1045,6 +1068,8 @@ definitions:
         type: integer
         x-nullable: false
     type: object
+  DirectoryID:
+    type: string
   Duration:
     description: |-
       A Duration represents the elapsed time between two instants
@@ -1063,7 +1088,7 @@ definitions:
         x-nullable: false
       default_scopes:
         description: |-
-          An optional list of scopes to be granted to a client when no scopes are provided in the DCR registration request
+          An optional list of scopes that are always included in client registrations, merged with any scopes requested by the client
 
           If not provided, the following default scopes are granted for the client application: openid, address, email, phone, profile.
         items:
@@ -1451,6 +1476,15 @@ definitions:
         type: string
         x-nullable: false
     type: object
+  FieldMapping:
+    properties:
+      internal:
+        type: string
+        x-nullable: false
+      scim:
+        type: string
+        x-nullable: false
+    type: object
   FnEnvVersion:
     type: string
   GatewayAPI:
@@ -1697,6 +1731,8 @@ definitions:
     type: object
   IDPCredentials:
     properties:
+      active_directory:
+        $ref: '#/definitions/ActiveDirectoryCredentials'
       apple:
         $ref: '#/definitions/AppleCredentials'
       auth0:
@@ -1739,6 +1775,8 @@ definitions:
         $ref: '#/definitions/SAMLV2Credentials'
       static:
         $ref: '#/definitions/StaticCredentials'
+      workforce:
+        $ref: '#/definitions/WorkforceCredentials'
       x:
         $ref: '#/definitions/XCredentials'
     type: object
@@ -1890,6 +1928,8 @@ definitions:
     type: object
   IDPSettings:
     properties:
+      active_directory:
+        $ref: '#/definitions/ActiveDirectorySettings'
       apple:
         $ref: '#/definitions/AppleSettings'
       auth0:
@@ -1932,6 +1972,8 @@ definitions:
         $ref: '#/definitions/SAMLV2Settings'
       static:
         $ref: '#/definitions/StaticSettings'
+      workforce:
+        $ref: '#/definitions/WorkforceSettings'
       x:
         $ref: '#/definitions/XSettings'
     type: object
@@ -2315,6 +2357,8 @@ definitions:
         $ref: '#/definitions/EmailAuth'
       sms:
         $ref: '#/definitions/SMSAuth'
+      voice:
+        $ref: '#/definitions/VoiceAuth'
     type: object
   MFASettings:
     properties:
@@ -2322,6 +2366,8 @@ definitions:
         $ref: '#/definitions/EmailSettings'
       sms:
         $ref: '#/definitions/SMSSettings'
+      voice:
+        $ref: '#/definitions/VoiceSettings'
     type: object
   Mapping:
     description: Source and target must be provided.
@@ -2351,6 +2397,10 @@ definitions:
           single values are converted to slices if required. Each element is weakly decoded.
         example: false
         type: boolean
+        x-nullable: false
+      default:
+        description: Default value used when source value is missing in dynamic mode.
+        type: object
         x-nullable: false
       mode:
         $ref: '#/definitions/MappingMode'
@@ -2840,6 +2890,8 @@ definitions:
         $ref: '#/definitions/OtpConfig'
       enroll_webauthn:
         $ref: '#/definitions/OtpConfig'
+      pair_device:
+        $ref: '#/definitions/OtpConfig'
       reset_password:
         $ref: '#/definitions/OtpConfig'
       reset_totp:
@@ -2970,6 +3022,42 @@ definitions:
       jws_payload:
         $ref: '#/definitions/JWSPayloadSettings'
     type: object
+  PhoneProvider:
+    description: Set exactly one provider type (e.g. twilio, vonage, telesign).
+    properties:
+      telesign:
+        $ref: '#/definitions/TelesignPhoneProvider'
+      twilio:
+        $ref: '#/definitions/TwilioPhoneProvider'
+      vonage:
+        $ref: '#/definitions/VonagePhoneProvider'
+    title: PhoneProvider defines a single phone messaging provider.
+    type: object
+  PoolLimits:
+    description: All values are clamped to the range [1, 100] with sensible defaults.
+    properties:
+      max_addresses:
+        format: int64
+        type: integer
+        x-nullable: false
+      max_codes:
+        format: int64
+        type: integer
+        x-nullable: false
+      max_credentials:
+        format: int64
+        type: integer
+        x-nullable: false
+      max_identifiers:
+        format: int64
+        type: integer
+        x-nullable: false
+      webauthn_credentials_capacity:
+        format: int64
+        type: integer
+        x-nullable: false
+    title: PoolLimits defines limits for user sub-entries within a pool.
+    type: object
   PreProvisioningAuthenticationFlowControl:
     type: string
   PreProvisioningConfiguration:
@@ -3006,7 +3094,7 @@ definitions:
     type: object
   RedirectURIs:
     description: |-
-      Cloudentity uses redirect URIs to redirect users back to the application after they authorized the application. Along
+      SecureAuth uses redirect URIs to redirect users back to the application after they authorized the application. Along
       with the redirection, an authorization code or access token is added to the URL.
 
       For backward compatibility reasons, it's also acceptable to pass `redirect_uris` as a string, for example:
@@ -3252,6 +3340,8 @@ definitions:
         x-nullable: false
       response_binding_mode:
         $ref: '#/definitions/SAMLResponseBindingMode'
+      service_provider_discovery_mode:
+        $ref: '#/definitions/ServiceProviderDiscoveryMode'
       signing_hash_algorithms:
         default:
         - sha-256
@@ -3432,6 +3522,14 @@ definitions:
 
           If empty than NameID will be used instead.
         type: string
+        x-nullable: false
+    type: object
+  SCIMSettings:
+    properties:
+      inboundInputMapping:
+        items:
+          $ref: '#/definitions/FieldMapping'
+        type: array
         x-nullable: false
     type: object
   SMSAuth:
@@ -3972,6 +4070,10 @@ definitions:
         type: string
         x-nullable: false
     type: object
+  ServiceCapability:
+    type: string
+  ServiceProviderDiscoveryMode:
+    type: string
   StaticCredentials:
     description: Static IDP specific credentials
     properties:
@@ -4197,6 +4299,22 @@ definitions:
         type: boolean
         x-nullable: false
     type: object
+  TelesignPhoneProvider:
+    properties:
+      api_key:
+        type: string
+        x-nullable: false
+      customer_id:
+        type: string
+        x-nullable: false
+      from:
+        type: string
+        x-nullable: false
+    required:
+    - customer_id
+    - api_key
+    title: TelesignPhoneProvider holds TeleSign-specific configuration.
+    type: object
   TenantMetadata:
     additionalProperties:
       type: object
@@ -4221,7 +4339,7 @@ definitions:
         type: object
         x-nullable: false
       workforce:
-        $ref: '#/definitions/WorkforceSettings'
+        $ref: '#/definitions/TenantWorkforceSettings'
     type: object
   TenantTranslationsSettings:
     properties:
@@ -4244,6 +4362,18 @@ definitions:
       selector_enabled:
         description: Is locale selector enabled in templates
         type: boolean
+        x-nullable: false
+    type: object
+  TenantWorkforceSettings:
+    properties:
+      faye_url:
+        type: string
+        x-nullable: false
+      manifest_url:
+        type: string
+        x-nullable: false
+      url:
+        type: string
         x-nullable: false
     type: object
   Token:
@@ -4435,8 +4565,24 @@ definitions:
     type: object
   TreeClient:
     properties:
+      agent_capability:
+        $ref: '#/definitions/AgentCapability'
       app_url:
         description: Application URL
+        type: string
+        x-nullable: false
+      application_purpose:
+        description: Application purpose
+        enum:
+        - single_page
+        - server_web
+        - mobile_desktop
+        - service
+        - legacy
+        - custom
+        - saml
+        - ai_agent
+        example: signle_page
         type: string
         x-nullable: false
       application_type:
@@ -4755,7 +4901,7 @@ definitions:
 
           If empty, the `token_endpoint_auth_method` is used.
 
-          Cloudentity supports the following client authentication methods:
+          SecureAuth supports the following client authentication methods:
           `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
           `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 
@@ -4775,7 +4921,7 @@ definitions:
         $ref: '#/definitions/ClientJWKs'
       jwks_uri:
         description: A URL of JSON Web Key Set with the public keys used by a client
-          application to authenticate to Cloudentity.
+          application to authenticate to SecureAuth.
         type: string
         x-nullable: false
       logo_uri:
@@ -4839,7 +4985,7 @@ definitions:
         description: |-
           Request object signing algorithm for the token endpoint
 
-          Cloudentity supports signing tokens with the RS256, ES256, and PS256 algorithms. If you do not want
+          SecureAuth supports signing tokens with the RS256, ES256, and PS256 algorithms. If you do not want
           to use a signing algorithm, set the value of this parameter to `none`.
         enum:
         - any
@@ -4870,7 +5016,7 @@ definitions:
           A revocation endpoint authentication method configured for the client application (read-only).
           If empty, the `token_endpoint_auth_method` is used.
 
-          Cloudentity supports the following client authentication methods:
+          SecureAuth supports the following client authentication methods:
           `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
           `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 
@@ -4898,6 +5044,11 @@ definitions:
         items:
           type: string
         type: array
+        x-nullable: false
+      saml_idp_accept_acs_from_request:
+        description: accept ACS from SamlRequest even if it's not registered in the
+          metadata
+        type: boolean
         x-nullable: false
       saml_idp_attributes_override:
         $ref: '#/definitions/SAMLIDPAttributesOverride'
@@ -5084,7 +5235,7 @@ definitions:
         description: |-
           Token endpoint authentication method configured for a client application
 
-          Cloudentity supports the following client authentication methods:
+          SecureAuth supports the following client authentication methods:
           `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`,
           `self_signed_tls_client_auth`, `tls_client_auth`, `none`.
 
@@ -5189,15 +5340,16 @@ definitions:
         description: Type of the custom app
         enum:
         - post-authn
+        - scim
         example: post-authn
         type: string
         x-nullable: false
       url:
-        description: url of the CustomApp
+        description: |-
+          URL of the CustomApp.
+          Required for type 'post-authn'. Not allowed for type 'scim'.
         type: string
         x-nullable: false
-    required:
-    - url
     type: object
   TreeCustomApps:
     additionalProperties:
@@ -5244,7 +5396,7 @@ definitions:
         x-nullable: false
       name:
         description: gateway name
-        example: Cloudentity Pyron
+        example: SecureAuth Pyron
         type: string
         x-nullable: false
       token_exchange:
@@ -5340,8 +5492,8 @@ definitions:
         description: |-
           Defines the type of an IDP
 
-          Cloudentity is designed to make it possible for you to bring any of your own IDPs and integrate it
-          with Cloudentity as it delivers enterprise connectors for major Cloud IDPs and a possibility for
+          SecureAuth is designed to make it possible for you to bring any of your own IDPs and integrate it
+          with SecureAuth as it delivers enterprise connectors for major Cloud IDPs and a possibility for
           custom integration DKS for home-built solutions. You can also use built-in Sandbox IDP, which
           is a static IDP, to create an IDP for testing purposes.
         format: idpMethod
@@ -5404,6 +5556,7 @@ definitions:
         enum:
         - sms
         - email
+        - voice
         example: email
         type: string
         x-nullable: false
@@ -5416,6 +5569,17 @@ definitions:
   TreeMFAMethods:
     additionalProperties:
       $ref: '#/definitions/TreeMFAMethod'
+    type: object
+  TreePhoneProviderConfig:
+    properties:
+      active:
+        type: boolean
+        x-nullable: false
+      providers:
+        items:
+          $ref: '#/definitions/PhoneProvider'
+        type: array
+        x-nullable: false
     type: object
   TreePolicies:
     additionalProperties:
@@ -5436,7 +5600,7 @@ definitions:
         description: |-
           Language of a policy
 
-          ACP supports creating Cloudentity policies (using a visual editor or defined using JSON or
+          ACP supports creating SecureAuth policies (using a visual editor or defined using JSON or
           YAML) and policies defined using REGO (language used by Open Policy Agent (OPA)).
         example: cloudentity
         format: policyLanguage
@@ -5476,7 +5640,7 @@ definitions:
         type: string
         x-nullable: false
       validators:
-        description: An array of validators for a Cloudentity policy
+        description: An array of validators for a SecureAuth policy
         items:
           $ref: '#/definitions/ValidatorConfig'
         type: array
@@ -5536,6 +5700,8 @@ definitions:
         format: schemaID
         type: string
         x-nullable: false
+      pool_limits:
+        $ref: '#/definitions/PoolLimits'
       preferred_authentication_mechanism:
         enum:
         - totp
@@ -5543,7 +5709,12 @@ definitions:
         - otp
         - email_otp
         - sms_otp
+        - voice_otp
         - webauthn
+        - usernameless_webauthn
+        - push
+        - symbol
+        - qr_code
         example: password
         type: string
         x-nullable: false
@@ -5552,6 +5723,8 @@ definitions:
         x-nullable: false
       reset_credentials_settings:
         $ref: '#/definitions/ResetCredentialsSettings'
+      scim_settings:
+        $ref: '#/definitions/SCIMSettings'
       second_factor_authentication_mechanisms:
         $ref: '#/definitions/AuthenticationMechanisms'
       second_factor_preferred_authentication_mechanism:
@@ -5561,7 +5734,12 @@ definitions:
         - otp
         - email_otp
         - sms_otp
+        - voice_otp
         - webauthn
+        - usernameless_webauthn
+        - push
+        - symbol
+        - qr_code
         example: password
         type: string
         x-nullable: false
@@ -5575,6 +5753,8 @@ definitions:
         x-nullable: false
       totp_settings:
         $ref: '#/definitions/TotpSettings'
+      webauthn_settings:
+        $ref: '#/definitions/WebAuthnSettings'
     required:
     - name
     type: object
@@ -5736,7 +5916,12 @@ definitions:
           - otp
           - email_otp
           - sms_otp
+          - voice_otp
           - webauthn
+          - usernameless_webauthn
+          - push
+          - symbol
+          - qr_code
           type: string
         type: array
         x-nullable: false
@@ -6040,6 +6225,7 @@ definitions:
         - fapi_20_message_signing
         - connect_id
         - agentic_ai
+        - saidp_legacy
         example: default
         type: string
         x-nullable: false
@@ -6299,6 +6485,12 @@ definitions:
     properties:
       apis:
         $ref: '#/definitions/TreeAPIs'
+      capabilities:
+        description: Service capabilities
+        items:
+          $ref: '#/definitions/ServiceCapability'
+        type: array
+        x-nullable: false
       custom_audience:
         description: Custom service audience
         example: https://api.example.com
@@ -6388,6 +6580,8 @@ definitions:
         example: Default
         type: string
         x-nullable: false
+      phone_provider_config:
+        $ref: '#/definitions/TreePhoneProviderConfig'
       pools:
         $ref: '#/definitions/TreePools'
       schemas:
@@ -6478,6 +6672,11 @@ definitions:
         description: events
         type: object
         x-nullable: false
+      include_child_events:
+        description: IncludeChildEvents indicates whether to receive events from child
+          organizations
+        type: boolean
+        x-nullable: false
       insecure:
         description: Insecure
         type: boolean
@@ -6500,6 +6699,23 @@ definitions:
           the Software Statement
         type: string
         x-nullable: false
+    type: object
+  TwilioPhoneProvider:
+    properties:
+      auth_token:
+        type: string
+        x-nullable: false
+      from:
+        type: string
+        x-nullable: false
+      sid:
+        type: string
+        x-nullable: false
+    required:
+    - sid
+    - auth_token
+    - from
+    title: TwilioPhoneProvider holds Twilio-specific configuration.
     type: object
   UserAttributeMapping:
     properties:
@@ -6528,6 +6744,10 @@ definitions:
           single values are converted to slices if required. Each element is weakly decoded.
         example: false
         type: boolean
+        x-nullable: false
+      default:
+        description: Default value used when source value is missing in dynamic mode.
+        type: object
         x-nullable: false
       mode:
         $ref: '#/definitions/MappingMode'
@@ -6605,8 +6825,78 @@ definitions:
         x-nullable: false
     title: Configuration of a policy validator
     type: object
+  VoiceAuth:
+    properties:
+      auth_token:
+        description: The Twilio Auth Token.
+        type: string
+        x-nullable: false
+      sid:
+        description: The Twilio Account SID.
+        type: string
+        x-nullable: false
+    required:
+    - sid
+    - auth_token
+    type: object
+  VoiceSettings:
+    properties:
+      custom_source:
+        description: |-
+          Custom voice call From phone number.
+
+          If not set, the default is used.
+        type: string
+        x-nullable: false
+      otp:
+        $ref: '#/definitions/OTPConfiguration'
+      provider:
+        description: Voice provider.
+        enum:
+        - twilio
+        - embedded
+        example: embedded
+        type: string
+        x-nullable: false
+    type: object
+  VonagePhoneProvider:
+    properties:
+      api_key:
+        type: string
+        x-nullable: false
+      api_secret:
+        type: string
+        x-nullable: false
+      from:
+        type: string
+        x-nullable: false
+    required:
+    - api_key
+    - api_secret
+    - from
+    title: VonagePhoneProvider holds Vonage-specific configuration.
+    type: object
+  WebAuthnSettings:
+    properties:
+      rp_id:
+        type: string
+        x-nullable: false
+      rp_origins:
+        items:
+          type: string
+        type: array
+        x-nullable: false
+    type: object
   WorkforceConfiguration:
     properties:
+      client_id:
+        description: workforce authentication client id
+        type: string
+        x-nullable: false
+      client_secret:
+        description: workforce authentication client secret
+        type: string
+        x-nullable: false
       status:
         $ref: '#/definitions/WorkforceProvisioningStatus'
       tenant_slug:
@@ -6614,18 +6904,19 @@ definitions:
         type: string
         x-nullable: false
     type: object
+  WorkforceCredentials:
+    type: object
   WorkforceProvisioningStatus:
     type: string
   WorkforceSettings:
     properties:
-      faye_url:
+      issuer_url:
         type: string
         x-nullable: false
-      manifest_url:
-        type: string
-        x-nullable: false
-      url:
-        type: string
+      scopes:
+        items:
+          type: string
+        type: array
         x-nullable: false
     type: object
   X509Certificate:
@@ -6685,7 +6976,7 @@ definitions:
 host: localhost:8443
 info:
   description: |-
-    Cloudentity Hub API
+    SecureAuth Hub API
 
     The POST APIs support idempotency for safely retrying requests without accidentally performing the same operation twice.
 
@@ -6696,7 +6987,7 @@ info:
     3. Retry failed requests with the same key within 1 minute.
 
     Responses for replayed requests will include the X-Idempotent-Replayed: true header.
-  title: Cloudentity API
+  title: SecureAuth API
   version: latest
 paths:
   /{tid}/promote/config:
@@ -6764,15 +7055,15 @@ paths:
 
           The `mode` parameter defines
           what happens if there are any conflicts when importing your configuration. For example, if a
-          client already exists within Cloudentity and you are trying to import a
+          client already exists within SecureAuth and you are trying to import a
           configuration that also has a client with this ID, there are the following ways
-          Cloudentity can handle the request:
+          SecureAuth can handle the request:
 
-          `mode` set to `ignore`, Cloudentity ignores the changes that come from your configuration import.
+          `mode` set to `ignore`, SecureAuth ignores the changes that come from your configuration import.
 
-          `mode` set to `fail`, Cloudentity stops processing the import and returns an error.
+          `mode` set to `fail`, SecureAuth stops processing the import and returns an error.
 
-          `mode` set to `update`, Cloudentity updates the value from the previous configuration with the value
+          `mode` set to `update`, SecureAuth updates the value from the previous configuration with the value
           provided in the request.
         format: insertMode
         in: query
@@ -6840,15 +7131,15 @@ paths:
 
           The `mode` parameter defines
           what happens if there are any conflicts when importing your configuration. For example, if a
-          client already exists within Cloudentity and you are trying to import a
+          client already exists within SecureAuth and you are trying to import a
           configuration that also has a client with this ID, there are the following ways
-          Cloudentity can handle the request:
+          SecureAuth can handle the request:
 
-          `mode` set to `ignore`, Cloudentity ignores the changes that come from your configuration import.
+          `mode` set to `ignore`, SecureAuth ignores the changes that come from your configuration import.
 
-          `mode` set to `fail`, Cloudentity stops processing the import and returns an error.
+          `mode` set to `fail`, SecureAuth stops processing the import and returns an error.
 
-          `mode` set to `update`, Cloudentity updates the value from the previous configuration with the value
+          `mode` set to `update`, SecureAuth updates the value from the previous configuration with the value
           provided in the request.
         format: insertMode
         in: query
@@ -6913,15 +7204,15 @@ paths:
 
           The `mode` parameter defines
           what happens if there are any conflicts when importing your configuration. For example, if a
-          client already exists within Cloudentity and you are trying to import a
+          client already exists within SecureAuth and you are trying to import a
           configuration that also has a client with this ID, there are the following ways
-          Cloudentity can handle the request:
+          SecureAuth can handle the request:
 
-          `mode` set to `ignore`, Cloudentity ignores the changes that come from your configuration import.
+          `mode` set to `ignore`, SecureAuth ignores the changes that come from your configuration import.
 
-          `mode` set to `fail`, Cloudentity stops processing the import and returns an error.
+          `mode` set to `fail`, SecureAuth stops processing the import and returns an error.
 
-          `mode` set to `update`, Cloudentity updates the value from the previous configuration with the value
+          `mode` set to `update`, SecureAuth updates the value from the previous configuration with the value
           provided in the request.
         format: insertMode
         in: query
@@ -7076,15 +7367,15 @@ paths:
 
           The `mode` parameter defines
           what happens if there are any conflicts when importing your configuration. For example, if a
-          client already exists within Cloudentity and you are trying to import a
+          client already exists within SecureAuth and you are trying to import a
           configuration that also has a client with this ID, there are the following ways
-          Cloudentity can handle the request:
+          SecureAuth can handle the request:
 
-          `mode` set to `ignore`, Cloudentity ignores the changes that come from your configuration import.
+          `mode` set to `ignore`, SecureAuth ignores the changes that come from your configuration import.
 
-          `mode` set to `fail`, Cloudentity stops processing the import and returns an error.
+          `mode` set to `fail`, SecureAuth stops processing the import and returns an error.
 
-          `mode` set to `update`, Cloudentity updates the value from the previous configuration with the value
+          `mode` set to `update`, SecureAuth updates the value from the previous configuration with the value
           provided in the request.
         format: insertMode
         in: query
@@ -7158,15 +7449,15 @@ paths:
 
           The `mode` parameter defines
           what happens if there are any conflicts when importing your configuration. For example, if a
-          client already exists within Cloudentity and you are trying to import a
+          client already exists within SecureAuth and you are trying to import a
           configuration that also has a client with this ID, there are the following ways
-          Cloudentity can handle the request:
+          SecureAuth can handle the request:
 
-          `mode` set to `ignore`, Cloudentity ignores the changes that come from your configuration import.
+          `mode` set to `ignore`, SecureAuth ignores the changes that come from your configuration import.
 
-          `mode` set to `fail`, Cloudentity stops processing the import and returns an error.
+          `mode` set to `fail`, SecureAuth stops processing the import and returns an error.
 
-          `mode` set to `update`, Cloudentity updates the value from the previous configuration with the value
+          `mode` set to `update`, SecureAuth updates the value from the previous configuration with the value
           provided in the request.
         format: insertMode
         in: query
@@ -7237,15 +7528,15 @@ paths:
 
           The `mode` parameter defines
           what happens if there are any conflicts when importing your configuration. For example, if a
-          client already exists within Cloudentity and you are trying to import a
+          client already exists within SecureAuth and you are trying to import a
           configuration that also has a client with this ID, there are the following ways
-          Cloudentity can handle the request:
+          SecureAuth can handle the request:
 
-          `mode` set to `ignore`, Cloudentity ignores the changes that come from your configuration import.
+          `mode` set to `ignore`, SecureAuth ignores the changes that come from your configuration import.
 
-          `mode` set to `fail`, Cloudentity stops processing the import and returns an error.
+          `mode` set to `fail`, SecureAuth stops processing the import and returns an error.
 
-          `mode` set to `update`, Cloudentity updates the value from the previous configuration with the value
+          `mode` set to `update`, SecureAuth updates the value from the previous configuration with the value
           provided in the request.
         format: insertMode
         in: query
@@ -7341,15 +7632,15 @@ paths:
 
           The `mode` parameter defines
           what happens if there are any conflicts when importing your configuration. For example, if a
-          client already exists within Cloudentity and you are trying to import a
+          client already exists within SecureAuth and you are trying to import a
           configuration that also has a client with this ID, there are the following ways
-          Cloudentity can handle the request:
+          SecureAuth can handle the request:
 
-          `mode` set to `ignore`, Cloudentity ignores the changes that come from your configuration import.
+          `mode` set to `ignore`, SecureAuth ignores the changes that come from your configuration import.
 
-          `mode` set to `fail`, Cloudentity stops processing the import and returns an error.
+          `mode` set to `fail`, SecureAuth stops processing the import and returns an error.
 
-          `mode` set to `update`, Cloudentity updates the value from the previous configuration with the value
+          `mode` set to `update`, SecureAuth updates the value from the previous configuration with the value
           provided in the request.
         format: insertMode
         in: query
@@ -7417,15 +7708,15 @@ paths:
 
           The `mode` parameter defines
           what happens if there are any conflicts when importing your configuration. For example, if a
-          client already exists within Cloudentity and you are trying to import a
+          client already exists within SecureAuth and you are trying to import a
           configuration that also has a client with this ID, there are the following ways
-          Cloudentity can handle the request:
+          SecureAuth can handle the request:
 
-          `mode` set to `ignore`, Cloudentity ignores the changes that come from your configuration import.
+          `mode` set to `ignore`, SecureAuth ignores the changes that come from your configuration import.
 
-          `mode` set to `fail`, Cloudentity stops processing the import and returns an error.
+          `mode` set to `fail`, SecureAuth stops processing the import and returns an error.
 
-          `mode` set to `update`, Cloudentity updates the value from the previous configuration with the value
+          `mode` set to `update`, SecureAuth updates the value from the previous configuration with the value
           provided in the request.
         format: insertMode
         in: query
@@ -7490,15 +7781,15 @@ paths:
 
           The `mode` parameter defines
           what happens if there are any conflicts when importing your configuration. For example, if a
-          client already exists within Cloudentity and you are trying to import a
+          client already exists within SecureAuth and you are trying to import a
           configuration that also has a client with this ID, there are the following ways
-          Cloudentity can handle the request:
+          SecureAuth can handle the request:
 
-          `mode` set to `ignore`, Cloudentity ignores the changes that come from your configuration import.
+          `mode` set to `ignore`, SecureAuth ignores the changes that come from your configuration import.
 
-          `mode` set to `fail`, Cloudentity stops processing the import and returns an error.
+          `mode` set to `fail`, SecureAuth stops processing the import and returns an error.
 
-          `mode` set to `update`, Cloudentity updates the value from the previous configuration with the value
+          `mode` set to `update`, SecureAuth updates the value from the previous configuration with the value
           provided in the request.
         format: insertMode
         in: query

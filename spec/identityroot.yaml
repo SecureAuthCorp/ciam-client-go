@@ -36,7 +36,12 @@ definitions:
       - otp
       - email_otp
       - sms_otp
+      - voice_otp
       - webauthn
+      - usernameless_webauthn
+      - push
+      - symbol
+      - qr_code
       type: string
     type: array
   BcryptConfig:
@@ -86,6 +91,7 @@ definitions:
         - challenge
         - verify_address
         - authentication
+        - pair_device
         example: active
         type: string
         x-nullable: false
@@ -191,6 +197,15 @@ definitions:
         type: integer
         x-nullable: false
     type: object
+  FieldMapping:
+    properties:
+      internal:
+        type: string
+        x-nullable: false
+      scim:
+        type: string
+        x-nullable: false
+    type: object
   GroupMember:
     properties:
       group_id:
@@ -242,7 +257,14 @@ definitions:
     type: object
   InternalGroup:
     properties:
+      created_at:
+        format: date-time
+        type: string
+        x-nullable: false
       description:
+        type: string
+        x-nullable: false
+      external_id:
         type: string
         x-nullable: false
       id:
@@ -257,6 +279,10 @@ definitions:
         x-nullable: false
       tenant_id:
         format: tenantID
+        type: string
+        x-nullable: false
+      updated_at:
+        format: date-time
         type: string
         x-nullable: false
       user_pool_id:
@@ -289,7 +315,12 @@ definitions:
         - otp
         - email_otp
         - sms_otp
+        - voice_otp
         - webauthn
+        - usernameless_webauthn
+        - push
+        - symbol
+        - qr_code
         type: string
         x-nullable: false
     type: object
@@ -313,6 +344,8 @@ definitions:
       challenge:
         $ref: '#/definitions/OtpConfig'
       enroll_webauthn:
+        $ref: '#/definitions/OtpConfig'
+      pair_device:
         $ref: '#/definitions/OtpConfig'
       reset_password:
         $ref: '#/definitions/OtpConfig'
@@ -446,6 +479,8 @@ definitions:
         format: schemaID
         type: string
         x-nullable: false
+      pool_limits:
+        $ref: '#/definitions/PoolLimits'
       preferred_authentication_mechanism:
         enum:
         - totp
@@ -453,7 +488,12 @@ definitions:
         - otp
         - email_otp
         - sms_otp
+        - voice_otp
         - webauthn
+        - usernameless_webauthn
+        - push
+        - symbol
+        - qr_code
         example: password
         type: string
         x-nullable: false
@@ -462,6 +502,8 @@ definitions:
         x-nullable: false
       reset_credentials_settings:
         $ref: '#/definitions/ResetCredentialsSettings'
+      scim_settings:
+        $ref: '#/definitions/SCIMSettings'
       second_factor_authentication_mechanisms:
         $ref: '#/definitions/AuthenticationMechanisms'
       second_factor_preferred_authentication_mechanism:
@@ -471,7 +513,12 @@ definitions:
         - otp
         - email_otp
         - sms_otp
+        - voice_otp
         - webauthn
+        - usernameless_webauthn
+        - push
+        - symbol
+        - qr_code
         example: password
         type: string
         x-nullable: false
@@ -490,6 +537,8 @@ definitions:
         x-nullable: false
       totp_settings:
         $ref: '#/definitions/TotpSettings'
+      webauthn_settings:
+        $ref: '#/definitions/WebAuthnSettings'
       workspace_id:
         format: serverID
         type: string
@@ -497,6 +546,31 @@ definitions:
     required:
     - tenant_id
     - name
+    type: object
+  PoolLimits:
+    description: All values are clamped to the range [1, 100] with sensible defaults.
+    properties:
+      max_addresses:
+        format: int64
+        type: integer
+        x-nullable: false
+      max_codes:
+        format: int64
+        type: integer
+        x-nullable: false
+      max_credentials:
+        format: int64
+        type: integer
+        x-nullable: false
+      max_identifiers:
+        format: int64
+        type: integer
+        x-nullable: false
+      webauthn_credentials_capacity:
+        format: int64
+        type: integer
+        x-nullable: false
+    title: PoolLimits defines limits for user sub-entries within a pool.
     type: object
   RequestCode:
     properties:
@@ -521,6 +595,7 @@ definitions:
         - challenge
         - verify_address
         - authentication
+        - pair_device
         type: string
         x-nullable: false
     required:
@@ -578,6 +653,14 @@ definitions:
     items:
       $ref: '#/definitions/Rfc6902PatchOperation'
     type: array
+  SCIMSettings:
+    properties:
+      inboundInputMapping:
+        items:
+          $ref: '#/definitions/FieldMapping'
+        type: array
+        x-nullable: false
+    type: object
   SHAConfig:
     properties:
       function:
@@ -847,6 +930,11 @@ definitions:
         type: string
         x-nullable: false
       user_type:
+        enum:
+        - jit
+        - standard
+        - scim
+        type: string
         x-nullable: false
     required:
     - tenant_id
@@ -857,6 +945,9 @@ definitions:
     properties:
       created_at:
         format: date-time
+        type: string
+        x-nullable: false
+      discoverable_id:
         type: string
         x-nullable: false
       expires_at:
@@ -889,6 +980,7 @@ definitions:
         - password
         - webauthn
         - totp
+        - device
         example: password
         type: string
         x-nullable: false
@@ -978,6 +1070,15 @@ definitions:
     type: object
   UserPreferences:
     properties:
+      locales:
+        description: Locale is the list of user's preferred languages/locales for
+          UI and communications
+        example: en-US, es-ES
+        items:
+          format: locale
+          type: string
+        type: array
+        x-nullable: false
       mfa:
         $ref: '#/definitions/MFAPreferences'
     type: object
@@ -1067,10 +1168,21 @@ definitions:
     - created_at
     - updated_at
     type: object
+  WebAuthnSettings:
+    properties:
+      rp_id:
+        type: string
+        x-nullable: false
+      rp_origins:
+        items:
+          type: string
+        type: array
+        x-nullable: false
+    type: object
 host: localhost:8443
 info:
   description: |-
-    Cloudentity Root API
+    SecureAuth Root API
 
     The POST APIs support idempotency for safely retrying requests without accidentally performing the same operation twice.
 
@@ -1081,7 +1193,7 @@ info:
     3. Retry failed requests with the same key within 1 minute.
 
     Responses for replayed requests will include the X-Idempotent-Replayed: true header.
-  title: Cloudentity API
+  title: SecureAuth API
   version: latest
 paths:
   /code/generate:
@@ -1129,7 +1241,8 @@ paths:
         "429":
           $ref: '#/responses/tooManyRequestsHTTPError'
       security:
-      - setup: []
+      - setup:
+        - manage_configuration
       summary: Generate code of a specific type
       tags:
       - system
@@ -1294,6 +1407,8 @@ securityDefinitions:
   setup:
     authorizationUrl: /system/system/oauth2/authorize
     flow: accessCode
+    scopes:
+      manage_configuration: manage_configuration
     tokenUrl: /system/system/oauth2/token
     type: oauth2
 swagger: "2.0"

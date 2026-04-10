@@ -74,10 +74,7 @@ type SystemSCIMv2PatchUserParams struct {
 	// IPID.
 	IPID string
 
-	/* Patch.
-
-	   Patch spec in RFC 6902 format
-	*/
+	// Patch.
 	Patch *models.SCIMv2Patch
 
 	// UserID.

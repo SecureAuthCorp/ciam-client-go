@@ -401,7 +401,7 @@ func NewActivateSelfRegisteredUserUsingExtendedCodePreconditionFailed() *Activat
 /*
 ActivateSelfRegisteredUserUsingExtendedCodePreconditionFailed describes a response with status code 412, with default header values.
 
-Payload too large
+Precondition failed
 */
 type ActivateSelfRegisteredUserUsingExtendedCodePreconditionFailed struct {
 	Payload *models.Error

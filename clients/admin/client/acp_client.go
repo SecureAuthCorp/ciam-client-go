@@ -30,6 +30,7 @@ import (
 	"github.com/cloudentity/acp-client-go/clients/admin/client/openbanking"
 	"github.com/cloudentity/acp-client-go/clients/admin/client/organizations"
 	"github.com/cloudentity/acp-client-go/clients/admin/client/permissions"
+	"github.com/cloudentity/acp-client-go/clients/admin/client/phone_provider_config"
 	"github.com/cloudentity/acp-client-go/clients/admin/client/policies"
 	"github.com/cloudentity/acp-client-go/clients/admin/client/recent_activities"
 	"github.com/cloudentity/acp-client-go/clients/admin/client/roles"
@@ -111,6 +112,7 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *Acp {
 	cli.Openbanking = openbanking.New(transport, formats)
 	cli.Organizations = organizations.New(transport, formats)
 	cli.Permissions = permissions.New(transport, formats)
+	cli.PhoneProviderConfig = phone_provider_config.New(transport, formats)
 	cli.Policies = policies.New(transport, formats)
 	cli.RecentActivities = recent_activities.New(transport, formats)
 	cli.Roles = roles.New(transport, formats)
@@ -212,6 +214,8 @@ type Acp struct {
 
 	Permissions permissions.ClientService
 
+	PhoneProviderConfig phone_provider_config.ClientService
+
 	Policies policies.ClientService
 
 	RecentActivities recent_activities.ClientService
@@ -272,6 +276,7 @@ func (c *Acp) SetTransport(transport runtime.ClientTransport) {
 	c.Openbanking.SetTransport(transport)
 	c.Organizations.SetTransport(transport)
 	c.Permissions.SetTransport(transport)
+	c.PhoneProviderConfig.SetTransport(transport)
 	c.Policies.SetTransport(transport)
 	c.RecentActivities.SetTransport(transport)
 	c.Roles.SetTransport(transport)

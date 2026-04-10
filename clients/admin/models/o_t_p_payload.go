@@ -33,7 +33,7 @@ type OTPPayload struct {
 	Purpose string `json:"purpose,omitempty" yaml:"purpose,omitempty"`
 
 	// type
-	// Enum: ["sms","email"]
+	// Enum: ["sms","email","voice"]
 	Type string `json:"type,omitempty" yaml:"type,omitempty"`
 
 	// user id
@@ -58,7 +58,7 @@ var oTPPayloadTypeTypePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["sms","email"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["sms","email","voice"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -73,6 +73,9 @@ const (
 
 	// OTPPayloadTypeEmail captures enum value "email"
 	OTPPayloadTypeEmail string = "email"
+
+	// OTPPayloadTypeVoice captures enum value "voice"
+	OTPPayloadTypeVoice string = "voice"
 )
 
 // prop value enum

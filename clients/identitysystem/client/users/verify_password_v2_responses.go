@@ -201,7 +201,7 @@ func NewVerifyPasswordV2PreconditionFailed() *VerifyPasswordV2PreconditionFailed
 /*
 VerifyPasswordV2PreconditionFailed describes a response with status code 412, with default header values.
 
-Payload too large
+Precondition failed
 */
 type VerifyPasswordV2PreconditionFailed struct {
 	Payload *models.Error

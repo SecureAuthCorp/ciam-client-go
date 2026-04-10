@@ -18,6 +18,10 @@ import (
 // swagger:model UserPreferences
 type UserPreferences struct {
 
+	// Locale is the list of user's preferred languages/locales for UI and communications
+	// Example: en-US, es-ES
+	Locales []string `json:"locales" yaml:"locales"`
+
 	// mfa
 	Mfa *MFAPreferences `json:"mfa,omitempty" yaml:"mfa,omitempty"`
 }

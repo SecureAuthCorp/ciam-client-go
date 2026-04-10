@@ -24,11 +24,7 @@ type SCIMv2Email struct {
 	Type string `json:"type,omitempty" yaml:"type,omitempty"`
 
 	// value
-	// Example: test@test.com
 	Value string `json:"value,omitempty" yaml:"value,omitempty"`
-
-	// verified
-	Verified bool `json:"verified,omitempty" yaml:"verified,omitempty"`
 }
 
 // Validate validates this s c i mv2 email

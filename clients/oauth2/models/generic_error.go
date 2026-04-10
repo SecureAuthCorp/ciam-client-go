@@ -19,18 +19,27 @@ import (
 // swagger:model genericError
 type GenericError struct {
 
+	// error cause
+	Cause string `json:"cause,omitempty" yaml:"cause,omitempty"`
+
+	// error details
+	Details interface{} `json:"details,omitempty" yaml:"details,omitempty"`
+
 	// error
 	// Example: The requested resource could not be found
 	// Required: true
 	Error string `json:"error" yaml:"error"`
 
-	// Code represents the error status code (404, 403, 401, ...).
-	// Example: 404
-	ErrorCode int64 `json:"error_code,omitempty" yaml:"error_code,omitempty"`
+	// error description
+	ErrorDescription string `json:"error_description,omitempty" yaml:"error_description,omitempty"`
 
 	// error hint
 	// Example: Object with ID 12345 does not exist
 	ErrorHint string `json:"error_hint,omitempty" yaml:"error_hint,omitempty"`
+
+	// Code represents the error status code (404, 403, 401, ...).
+	// Example: 404
+	StatusCode int64 `json:"status_code,omitempty" yaml:"status_code,omitempty"`
 }
 
 // Validate validates this generic error

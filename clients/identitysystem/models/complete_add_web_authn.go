@@ -7,6 +7,7 @@ package models
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
@@ -35,6 +36,10 @@ type CompleteAddWebAuthn struct {
 
 	// user ID
 	UserID string `json:"userID,omitempty" yaml:"userID,omitempty"`
+
+	// Webauthn credential type. When omitted, defaults to regular.
+	// Enum: ["regular","discoverable"]
+	WebauthnType string `json:"webauthn_type,omitempty" yaml:"webauthn_type,omitempty"`
 }
 
 // Validate validates this complete add web authn
@@ -46,6 +51,10 @@ func (m *CompleteAddWebAuthn) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateNewWebAuthn(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateWebauthnType(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -79,6 +88,48 @@ func (m *CompleteAddWebAuthn) validateNewWebAuthn(formats strfmt.Registry) error
 			}
 			return err
 		}
+	}
+
+	return nil
+}
+
+var completeAddWebAuthnTypeWebauthnTypePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["regular","discoverable"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		completeAddWebAuthnTypeWebauthnTypePropEnum = append(completeAddWebAuthnTypeWebauthnTypePropEnum, v)
+	}
+}
+
+const (
+
+	// CompleteAddWebAuthnWebauthnTypeRegular captures enum value "regular"
+	CompleteAddWebAuthnWebauthnTypeRegular string = "regular"
+
+	// CompleteAddWebAuthnWebauthnTypeDiscoverable captures enum value "discoverable"
+	CompleteAddWebAuthnWebauthnTypeDiscoverable string = "discoverable"
+)
+
+// prop value enum
+func (m *CompleteAddWebAuthn) validateWebauthnTypeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, completeAddWebAuthnTypeWebauthnTypePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *CompleteAddWebAuthn) validateWebauthnType(formats strfmt.Registry) error {
+	if swag.IsZero(m.WebauthnType) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateWebauthnTypeEnum("webauthn_type", "body", m.WebauthnType); err != nil {
+		return err
 	}
 
 	return nil

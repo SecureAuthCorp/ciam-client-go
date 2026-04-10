@@ -32,6 +32,9 @@ type RFC6749Error struct {
 	// error hint
 	ErrorHint string `json:"error_hint,omitempty" yaml:"error_hint,omitempty"`
 
+	// error uri
+	ErrorURI string `json:"error_uri,omitempty" yaml:"error_uri,omitempty"`
+
 	// status code
 	StatusCode int64 `json:"status_code,omitempty" yaml:"status_code,omitempty"`
 }

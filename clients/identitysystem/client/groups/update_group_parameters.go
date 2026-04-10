@@ -64,7 +64,7 @@ UpdateGroupParams contains all the parameters to send to the API endpoint
 type UpdateGroupParams struct {
 
 	// UpdateGroup.
-	UpdateGroup *models.Group
+	UpdateGroup *models.BaseGroup
 
 	// GroupID.
 	GroupID string
@@ -126,13 +126,13 @@ func (o *UpdateGroupParams) SetHTTPClient(client *http.Client) {
 }
 
 // WithUpdateGroup adds the updateGroup to the update group params
-func (o *UpdateGroupParams) WithUpdateGroup(updateGroup *models.Group) *UpdateGroupParams {
+func (o *UpdateGroupParams) WithUpdateGroup(updateGroup *models.BaseGroup) *UpdateGroupParams {
 	o.SetUpdateGroup(updateGroup)
 	return o
 }
 
 // SetUpdateGroup adds the updateGroup to the update group params
-func (o *UpdateGroupParams) SetUpdateGroup(updateGroup *models.Group) {
+func (o *UpdateGroupParams) SetUpdateGroup(updateGroup *models.BaseGroup) {
 	o.UpdateGroup = updateGroup
 }
 

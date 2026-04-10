@@ -64,7 +64,7 @@ CreateGroupParams contains all the parameters to send to the API endpoint
 type CreateGroupParams struct {
 
 	// NewGroup.
-	NewGroup *models.Group
+	NewGroup *models.BaseGroup
 
 	// IPID.
 	IPID string
@@ -123,13 +123,13 @@ func (o *CreateGroupParams) SetHTTPClient(client *http.Client) {
 }
 
 // WithNewGroup adds the newGroup to the create group params
-func (o *CreateGroupParams) WithNewGroup(newGroup *models.Group) *CreateGroupParams {
+func (o *CreateGroupParams) WithNewGroup(newGroup *models.BaseGroup) *CreateGroupParams {
 	o.SetNewGroup(newGroup)
 	return o
 }
 
 // SetNewGroup adds the newGroup to the create group params
-func (o *CreateGroupParams) SetNewGroup(newGroup *models.Group) {
+func (o *CreateGroupParams) SetNewGroup(newGroup *models.BaseGroup) {
 	o.NewGroup = newGroup
 }
 

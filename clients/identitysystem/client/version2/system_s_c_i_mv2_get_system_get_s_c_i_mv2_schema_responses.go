@@ -395,7 +395,7 @@ func NewSystemSCIMv2GetSystemGetSCIMv2SchemaPreconditionFailed() *SystemSCIMv2Ge
 /*
 SystemSCIMv2GetSystemGetSCIMv2SchemaPreconditionFailed describes a response with status code 412, with default header values.
 
-Payload too large
+Precondition failed
 */
 type SystemSCIMv2GetSystemGetSCIMv2SchemaPreconditionFailed struct {
 	Payload *models.Error

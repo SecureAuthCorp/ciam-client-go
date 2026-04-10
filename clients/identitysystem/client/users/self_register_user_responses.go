@@ -401,7 +401,7 @@ func NewSelfRegisterUserPreconditionFailed() *SelfRegisterUserPreconditionFailed
 /*
 SelfRegisterUserPreconditionFailed describes a response with status code 412, with default header values.
 
-Payload too large
+Precondition failed
 */
 type SelfRegisterUserPreconditionFailed struct {
 	Payload *models.Error

@@ -23,6 +23,9 @@ type Environment struct {
 	// ACR support
 	Acr bool `json:"acr,omitempty" yaml:"acr,omitempty"`
 
+	// reject bot user agents in activation handler
+	ActivationBotProtection bool `json:"activation_bot_protection,omitempty" yaml:"activation_bot_protection,omitempty"`
+
 	// Active Directory IDP
 	ActiveDirectoryIdp bool `json:"active_directory_idp,omitempty" yaml:"active_directory_idp,omitempty"`
 
@@ -35,12 +38,27 @@ type Environment struct {
 	// admin workspace access
 	AdminWorkspaceAccess bool `json:"admin_workspace_access,omitempty" yaml:"admin_workspace_access,omitempty"`
 
+	// allow tenants to configure custom phone providers
+	AdvancedPhone bool `json:"advanced_phone,omitempty" yaml:"advanced_phone,omitempty"`
+
+	// AI Security
+	AiSecurity bool `json:"ai_security,omitempty" yaml:"ai_security,omitempty"`
+
+	// ai security manifest url
+	AiSecurityManifestURL string `json:"ai_security_manifest_url,omitempty" yaml:"ai_security_manifest_url,omitempty"`
+
+	// ai security public url
+	AiSecurityPublicURL string `json:"ai_security_public_url,omitempty" yaml:"ai_security_public_url,omitempty"`
+
 	// allow Identity Pool OTP Challenge confirmation via web page
 	AllowIdentityPoolOtpChallengeConfirmationViaWebPage bool `json:"allow_identity_pool_otp_challenge_confirmation_via_web_page,omitempty" yaml:"allow_identity_pool_otp_challenge_confirmation_via_web_page,omitempty"`
 
 	// analytics duration
 	// Format: duration
 	AnalyticsDuration strfmt.Duration `json:"analytics_duration,omitempty" yaml:"analytics_duration,omitempty"`
+
+	// application quickstart tab
+	AppQuickstart bool `json:"app_quickstart,omitempty" yaml:"app_quickstart,omitempty"`
 
 	// application launch dashboard
 	ApplicationLaunchDashboard bool `json:"application_launch_dashboard,omitempty" yaml:"application_launch_dashboard,omitempty"`
@@ -57,6 +75,9 @@ type Environment struct {
 
 	// brute force limits
 	BruteForceLimits *DefaultBruteForceLimits `json:"brute_force_limits,omitempty" yaml:"brute_force_limits,omitempty"`
+
+	// send SMS using built-in advanced phone providers
+	BuiltInAdvancedPhoneProviders bool `json:"built_in_advanced_phone_providers,omitempty" yaml:"built_in_advanced_phone_providers,omitempty"`
 
 	// cache access tokens
 	CacheAccessTokens bool `json:"cache_access_tokens,omitempty" yaml:"cache_access_tokens,omitempty"`
@@ -105,6 +126,9 @@ type Environment struct {
 
 	// disable embedded sms provider
 	DisableEmbeddedSmsProvider bool `json:"disable_embedded_sms_provider,omitempty" yaml:"disable_embedded_sms_provider,omitempty"`
+
+	// disable embedded voice provider
+	DisableEmbeddedVoiceProvider bool `json:"disable_embedded_voice_provider,omitempty" yaml:"disable_embedded_voice_provider,omitempty"`
 
 	// disable Identity Pool Self User APIs without scopes
 	DisableIdentityPoolSelfUserApisWithoutScopes bool `json:"disable_identity_pool_self_user_apis_without_scopes,omitempty" yaml:"disable_identity_pool_self_user_apis_without_scopes,omitempty"`
@@ -160,6 +184,9 @@ type Environment struct {
 	// internationalization
 	Internationalization bool `json:"internationalization,omitempty" yaml:"internationalization,omitempty"`
 
+	// allow any system client with manage_logins scope to manage login sessions without being linked to an IDP
+	ManageLoginsAnySystemClient bool `json:"manage_logins_any_system_client,omitempty" yaml:"manage_logins_any_system_client,omitempty"`
+
 	// mark address as verified on any proof of possession of the address
 	MarkAddressAsVerifiedOnAnyProofOfPossession bool `json:"mark_address_as_verified_on_any_proof_of_possession,omitempty" yaml:"mark_address_as_verified_on_any_proof_of_possession,omitempty"`
 
@@ -175,6 +202,9 @@ type Environment struct {
 	// Push
 	Push bool `json:"push,omitempty" yaml:"push,omitempty"`
 
+	// radius
+	Radius bool `json:"radius,omitempty" yaml:"radius,omitempty"`
+
 	// rich authorization requests
 	Rar bool `json:"rar,omitempty" yaml:"rar,omitempty"`
 
@@ -189,6 +219,9 @@ type Environment struct {
 
 	// risk manifest url
 	RiskManifestURL string `json:"risk_manifest_url,omitempty" yaml:"risk_manifest_url,omitempty"`
+
+	// risk organization id
+	RiskOrganizationID string `json:"risk_organization_id,omitempty" yaml:"risk_organization_id,omitempty"`
 
 	// risk public url
 	RiskPublicURL string `json:"risk_public_url,omitempty" yaml:"risk_public_url,omitempty"`
@@ -210,6 +243,9 @@ type Environment struct {
 
 	// swagger ui
 	SwaggerUI bool `json:"swagger_ui,omitempty" yaml:"swagger_ui,omitempty"`
+
+	// synchronous user persistence (bypass event stream, write directly to database)
+	SyncUserPersistence bool `json:"sync_user_persistence,omitempty" yaml:"sync_user_persistence,omitempty"`
 
 	// system flags
 	SystemFlags []string `json:"system_flags" yaml:"system_flags"`
@@ -241,8 +277,14 @@ type Environment struct {
 	// User-friendly credentials setup
 	UserFriendlyCredentialsSetup bool `json:"user_friendly_credentials_setup,omitempty" yaml:"user_friendly_credentials_setup,omitempty"`
 
+	// Usernameless WebAuthn (discoverable passkeys)
+	UsernamelessWebauthn bool `json:"usernameless_webauthn,omitempty" yaml:"usernameless_webauthn,omitempty"`
+
 	// version
 	Version string `json:"version,omitempty" yaml:"version,omitempty"`
+
+	// enable voice OTP authn method
+	VoiceOtp bool `json:"voice_otp,omitempty" yaml:"voice_otp,omitempty"`
 
 	// require that the wildcard tenant id matches the path param tenant id
 	WildcardTenantIDMustMatchPathTenantID bool `json:"wildcard_tenant_id_must_match_path_tenant_id,omitempty" yaml:"wildcard_tenant_id_must_match_path_tenant_id,omitempty"`

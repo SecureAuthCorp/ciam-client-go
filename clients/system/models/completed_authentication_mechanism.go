@@ -21,7 +21,7 @@ import (
 type CompletedAuthenticationMechanism struct {
 
 	// mechanism
-	// Enum: ["totp","password","otp","email_otp","sms_otp","webauthn","push","symbol","qr_code"]
+	// Enum: ["totp","password","otp","email_otp","sms_otp","voice_otp","webauthn","usernameless_webauthn","push","symbol","qr_code"]
 	Mechanism string `json:"Mechanism,omitempty" yaml:"Mechanism,omitempty"`
 
 	// time
@@ -51,7 +51,7 @@ var completedAuthenticationMechanismTypeMechanismPropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["totp","password","otp","email_otp","sms_otp","webauthn","push","symbol","qr_code"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["totp","password","otp","email_otp","sms_otp","voice_otp","webauthn","usernameless_webauthn","push","symbol","qr_code"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -76,8 +76,14 @@ const (
 	// CompletedAuthenticationMechanismMechanismSmsOtp captures enum value "sms_otp"
 	CompletedAuthenticationMechanismMechanismSmsOtp string = "sms_otp"
 
+	// CompletedAuthenticationMechanismMechanismVoiceOtp captures enum value "voice_otp"
+	CompletedAuthenticationMechanismMechanismVoiceOtp string = "voice_otp"
+
 	// CompletedAuthenticationMechanismMechanismWebauthn captures enum value "webauthn"
 	CompletedAuthenticationMechanismMechanismWebauthn string = "webauthn"
+
+	// CompletedAuthenticationMechanismMechanismUsernamelessWebauthn captures enum value "usernameless_webauthn"
+	CompletedAuthenticationMechanismMechanismUsernamelessWebauthn string = "usernameless_webauthn"
 
 	// CompletedAuthenticationMechanismMechanismPush captures enum value "push"
 	CompletedAuthenticationMechanismMechanismPush string = "push"

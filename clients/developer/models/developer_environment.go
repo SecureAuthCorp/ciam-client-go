@@ -22,6 +22,9 @@ type DeveloperEnvironment struct {
 
 	// Rich Authorization Requests (RAR)
 	Rar bool `json:"rar,omitempty" yaml:"rar,omitempty"`
+
+	// SAML IDP overrides per SP
+	SamlIdpOverridesPerSp bool `json:"saml_idp_overrides_per_sp,omitempty" yaml:"saml_idp_overrides_per_sp,omitempty"`
 }
 
 // Validate validates this developer environment

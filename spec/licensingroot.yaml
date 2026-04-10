@@ -192,7 +192,7 @@ definitions:
 host: localhost:8443
 info:
   description: |-
-    Cloudentity Root API
+    SecureAuth Root API
 
     The POST APIs support idempotency for safely retrying requests without accidentally performing the same operation twice.
 
@@ -203,7 +203,7 @@ info:
     3. Retry failed requests with the same key within 1 minute.
 
     Responses for replayed requests will include the X-Idempotent-Replayed: true header.
-  title: Cloudentity API
+  title: SecureAuth API
   version: latest
 paths:
   /admin/tenants/{tenantID}/license:
@@ -329,7 +329,8 @@ paths:
         "429":
           $ref: '#/responses/tooManyRequestsHTTPError'
       security:
-      - setup: []
+      - setup:
+        - manage_configuration
       summary: Export global licensing configuration
       tags:
       - configuration
@@ -366,7 +367,8 @@ paths:
         "429":
           $ref: '#/responses/tooManyRequestsHTTPError'
       security:
-      - setup: []
+      - setup:
+        - manage_configuration
       summary: Patch configuration
       tags:
       - configuration
@@ -425,7 +427,8 @@ paths:
         "429":
           $ref: '#/responses/tooManyRequestsHTTPError'
       security:
-      - setup: []
+      - setup:
+        - manage_configuration
       summary: Import global licensing configuration
       tags:
       - configuration
@@ -452,7 +455,8 @@ paths:
         "429":
           $ref: '#/responses/tooManyRequestsHTTPError'
       security:
-      - setup: []
+      - setup:
+        - manage_configuration
       summary: Get tenant license
       tags:
       - licenses
@@ -485,7 +489,8 @@ paths:
         "429":
           $ref: '#/responses/tooManyRequestsHTTPError'
       security:
-      - setup: []
+      - setup:
+        - manage_configuration
       summary: Set tenant license
       tags:
       - licenses
@@ -512,7 +517,8 @@ paths:
         "429":
           $ref: '#/responses/tooManyRequestsHTTPError'
       security:
-      - setup: []
+      - setup:
+        - manage_configuration
       summary: Get usage
       tags:
       - usage
@@ -586,6 +592,8 @@ securityDefinitions:
   setup:
     authorizationUrl: /system/system/oauth2/authorize
     flow: accessCode
+    scopes:
+      manage_configuration: manage_configuration
     tokenUrl: /system/system/oauth2/token
     type: oauth2
 swagger: "2.0"

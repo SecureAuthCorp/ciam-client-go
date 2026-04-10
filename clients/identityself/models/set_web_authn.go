@@ -7,6 +7,7 @@ package models
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
@@ -22,6 +23,10 @@ type SetWebAuthn struct {
 	// new webauthn
 	// Required: true
 	NewWebauthn *Credential `json:"new_webauthn" yaml:"new_webauthn"`
+
+	// type
+	// Enum: ["regular","discoverable"]
+	Type string `json:"type,omitempty" yaml:"type,omitempty"`
 }
 
 // Validate validates this set web authn
@@ -29,6 +34,10 @@ func (m *SetWebAuthn) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateNewWebauthn(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateType(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -53,6 +62,48 @@ func (m *SetWebAuthn) validateNewWebauthn(formats strfmt.Registry) error {
 			}
 			return err
 		}
+	}
+
+	return nil
+}
+
+var setWebAuthnTypeTypePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["regular","discoverable"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		setWebAuthnTypeTypePropEnum = append(setWebAuthnTypeTypePropEnum, v)
+	}
+}
+
+const (
+
+	// SetWebAuthnTypeRegular captures enum value "regular"
+	SetWebAuthnTypeRegular string = "regular"
+
+	// SetWebAuthnTypeDiscoverable captures enum value "discoverable"
+	SetWebAuthnTypeDiscoverable string = "discoverable"
+)
+
+// prop value enum
+func (m *SetWebAuthn) validateTypeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, setWebAuthnTypeTypePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *SetWebAuthn) validateType(formats strfmt.Registry) error {
+	if swag.IsZero(m.Type) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateTypeEnum("type", "body", m.Type); err != nil {
+		return err
 	}
 
 	return nil

@@ -41,13 +41,17 @@ type SelfUserCredentials struct {
 	// type
 	// Example: password
 	// Required: true
-	// Enum: ["password","webauthn","totp"]
+	// Enum: ["password","webauthn","totp","device"]
 	Type string `json:"type" yaml:"type"`
 
 	// updated at
 	// Required: true
 	// Format: date-time
 	UpdatedAt strfmt.DateTime `json:"updated_at" yaml:"updated_at"`
+
+	// webauthn type
+	// Enum: ["regular","discoverable"]
+	WebauthnType string `json:"webauthn_type,omitempty" yaml:"webauthn_type,omitempty"`
 }
 
 // Validate validates this self user credentials
@@ -71,6 +75,10 @@ func (m *SelfUserCredentials) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateUpdatedAt(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateWebauthnType(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -153,7 +161,7 @@ var selfUserCredentialsTypeTypePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["password","webauthn","totp"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["password","webauthn","totp","device"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -171,6 +179,9 @@ const (
 
 	// SelfUserCredentialsTypeTotp captures enum value "totp"
 	SelfUserCredentialsTypeTotp string = "totp"
+
+	// SelfUserCredentialsTypeDevice captures enum value "device"
+	SelfUserCredentialsTypeDevice string = "device"
 )
 
 // prop value enum
@@ -202,6 +213,48 @@ func (m *SelfUserCredentials) validateUpdatedAt(formats strfmt.Registry) error {
 	}
 
 	if err := validate.FormatOf("updated_at", "body", "date-time", m.UpdatedAt.String(), formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+var selfUserCredentialsTypeWebauthnTypePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["regular","discoverable"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		selfUserCredentialsTypeWebauthnTypePropEnum = append(selfUserCredentialsTypeWebauthnTypePropEnum, v)
+	}
+}
+
+const (
+
+	// SelfUserCredentialsWebauthnTypeRegular captures enum value "regular"
+	SelfUserCredentialsWebauthnTypeRegular string = "regular"
+
+	// SelfUserCredentialsWebauthnTypeDiscoverable captures enum value "discoverable"
+	SelfUserCredentialsWebauthnTypeDiscoverable string = "discoverable"
+)
+
+// prop value enum
+func (m *SelfUserCredentials) validateWebauthnTypeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, selfUserCredentialsTypeWebauthnTypePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *SelfUserCredentials) validateWebauthnType(formats strfmt.Registry) error {
+	if swag.IsZero(m.WebauthnType) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateWebauthnTypeEnum("webauthn_type", "body", m.WebauthnType); err != nil {
 		return err
 	}
 

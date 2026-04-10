@@ -54,12 +54,6 @@ func (o *PatchB2BUserReader) ReadResponse(response runtime.ClientResponse, consu
 			return nil, err
 		}
 		return nil, result
-	case 409:
-		result := NewPatchB2BUserConflict()
-		if err := result.readResponse(response, consumer, o.formats); err != nil {
-			return nil, err
-		}
-		return nil, result
 	case 422:
 		result := NewPatchB2BUserUnprocessableEntity()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -416,76 +410,6 @@ func (o *PatchB2BUserNotFound) GetPayload() *models.Error {
 }
 
 func (o *PatchB2BUserNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
-	o.Payload = new(models.Error)
-
-	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
-		return err
-	}
-
-	return nil
-}
-
-// NewPatchB2BUserConflict creates a PatchB2BUserConflict with default headers values
-func NewPatchB2BUserConflict() *PatchB2BUserConflict {
-	return &PatchB2BUserConflict{}
-}
-
-/*
-PatchB2BUserConflict describes a response with status code 409, with default header values.
-
-Conflict
-*/
-type PatchB2BUserConflict struct {
-	Payload *models.Error
-}
-
-// IsSuccess returns true when this patch b2 b user conflict response has a 2xx status code
-func (o *PatchB2BUserConflict) IsSuccess() bool {
-	return false
-}
-
-// IsRedirect returns true when this patch b2 b user conflict response has a 3xx status code
-func (o *PatchB2BUserConflict) IsRedirect() bool {
-	return false
-}
-
-// IsClientError returns true when this patch b2 b user conflict response has a 4xx status code
-func (o *PatchB2BUserConflict) IsClientError() bool {
-	return true
-}
-
-// IsServerError returns true when this patch b2 b user conflict response has a 5xx status code
-func (o *PatchB2BUserConflict) IsServerError() bool {
-	return false
-}
-
-// IsCode returns true when this patch b2 b user conflict response a status code equal to that given
-func (o *PatchB2BUserConflict) IsCode(code int) bool {
-	return code == 409
-}
-
-// Code gets the status code for the patch b2 b user conflict response
-func (o *PatchB2BUserConflict) Code() int {
-	return 409
-}
-
-func (o *PatchB2BUserConflict) Error() string {
-	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[PATCH /admin/b2b/pools/{ipID}/users/{userID}][%d] patchB2BUserConflict %s", 409, payload)
-}
-
-func (o *PatchB2BUserConflict) String() string {
-	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[PATCH /admin/b2b/pools/{ipID}/users/{userID}][%d] patchB2BUserConflict %s", 409, payload)
-}
-
-func (o *PatchB2BUserConflict) GetPayload() *models.Error {
-	return o.Payload
-}
-
-func (o *PatchB2BUserConflict) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.Error)
 

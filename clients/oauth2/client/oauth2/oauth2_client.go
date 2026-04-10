@@ -241,10 +241,10 @@ func (a *Client) DeviceAuthorization(params *DeviceAuthorizationParams, authInfo
 
 	Dynamic Client Registration endpoint allows to dynamically register OAuth 2.0 client applications
 
-with the Cloudentity Platform. When a request with all required registration metadata
-values reaches the Cloudentity authorization server, the server issues a client
+with the SecureAuth Platform. When a request with all required registration metadata
+values reaches the SecureAuth authorization server, the server issues a client
 identifier and provides client metadata values registered for the client.
-Client applications can use their registration data to communicate with the Cloudentity
+Client applications can use their registration data to communicate with the SecureAuth
 platform using the OAuth 2.0 protocol.
 */
 func (a *Client) DynamicClientRegistration(params *DynamicClientRegistrationParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*DynamicClientRegistrationCreated, error) {
@@ -425,7 +425,7 @@ and ascertain the relevant metadata about the token to make the
 authorization decision appropriately.
 
 Client applications that call the OAuth 2.0 Introspection Endpoint must authenticate with the
-Cloudentity authorization server either with a valid access token provided as the value of
+SecureAuth authorization server either with a valid access token provided as the value of
 the `Authorization: Bearer $AT` request header or using the client authentication method
 configured for the client application.
 
@@ -565,7 +565,7 @@ value of the `token` parameter. When a token is revoked, it cannot be used to, f
 exchange a refresh token to an access token.
 
 Client applications that call the OAuth 2.0 Revocation Endpoint must authenticate with the
-Cloudentity authorization server either
+SecureAuth authorization server either
 with a valid access token provided as the value of the `Authorization: Bearer $AT` request header
 or using the client authentication method configured for the client application.
 

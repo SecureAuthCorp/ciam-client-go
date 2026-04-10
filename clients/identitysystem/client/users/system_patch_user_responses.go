@@ -54,12 +54,6 @@ func (o *SystemPatchUserReader) ReadResponse(response runtime.ClientResponse, co
 			return nil, err
 		}
 		return nil, result
-	case 409:
-		result := NewSystemPatchUserConflict()
-		if err := result.readResponse(response, consumer, o.formats); err != nil {
-			return nil, err
-		}
-		return nil, result
 	case 412:
 		result := NewSystemPatchUserPreconditionFailed()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -475,76 +469,6 @@ func (o *SystemPatchUserNotFound) readResponse(response runtime.ClientResponse, 
 	return nil
 }
 
-// NewSystemPatchUserConflict creates a SystemPatchUserConflict with default headers values
-func NewSystemPatchUserConflict() *SystemPatchUserConflict {
-	return &SystemPatchUserConflict{}
-}
-
-/*
-SystemPatchUserConflict describes a response with status code 409, with default header values.
-
-Conflict
-*/
-type SystemPatchUserConflict struct {
-	Payload *models.Error
-}
-
-// IsSuccess returns true when this system patch user conflict response has a 2xx status code
-func (o *SystemPatchUserConflict) IsSuccess() bool {
-	return false
-}
-
-// IsRedirect returns true when this system patch user conflict response has a 3xx status code
-func (o *SystemPatchUserConflict) IsRedirect() bool {
-	return false
-}
-
-// IsClientError returns true when this system patch user conflict response has a 4xx status code
-func (o *SystemPatchUserConflict) IsClientError() bool {
-	return true
-}
-
-// IsServerError returns true when this system patch user conflict response has a 5xx status code
-func (o *SystemPatchUserConflict) IsServerError() bool {
-	return false
-}
-
-// IsCode returns true when this system patch user conflict response a status code equal to that given
-func (o *SystemPatchUserConflict) IsCode(code int) bool {
-	return code == 409
-}
-
-// Code gets the status code for the system patch user conflict response
-func (o *SystemPatchUserConflict) Code() int {
-	return 409
-}
-
-func (o *SystemPatchUserConflict) Error() string {
-	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[PATCH /system/pools/{ipID}/users/{userID}][%d] systemPatchUserConflict %s", 409, payload)
-}
-
-func (o *SystemPatchUserConflict) String() string {
-	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[PATCH /system/pools/{ipID}/users/{userID}][%d] systemPatchUserConflict %s", 409, payload)
-}
-
-func (o *SystemPatchUserConflict) GetPayload() *models.Error {
-	return o.Payload
-}
-
-func (o *SystemPatchUserConflict) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
-	o.Payload = new(models.Error)
-
-	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
-		return err
-	}
-
-	return nil
-}
-
 // NewSystemPatchUserPreconditionFailed creates a SystemPatchUserPreconditionFailed with default headers values
 func NewSystemPatchUserPreconditionFailed() *SystemPatchUserPreconditionFailed {
 	return &SystemPatchUserPreconditionFailed{}
@@ -553,7 +477,7 @@ func NewSystemPatchUserPreconditionFailed() *SystemPatchUserPreconditionFailed {
 /*
 SystemPatchUserPreconditionFailed describes a response with status code 412, with default header values.
 
-Payload too large
+Precondition failed
 */
 type SystemPatchUserPreconditionFailed struct {
 	Payload *models.Error

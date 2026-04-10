@@ -25,6 +25,9 @@ type UserCredential struct {
 	// Format: date-time
 	CreatedAt strfmt.DateTime `json:"created_at" yaml:"created_at"`
 
+	// discoverable id
+	DiscoverableID string `json:"discoverable_id,omitempty" yaml:"discoverable_id,omitempty"`
+
 	// expires at
 	// Format: date-time
 	ExpiresAt strfmt.DateTime `json:"expires_at,omitempty" yaml:"expires_at,omitempty"`
@@ -49,7 +52,7 @@ type UserCredential struct {
 	// type
 	// Example: password
 	// Required: true
-	// Enum: ["password","webauthn","totp"]
+	// Enum: ["password","webauthn","totp","device"]
 	Type string `json:"type" yaml:"type"`
 
 	// updated at
@@ -205,7 +208,7 @@ var userCredentialTypeTypePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["password","webauthn","totp"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["password","webauthn","totp","device"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -223,6 +226,9 @@ const (
 
 	// UserCredentialTypeTotp captures enum value "totp"
 	UserCredentialTypeTotp string = "totp"
+
+	// UserCredentialTypeDevice captures enum value "device"
+	UserCredentialTypeDevice string = "device"
 )
 
 // prop value enum

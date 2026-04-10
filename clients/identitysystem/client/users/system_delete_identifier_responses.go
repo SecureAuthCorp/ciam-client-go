@@ -380,7 +380,7 @@ func NewSystemDeleteIdentifierPreconditionFailed() *SystemDeleteIdentifierPrecon
 /*
 SystemDeleteIdentifierPreconditionFailed describes a response with status code 412, with default header values.
 
-Payload too large
+Precondition failed
 */
 type SystemDeleteIdentifierPreconditionFailed struct {
 	Payload *models.Error

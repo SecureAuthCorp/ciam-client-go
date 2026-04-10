@@ -78,7 +78,7 @@ type ClientService interface {
 /*
 	AcceptOBBRCustomerDataAccessConsentSystem accepts customer data access consent
 
-	Notify Cloudentity that a user allowed access to their data.
+	Notify SecureAuth that a user allowed access to their data.
 
 Used by a custom Open Banking consent page.
 
@@ -126,7 +126,7 @@ func (a *Client) AcceptOBBRCustomerDataAccessConsentSystem(params *AcceptOBBRCus
 /*
 	AcceptOBBRCustomerPaymentConsentSystem accepts customer payment initiation consent
 
-	Notify Cloudentity that a user allowed payment initiation.
+	Notify SecureAuth that a user allowed payment initiation.
 
 Used by a custom Open Banking consent page.
 
@@ -370,7 +370,7 @@ func (a *Client) GetOBBRCustomerPaymentConsentSystemV3(params *GetOBBRCustomerPa
 /*
 	RejectOBBRCustomerDataAccessConsentSystem rejects customer data access consent
 
-	Notify Cloudentity that a user rejected access to their data.
+	Notify SecureAuth that a user rejected access to their data.
 
 Used by a custom Open Banking consent page.
 
@@ -418,7 +418,7 @@ func (a *Client) RejectOBBRCustomerDataAccessConsentSystem(params *RejectOBBRCus
 /*
 	RejectOBBRCustomerPaymentConsentSystem rejects customer payment initiation consent
 
-	Notify Cloudentity that a user rejected payment initiation.
+	Notify SecureAuth that a user rejected payment initiation.
 
 Used by a custom Open Banking consent page.
 

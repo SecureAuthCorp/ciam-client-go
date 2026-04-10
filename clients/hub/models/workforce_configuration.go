@@ -18,6 +18,12 @@ import (
 // swagger:model WorkforceConfiguration
 type WorkforceConfiguration struct {
 
+	// workforce authentication client id
+	ClientID string `json:"client_id,omitempty" yaml:"client_id,omitempty"`
+
+	// workforce authentication client secret
+	ClientSecret string `json:"client_secret,omitempty" yaml:"client_secret,omitempty"`
+
 	// status
 	Status WorkforceProvisioningStatus `json:"status,omitempty" yaml:"status,omitempty"`
 

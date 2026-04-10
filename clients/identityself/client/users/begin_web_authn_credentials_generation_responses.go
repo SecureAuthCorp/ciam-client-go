@@ -88,7 +88,7 @@ BeginWebAuthnCredentialsGenerationOK describes a response with status code 200, 
 User WebAuthn credential data
 */
 type BeginWebAuthnCredentialsGenerationOK struct {
-	Payload *models.CredentialAssertion
+	Payload *models.CredentialCreation
 }
 
 // IsSuccess returns true when this begin web authn credentials generation o k response has a 2xx status code
@@ -131,13 +131,13 @@ func (o *BeginWebAuthnCredentialsGenerationOK) String() string {
 	return fmt.Sprintf("[POST /v2/self/webauthn/create/begin][%d] beginWebAuthnCredentialsGenerationOK %s", 200, payload)
 }
 
-func (o *BeginWebAuthnCredentialsGenerationOK) GetPayload() *models.CredentialAssertion {
+func (o *BeginWebAuthnCredentialsGenerationOK) GetPayload() *models.CredentialCreation {
 	return o.Payload
 }
 
 func (o *BeginWebAuthnCredentialsGenerationOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.CredentialAssertion)
+	o.Payload = new(models.CredentialCreation)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -435,7 +435,7 @@ func NewBeginWebAuthnCredentialsGenerationPreconditionFailed() *BeginWebAuthnCre
 /*
 BeginWebAuthnCredentialsGenerationPreconditionFailed describes a response with status code 412, with default header values.
 
-Payload too large
+Precondition failed
 */
 type BeginWebAuthnCredentialsGenerationPreconditionFailed struct {
 	Payload *models.Error

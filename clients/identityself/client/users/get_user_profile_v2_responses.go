@@ -395,7 +395,7 @@ func NewGetUserProfileV2PreconditionFailed() *GetUserProfileV2PreconditionFailed
 /*
 GetUserProfileV2PreconditionFailed describes a response with status code 412, with default header values.
 
-Payload too large
+Precondition failed
 */
 type GetUserProfileV2PreconditionFailed struct {
 	Payload *models.Error

@@ -7,6 +7,7 @@ package models
 
 import (
 	"context"
+	"encoding/json"
 	"strconv"
 
 	"github.com/go-openapi/errors"
@@ -38,6 +39,10 @@ type SelfRegisterUser struct {
 
 	// webauthn credentials
 	WebauthnCredentials []*Credential `json:"webauthn_credentials" yaml:"webauthn_credentials"`
+
+	// webauthn type
+	// Enum: ["regular","discoverable"]
+	WebauthnType string `json:"webauthn_type,omitempty" yaml:"webauthn_type,omitempty"`
 }
 
 // Validate validates this self register user
@@ -49,6 +54,10 @@ func (m *SelfRegisterUser) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateWebauthnCredentials(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateWebauthnType(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -88,6 +97,48 @@ func (m *SelfRegisterUser) validateWebauthnCredentials(formats strfmt.Registry) 
 			}
 		}
 
+	}
+
+	return nil
+}
+
+var selfRegisterUserTypeWebauthnTypePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["regular","discoverable"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		selfRegisterUserTypeWebauthnTypePropEnum = append(selfRegisterUserTypeWebauthnTypePropEnum, v)
+	}
+}
+
+const (
+
+	// SelfRegisterUserWebauthnTypeRegular captures enum value "regular"
+	SelfRegisterUserWebauthnTypeRegular string = "regular"
+
+	// SelfRegisterUserWebauthnTypeDiscoverable captures enum value "discoverable"
+	SelfRegisterUserWebauthnTypeDiscoverable string = "discoverable"
+)
+
+// prop value enum
+func (m *SelfRegisterUser) validateWebauthnTypeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, selfRegisterUserTypeWebauthnTypePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *SelfRegisterUser) validateWebauthnType(formats strfmt.Registry) error {
+	if swag.IsZero(m.WebauthnType) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateWebauthnTypeEnum("webauthn_type", "body", m.WebauthnType); err != nil {
+		return err
 	}
 
 	return nil

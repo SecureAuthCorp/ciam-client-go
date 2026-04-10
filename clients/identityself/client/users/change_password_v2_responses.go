@@ -462,7 +462,7 @@ func NewChangePasswordV2PreconditionFailed() *ChangePasswordV2PreconditionFailed
 /*
 ChangePasswordV2PreconditionFailed describes a response with status code 412, with default header values.
 
-Payload too large
+Precondition failed
 */
 type ChangePasswordV2PreconditionFailed struct {
 	Payload *models.Error

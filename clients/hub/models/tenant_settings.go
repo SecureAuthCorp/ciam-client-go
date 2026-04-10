@@ -34,7 +34,7 @@ type TenantSettings struct {
 	WellKnown map[string]interface{} `json:"well_known,omitempty" yaml:"well_known,omitempty"`
 
 	// workforce
-	Workforce *WorkforceSettings `json:"workforce,omitempty" yaml:"workforce,omitempty"`
+	Workforce *TenantWorkforceSettings `json:"workforce,omitempty" yaml:"workforce,omitempty"`
 }
 
 // Validate validates this tenant settings

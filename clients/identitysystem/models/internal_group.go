@@ -19,8 +19,15 @@ import (
 // swagger:model InternalGroup
 type InternalGroup struct {
 
+	// created at
+	// Format: date-time
+	CreatedAt strfmt.DateTime `json:"created_at,omitempty" yaml:"created_at,omitempty"`
+
 	// description
 	Description string `json:"description,omitempty" yaml:"description,omitempty"`
+
+	// external id
+	ExternalID string `json:"external_id,omitempty" yaml:"external_id,omitempty"`
 
 	// id
 	ID string `json:"id,omitempty" yaml:"id,omitempty"`
@@ -34,6 +41,10 @@ type InternalGroup struct {
 	// tenant id
 	TenantID string `json:"tenant_id,omitempty" yaml:"tenant_id,omitempty"`
 
+	// updated at
+	// Format: date-time
+	UpdatedAt strfmt.DateTime `json:"updated_at,omitempty" yaml:"updated_at,omitempty"`
+
 	// user pool id
 	// Example: default
 	// Required: true
@@ -44,6 +55,14 @@ type InternalGroup struct {
 func (m *InternalGroup) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateCreatedAt(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateUpdatedAt(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateUserPoolID(formats); err != nil {
 		res = append(res, err)
 	}
@@ -51,6 +70,30 @@ func (m *InternalGroup) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *InternalGroup) validateCreatedAt(formats strfmt.Registry) error {
+	if swag.IsZero(m.CreatedAt) { // not required
+		return nil
+	}
+
+	if err := validate.FormatOf("created_at", "body", "date-time", m.CreatedAt.String(), formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *InternalGroup) validateUpdatedAt(formats strfmt.Registry) error {
+	if swag.IsZero(m.UpdatedAt) { // not required
+		return nil
+	}
+
+	if err := validate.FormatOf("updated_at", "body", "date-time", m.UpdatedAt.String(), formats); err != nil {
+		return err
+	}
+
 	return nil
 }
 

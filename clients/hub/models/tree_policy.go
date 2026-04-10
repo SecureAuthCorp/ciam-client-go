@@ -30,7 +30,7 @@ type TreePolicy struct {
 
 	// Language of a policy
 	//
-	// ACP supports creating Cloudentity policies (using a visual editor or defined using JSON or
+	// ACP supports creating SecureAuth policies (using a visual editor or defined using JSON or
 	// YAML) and policies defined using REGO (language used by Open Policy Agent (OPA)).
 	// Example: cloudentity
 	Language string `json:"language,omitempty" yaml:"language,omitempty"`
@@ -64,7 +64,7 @@ type TreePolicy struct {
 	// Example: user
 	Type string `json:"type,omitempty" yaml:"type,omitempty"`
 
-	// An array of validators for a Cloudentity policy
+	// An array of validators for a SecureAuth policy
 	Validators []*ValidatorConfig `json:"validators" yaml:"validators"`
 }
 

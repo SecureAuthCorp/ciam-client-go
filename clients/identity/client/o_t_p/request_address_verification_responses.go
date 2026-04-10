@@ -66,12 +66,6 @@ func (o *RequestAddressVerificationReader) ReadResponse(response runtime.ClientR
 			return nil, err
 		}
 		return nil, result
-	case 429:
-		result := NewRequestAddressVerificationTooManyRequests()
-		if err := result.readResponse(response, consumer, o.formats); err != nil {
-			return nil, err
-		}
-		return nil, result
 	default:
 		return nil, runtime.NewAPIError("[POST /admin/pools/{ipID}/users/{userID}/address/verification/request] requestAddressVerification", response, response.Code())
 	}
@@ -421,7 +415,7 @@ func NewRequestAddressVerificationPreconditionFailed() *RequestAddressVerificati
 /*
 RequestAddressVerificationPreconditionFailed describes a response with status code 412, with default header values.
 
-Payload too large
+Precondition failed
 */
 type RequestAddressVerificationPreconditionFailed struct {
 	Payload *models.Error
@@ -542,76 +536,6 @@ func (o *RequestAddressVerificationUnprocessableEntity) GetPayload() *models.Err
 }
 
 func (o *RequestAddressVerificationUnprocessableEntity) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
-	o.Payload = new(models.Error)
-
-	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
-		return err
-	}
-
-	return nil
-}
-
-// NewRequestAddressVerificationTooManyRequests creates a RequestAddressVerificationTooManyRequests with default headers values
-func NewRequestAddressVerificationTooManyRequests() *RequestAddressVerificationTooManyRequests {
-	return &RequestAddressVerificationTooManyRequests{}
-}
-
-/*
-RequestAddressVerificationTooManyRequests describes a response with status code 429, with default header values.
-
-Too many requests
-*/
-type RequestAddressVerificationTooManyRequests struct {
-	Payload *models.Error
-}
-
-// IsSuccess returns true when this request address verification too many requests response has a 2xx status code
-func (o *RequestAddressVerificationTooManyRequests) IsSuccess() bool {
-	return false
-}
-
-// IsRedirect returns true when this request address verification too many requests response has a 3xx status code
-func (o *RequestAddressVerificationTooManyRequests) IsRedirect() bool {
-	return false
-}
-
-// IsClientError returns true when this request address verification too many requests response has a 4xx status code
-func (o *RequestAddressVerificationTooManyRequests) IsClientError() bool {
-	return true
-}
-
-// IsServerError returns true when this request address verification too many requests response has a 5xx status code
-func (o *RequestAddressVerificationTooManyRequests) IsServerError() bool {
-	return false
-}
-
-// IsCode returns true when this request address verification too many requests response a status code equal to that given
-func (o *RequestAddressVerificationTooManyRequests) IsCode(code int) bool {
-	return code == 429
-}
-
-// Code gets the status code for the request address verification too many requests response
-func (o *RequestAddressVerificationTooManyRequests) Code() int {
-	return 429
-}
-
-func (o *RequestAddressVerificationTooManyRequests) Error() string {
-	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[POST /admin/pools/{ipID}/users/{userID}/address/verification/request][%d] requestAddressVerificationTooManyRequests %s", 429, payload)
-}
-
-func (o *RequestAddressVerificationTooManyRequests) String() string {
-	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[POST /admin/pools/{ipID}/users/{userID}/address/verification/request][%d] requestAddressVerificationTooManyRequests %s", 429, payload)
-}
-
-func (o *RequestAddressVerificationTooManyRequests) GetPayload() *models.Error {
-	return o.Payload
-}
-
-func (o *RequestAddressVerificationTooManyRequests) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.Error)
 

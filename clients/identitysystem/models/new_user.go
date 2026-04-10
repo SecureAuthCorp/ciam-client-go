@@ -57,7 +57,8 @@ type NewUser struct {
 	Status string `json:"status" yaml:"status"`
 
 	// user type
-	UserType interface{} `json:"user_type,omitempty" yaml:"user_type,omitempty"`
+	// Enum: ["jit","standard","scim"]
+	UserType string `json:"user_type,omitempty" yaml:"user_type,omitempty"`
 
 	// verifiable addresses
 	VerifiableAddresses []*NewUserVerifiableAddress `json:"verifiable_addresses" yaml:"verifiable_addresses"`
@@ -80,6 +81,10 @@ func (m *NewUser) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateStatus(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateUserType(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -207,6 +212,51 @@ func (m *NewUser) validateStatus(formats strfmt.Registry) error {
 
 	// value enum
 	if err := m.validateStatusEnum("status", "body", m.Status); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+var newUserTypeUserTypePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["jit","standard","scim"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		newUserTypeUserTypePropEnum = append(newUserTypeUserTypePropEnum, v)
+	}
+}
+
+const (
+
+	// NewUserUserTypeJit captures enum value "jit"
+	NewUserUserTypeJit string = "jit"
+
+	// NewUserUserTypeStandard captures enum value "standard"
+	NewUserUserTypeStandard string = "standard"
+
+	// NewUserUserTypeScim captures enum value "scim"
+	NewUserUserTypeScim string = "scim"
+)
+
+// prop value enum
+func (m *NewUser) validateUserTypeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, newUserTypeUserTypePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *NewUser) validateUserType(formats strfmt.Registry) error {
+	if swag.IsZero(m.UserType) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateUserTypeEnum("user_type", "body", m.UserType); err != nil {
 		return err
 	}
 

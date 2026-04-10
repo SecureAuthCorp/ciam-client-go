@@ -39,12 +39,16 @@ type NewUserCredential struct {
 	// type
 	// Example: password
 	// Required: true
-	// Enum: ["password","webauthn","totp"]
+	// Enum: ["password","webauthn","totp","device"]
 	Type string `json:"type" yaml:"type"`
 
 	// webauthn credentials
 	// Example: public_key
 	WebauthnCredentials []*Credential `json:"webauthn_credentials" yaml:"webauthn_credentials"`
+
+	// webauthn type
+	// Enum: ["regular","discoverable"]
+	WebauthnType string `json:"webauthn_type,omitempty" yaml:"webauthn_type,omitempty"`
 }
 
 // Validate validates this new user credential
@@ -59,6 +63,10 @@ func (m *NewUserCredential) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateWebauthnType(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
@@ -69,7 +77,7 @@ var newUserCredentialTypeTypePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["password","webauthn","totp"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["password","webauthn","totp","device"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -87,6 +95,9 @@ const (
 
 	// NewUserCredentialTypeTotp captures enum value "totp"
 	NewUserCredentialTypeTotp string = "totp"
+
+	// NewUserCredentialTypeDevice captures enum value "device"
+	NewUserCredentialTypeDevice string = "device"
 )
 
 // prop value enum
@@ -132,6 +143,48 @@ func (m *NewUserCredential) validateWebauthnCredentials(formats strfmt.Registry)
 			}
 		}
 
+	}
+
+	return nil
+}
+
+var newUserCredentialTypeWebauthnTypePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["regular","discoverable"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		newUserCredentialTypeWebauthnTypePropEnum = append(newUserCredentialTypeWebauthnTypePropEnum, v)
+	}
+}
+
+const (
+
+	// NewUserCredentialWebauthnTypeRegular captures enum value "regular"
+	NewUserCredentialWebauthnTypeRegular string = "regular"
+
+	// NewUserCredentialWebauthnTypeDiscoverable captures enum value "discoverable"
+	NewUserCredentialWebauthnTypeDiscoverable string = "discoverable"
+)
+
+// prop value enum
+func (m *NewUserCredential) validateWebauthnTypeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, newUserCredentialTypeWebauthnTypePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *NewUserCredential) validateWebauthnType(formats strfmt.Registry) error {
+	if swag.IsZero(m.WebauthnType) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateWebauthnTypeEnum("webauthn_type", "body", m.WebauthnType); err != nil {
+		return err
 	}
 
 	return nil

@@ -71,7 +71,8 @@ type BaseExtendedUser struct {
 	UserPoolID string `json:"user_pool_id" yaml:"user_pool_id"`
 
 	// user type
-	UserType interface{} `json:"user_type,omitempty" yaml:"user_type,omitempty"`
+	// Enum: ["jit","standard","scim"]
+	UserType string `json:"user_type,omitempty" yaml:"user_type,omitempty"`
 
 	// verified addresses
 	VerifiedAddresses []string `json:"verified addresses" yaml:"verified addresses"`
@@ -114,6 +115,10 @@ func (m *BaseExtendedUser) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateUserPoolID(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateUserType(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -291,6 +296,51 @@ func (m *BaseExtendedUser) validateUpdatedAt(formats strfmt.Registry) error {
 func (m *BaseExtendedUser) validateUserPoolID(formats strfmt.Registry) error {
 
 	if err := validate.RequiredString("user_pool_id", "body", m.UserPoolID); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+var baseExtendedUserTypeUserTypePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["jit","standard","scim"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		baseExtendedUserTypeUserTypePropEnum = append(baseExtendedUserTypeUserTypePropEnum, v)
+	}
+}
+
+const (
+
+	// BaseExtendedUserUserTypeJit captures enum value "jit"
+	BaseExtendedUserUserTypeJit string = "jit"
+
+	// BaseExtendedUserUserTypeStandard captures enum value "standard"
+	BaseExtendedUserUserTypeStandard string = "standard"
+
+	// BaseExtendedUserUserTypeScim captures enum value "scim"
+	BaseExtendedUserUserTypeScim string = "scim"
+)
+
+// prop value enum
+func (m *BaseExtendedUser) validateUserTypeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, baseExtendedUserTypeUserTypePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *BaseExtendedUser) validateUserType(formats strfmt.Registry) error {
+	if swag.IsZero(m.UserType) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateUserTypeEnum("user_type", "body", m.UserType); err != nil {
 		return err
 	}
 

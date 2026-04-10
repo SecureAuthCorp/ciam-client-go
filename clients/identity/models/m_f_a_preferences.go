@@ -21,7 +21,7 @@ import (
 type MFAPreferences struct {
 
 	// preferred 2fa
-	// Enum: ["totp","password","otp","email_otp","sms_otp","webauthn"]
+	// Enum: ["totp","password","otp","email_otp","sms_otp","voice_otp","webauthn","usernameless_webauthn","push","symbol","qr_code"]
 	Preferred2fa string `json:"preferred_2fa,omitempty" yaml:"preferred_2fa,omitempty"`
 }
 
@@ -43,7 +43,7 @@ var mFAPreferencesTypePreferred2faPropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["totp","password","otp","email_otp","sms_otp","webauthn"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["totp","password","otp","email_otp","sms_otp","voice_otp","webauthn","usernameless_webauthn","push","symbol","qr_code"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -68,8 +68,23 @@ const (
 	// MFAPreferencesPreferred2faSmsOtp captures enum value "sms_otp"
 	MFAPreferencesPreferred2faSmsOtp string = "sms_otp"
 
+	// MFAPreferencesPreferred2faVoiceOtp captures enum value "voice_otp"
+	MFAPreferencesPreferred2faVoiceOtp string = "voice_otp"
+
 	// MFAPreferencesPreferred2faWebauthn captures enum value "webauthn"
 	MFAPreferencesPreferred2faWebauthn string = "webauthn"
+
+	// MFAPreferencesPreferred2faUsernamelessWebauthn captures enum value "usernameless_webauthn"
+	MFAPreferencesPreferred2faUsernamelessWebauthn string = "usernameless_webauthn"
+
+	// MFAPreferencesPreferred2faPush captures enum value "push"
+	MFAPreferencesPreferred2faPush string = "push"
+
+	// MFAPreferencesPreferred2faSymbol captures enum value "symbol"
+	MFAPreferencesPreferred2faSymbol string = "symbol"
+
+	// MFAPreferencesPreferred2faQrCode captures enum value "qr_code"
+	MFAPreferencesPreferred2faQrCode string = "qr_code"
 )
 
 // prop value enum

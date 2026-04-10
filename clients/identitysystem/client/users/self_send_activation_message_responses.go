@@ -386,7 +386,7 @@ func NewSelfSendActivationMessagePreconditionFailed() *SelfSendActivationMessage
 /*
 SelfSendActivationMessagePreconditionFailed describes a response with status code 412, with default header values.
 
-Payload too large
+Precondition failed
 */
 type SelfSendActivationMessagePreconditionFailed struct {
 	Payload *models.Error

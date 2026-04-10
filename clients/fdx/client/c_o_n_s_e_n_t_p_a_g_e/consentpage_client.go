@@ -68,11 +68,11 @@ type ClientService interface {
 /*
 	AcceptFDXConsentSystem accepts f d x consent
 
-	Used by a custom consent page to notify Cloudentity that a consumer accepted a consent.
+	Used by a custom consent page to notify SecureAuth that a consumer accepted a consent.
 
 The `login` path parameter accepts the `login_id` value—the login session identifier.
 
-Cloudentity passes the login session identifier along with the `login_state` parameter when redirecting
+SecureAuth passes the login session identifier along with the `login_state` parameter when redirecting
 a user to the consent page.
 
 Authorization: Bearer token.
@@ -167,11 +167,11 @@ func (a *Client) GetFDXConsentSystem(params *GetFDXConsentSystemParams, authInfo
 /*
 	RejectFDXConsentSystem rejects f d x consent
 
-	Used by a consent page to notify Cloudentity that a consumer rejected a consent.
+	Used by a consent page to notify SecureAuth that a consumer rejected a consent.
 
 The `login` path parameter accepts the `login_id` value—the login session identifier.
 
-Cloudentity passes the login session identifier along with the `login_state` parameter when redirecting
+SecureAuth passes the login session identifier along with the `login_state` parameter when redirecting
 a user to the consent page.
 
 Authorization: Bearer token.

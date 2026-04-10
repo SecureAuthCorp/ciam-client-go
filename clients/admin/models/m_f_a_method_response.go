@@ -39,7 +39,7 @@ type MFAMethodResponse struct {
 	// mechanism
 	// Example: email
 	// Required: true
-	// Enum: ["sms","email"]
+	// Enum: ["sms","email","voice"]
 	Mechanism string `json:"mechanism" yaml:"mechanism"`
 
 	// settings
@@ -159,7 +159,7 @@ var mFAMethodResponseTypeMechanismPropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["sms","email"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["sms","email","voice"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -174,6 +174,9 @@ const (
 
 	// MFAMethodResponseMechanismEmail captures enum value "email"
 	MFAMethodResponseMechanismEmail string = "email"
+
+	// MFAMethodResponseMechanismVoice captures enum value "voice"
+	MFAMethodResponseMechanismVoice string = "voice"
 )
 
 // prop value enum

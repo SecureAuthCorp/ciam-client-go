@@ -56,6 +56,8 @@ type ClientOption func(*runtime.ClientOperation)
 
 // ClientService is the interface for Client methods
 type ClientService interface {
+	BeginUsernamelessWebAuthnCredentialsGeneration(params *BeginUsernamelessWebAuthnCredentialsGenerationParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*BeginUsernamelessWebAuthnCredentialsGenerationOK, error)
+
 	BeginWebAuthnCredentialsGeneration(params *BeginWebAuthnCredentialsGenerationParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*BeginWebAuthnCredentialsGenerationOK, error)
 
 	ChangePassword(params *ChangePasswordParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ChangePasswordNoContent, error)
@@ -63,6 +65,8 @@ type ClientService interface {
 	ChangePasswordV2(params *ChangePasswordV2Params, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ChangePasswordV2NoContent, error)
 
 	ChangeTotpSecret(params *ChangeTotpSecretParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ChangeTotpSecretNoContent, error)
+
+	CompleteUsernamelessWebAuthnCredentialsGeneration(params *CompleteUsernamelessWebAuthnCredentialsGenerationParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*CompleteUsernamelessWebAuthnCredentialsGenerationOK, error)
 
 	CompleteWebAuthnCredentialsGeneration(params *CompleteWebAuthnCredentialsGenerationParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*CompleteWebAuthnCredentialsGenerationOK, error)
 
@@ -87,6 +91,49 @@ type ClientService interface {
 	UpdateUserProfileV2(params *UpdateUserProfileV2Params, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UpdateUserProfileV2OK, error)
 
 	SetTransport(transport runtime.ClientTransport)
+}
+
+/*
+	BeginUsernamelessWebAuthnCredentialsGeneration begins usernameless web authn credentials generation
+
+	Begin usernameless WebAuthn credentials generation
+
+This API requires authentication to happen within the last 5 minutes.
+*/
+func (a *Client) BeginUsernamelessWebAuthnCredentialsGeneration(params *BeginUsernamelessWebAuthnCredentialsGenerationParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*BeginUsernamelessWebAuthnCredentialsGenerationOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewBeginUsernamelessWebAuthnCredentialsGenerationParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "beginUsernamelessWebAuthnCredentialsGeneration",
+		Method:             "POST",
+		PathPattern:        "/v2/self/usernameless-webauthn/create/begin",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &BeginUsernamelessWebAuthnCredentialsGenerationReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*BeginUsernamelessWebAuthnCredentialsGenerationOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for beginUsernamelessWebAuthnCredentialsGeneration: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
@@ -252,6 +299,49 @@ func (a *Client) ChangeTotpSecret(params *ChangeTotpSecretParams, authInfo runti
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for changeTotpSecret: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+	CompleteUsernamelessWebAuthnCredentialsGeneration finishes usernameless web authn credentials generation
+
+	Finish usernameless WebAuthn credentials generation
+
+This API requires authentication to happen within the last 5 minutes.
+*/
+func (a *Client) CompleteUsernamelessWebAuthnCredentialsGeneration(params *CompleteUsernamelessWebAuthnCredentialsGenerationParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*CompleteUsernamelessWebAuthnCredentialsGenerationOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewCompleteUsernamelessWebAuthnCredentialsGenerationParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "completeUsernamelessWebAuthnCredentialsGeneration",
+		Method:             "POST",
+		PathPattern:        "/v2/self/usernameless-webauthn/create/complete",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &CompleteUsernamelessWebAuthnCredentialsGenerationReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*CompleteUsernamelessWebAuthnCredentialsGenerationOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for completeUsernamelessWebAuthnCredentialsGeneration: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

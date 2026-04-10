@@ -94,6 +94,9 @@ type Dump struct {
 	// openbanking uk consents
 	OpenbankingUkConsents []*OBConsent `json:"openbanking_uk_consents" yaml:"openbanking_uk_consents"`
 
+	// phone provider configs
+	PhoneProviderConfigs []*PhoneProviderConfig `json:"phone_provider_configs" yaml:"phone_provider_configs"`
+
 	// policies
 	Policies []*Policy `json:"policies" yaml:"policies"`
 
@@ -262,6 +265,10 @@ func (m *Dump) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateOpenbankingUkConsents(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validatePhoneProviderConfigs(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -1000,6 +1007,32 @@ func (m *Dump) validateOpenbankingUkConsents(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *Dump) validatePhoneProviderConfigs(formats strfmt.Registry) error {
+	if swag.IsZero(m.PhoneProviderConfigs) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(m.PhoneProviderConfigs); i++ {
+		if swag.IsZero(m.PhoneProviderConfigs[i]) { // not required
+			continue
+		}
+
+		if m.PhoneProviderConfigs[i] != nil {
+			if err := m.PhoneProviderConfigs[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("phone_provider_configs" + "." + strconv.Itoa(i))
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("phone_provider_configs" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
 func (m *Dump) validatePolicies(formats strfmt.Registry) error {
 	if swag.IsZero(m.Policies) { // not required
 		return nil
@@ -1673,6 +1706,10 @@ func (m *Dump) ContextValidate(ctx context.Context, formats strfmt.Registry) err
 	}
 
 	if err := m.contextValidateOpenbankingUkConsents(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidatePhoneProviderConfigs(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -2374,6 +2411,31 @@ func (m *Dump) contextValidateOpenbankingUkConsents(ctx context.Context, formats
 					return ve.ValidateName("openbanking_uk_consents" + "." + strconv.Itoa(i))
 				} else if ce, ok := err.(*errors.CompositeError); ok {
 					return ce.ValidateName("openbanking_uk_consents" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+func (m *Dump) contextValidatePhoneProviderConfigs(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(m.PhoneProviderConfigs); i++ {
+
+		if m.PhoneProviderConfigs[i] != nil {
+
+			if swag.IsZero(m.PhoneProviderConfigs[i]) { // not required
+				return nil
+			}
+
+			if err := m.PhoneProviderConfigs[i].ContextValidate(ctx, formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("phone_provider_configs" + "." + strconv.Itoa(i))
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("phone_provider_configs" + "." + strconv.Itoa(i))
 				}
 				return err
 			}

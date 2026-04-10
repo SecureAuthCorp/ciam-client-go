@@ -320,7 +320,9 @@ definitions:
           - otp
           - email_otp
           - sms_otp
+          - voice_otp
           - webauthn
+          - usernameless_webauthn
           - push
           - symbol
           - qr_code
@@ -528,7 +530,9 @@ definitions:
           - otp
           - email_otp
           - sms_otp
+          - voice_otp
           - webauthn
+          - usernameless_webauthn
           - push
           - symbol
           - qr_code
@@ -1355,6 +1359,7 @@ definitions:
         - succeeded
         - sent
         - not_sent
+        - received
         - executed
         - calculated
         - reset_requested
@@ -1420,6 +1425,7 @@ definitions:
         - device
         - webauthn
         - group
+        - phone_delivery
         example: client
         type: string
         x-nullable: false
@@ -4873,7 +4879,9 @@ definitions:
         - otp
         - email_otp
         - sms_otp
+        - voice_otp
         - webauthn
+        - usernameless_webauthn
         - push
         - symbol
         - qr_code
@@ -5576,7 +5584,9 @@ definitions:
           - otp
           - email_otp
           - sms_otp
+          - voice_otp
           - webauthn
+          - usernameless_webauthn
           - push
           - symbol
           - qr_code
@@ -6155,7 +6165,7 @@ definitions:
         x-nullable: false
       default_scopes:
         description: |-
-          An optional list of scopes to be granted to a client when no scopes are provided in the DCR registration request
+          An optional list of scopes that are always included in client registrations, merged with any scopes requested by the client
 
           If not provided, the following default scopes are granted for the client application: openid, address, email, phone, profile.
         items:
@@ -9111,6 +9121,7 @@ definitions:
         - succeeded
         - sent
         - not_sent
+        - received
         - executed
         - calculated
         - reset_requested
@@ -9170,6 +9181,7 @@ definitions:
         - device
         - webauthn
         - group
+        - phone_delivery
         type: string
         x-nullable: false
       event_type:
@@ -9998,6 +10010,8 @@ definitions:
         $ref: '#/definitions/EmailAuth'
       sms:
         $ref: '#/definitions/SMSAuth'
+      voice:
+        $ref: '#/definitions/VoiceAuth'
     type: object
   MFAMethod:
     properties:
@@ -10014,6 +10028,7 @@ definitions:
         enum:
         - sms
         - email
+        - voice
         example: email
         type: string
         x-nullable: false
@@ -10035,6 +10050,8 @@ definitions:
         $ref: '#/definitions/EmailSettings'
       sms:
         $ref: '#/definitions/SMSSettings'
+      voice:
+        $ref: '#/definitions/VoiceSettings'
     type: object
   Mapping:
     description: Source and target must be provided.
@@ -10968,6 +10985,7 @@ definitions:
         enum:
         - sms
         - email
+        - voice
         type: string
         x-nullable: false
       user_id:
@@ -11378,7 +11396,9 @@ definitions:
           - otp
           - email_otp
           - sms_otp
+          - voice_otp
           - webauthn
+          - usernameless_webauthn
           - push
           - symbol
           - qr_code
@@ -11606,7 +11626,9 @@ definitions:
           - otp
           - email_otp
           - sms_otp
+          - voice_otp
           - webauthn
+          - usernameless_webauthn
           - push
           - symbol
           - qr_code
@@ -11767,6 +11789,39 @@ definitions:
       user_id:
         type: string
         x-nullable: false
+    type: object
+  PhoneProvider:
+    description: Set exactly one provider type (e.g. twilio, vonage, telesign).
+    properties:
+      telesign:
+        $ref: '#/definitions/TelesignPhoneProvider'
+      twilio:
+        $ref: '#/definitions/TwilioPhoneProvider'
+      vonage:
+        $ref: '#/definitions/VonagePhoneProvider'
+    title: PhoneProvider defines a single phone messaging provider.
+    type: object
+  PhoneProviderConfig:
+    description: Providers is an ordered list — position in the array determines fallback
+      priority.
+    properties:
+      active:
+        type: boolean
+        x-nullable: false
+      providers:
+        items:
+          $ref: '#/definitions/PhoneProvider'
+        maxItems: 5
+        minItems: 1
+        type: array
+        x-nullable: false
+      tenant_id:
+        format: tenantID
+        type: string
+        x-nullable: false
+    required:
+    - providers
+    title: PhoneProviderConfig represents a tenant's phone provider configuration.
     type: object
   Policy:
     properties:
@@ -12852,7 +12907,9 @@ definitions:
           - otp
           - email_otp
           - sms_otp
+          - voice_otp
           - webauthn
+          - usernameless_webauthn
           - push
           - symbol
           - qr_code
@@ -13086,7 +13143,9 @@ definitions:
           - otp
           - email_otp
           - sms_otp
+          - voice_otp
           - webauthn
+          - usernameless_webauthn
           - push
           - symbol
           - qr_code
@@ -14721,7 +14780,9 @@ definitions:
           - otp
           - email_otp
           - sms_otp
+          - voice_otp
           - webauthn
+          - usernameless_webauthn
           - push
           - symbol
           - qr_code
@@ -15365,7 +15426,9 @@ definitions:
           - otp
           - email_otp
           - sms_otp
+          - voice_otp
           - webauthn
+          - usernameless_webauthn
           - push
           - symbol
           - qr_code
@@ -16217,7 +16280,9 @@ definitions:
           - otp
           - email_otp
           - sms_otp
+          - voice_otp
           - webauthn
+          - usernameless_webauthn
           - push
           - symbol
           - qr_code
@@ -17523,6 +17588,22 @@ definitions:
         type: string
         x-nullable: false
     type: object
+  TelesignPhoneProvider:
+    properties:
+      api_key:
+        type: string
+        x-nullable: false
+      customer_id:
+        type: string
+        x-nullable: false
+      from:
+        type: string
+        x-nullable: false
+    required:
+    - customer_id
+    - api_key
+    title: TelesignPhoneProvider holds TeleSign-specific configuration.
+    type: object
   Template:
     description: Custom Branding template
     properties:
@@ -17712,6 +17793,11 @@ definitions:
       openbanking_uk_consents:
         items:
           $ref: '#/definitions/OBConsent'
+        type: array
+        x-nullable: false
+      phone_provider_configs:
+        items:
+          $ref: '#/definitions/PhoneProviderConfig'
         type: array
         x-nullable: false
       policies:
@@ -17985,6 +18071,23 @@ definitions:
         type: string
         x-nullable: false
     type: object
+  TwilioPhoneProvider:
+    properties:
+      auth_token:
+        type: string
+        x-nullable: false
+      from:
+        type: string
+        x-nullable: false
+      sid:
+        type: string
+        x-nullable: false
+    required:
+    - sid
+    - auth_token
+    - from
+    title: TwilioPhoneProvider holds Twilio-specific configuration.
+    type: object
   UKConsentPayload:
     properties:
       account_ids:
@@ -18125,7 +18228,9 @@ definitions:
         - otp
         - email_otp
         - sms_otp
+        - voice_otp
         - webauthn
+        - usernameless_webauthn
         - push
         - symbol
         - qr_code
@@ -18149,7 +18254,9 @@ definitions:
         - otp
         - email_otp
         - sms_otp
+        - voice_otp
         - webauthn
+        - usernameless_webauthn
         - push
         - symbol
         - qr_code
@@ -18402,6 +18509,57 @@ definitions:
         $ref: '#/definitions/RequestedVerifiedClaims'
       userinfo:
         $ref: '#/definitions/RequestedVerifiedClaims'
+    type: object
+  VoiceAuth:
+    properties:
+      auth_token:
+        description: The Twilio Auth Token.
+        type: string
+        x-nullable: false
+      sid:
+        description: The Twilio Account SID.
+        type: string
+        x-nullable: false
+    required:
+    - sid
+    - auth_token
+    type: object
+  VoiceSettings:
+    properties:
+      custom_source:
+        description: |-
+          Custom voice call From phone number.
+
+          If not set, the default is used.
+        type: string
+        x-nullable: false
+      otp:
+        $ref: '#/definitions/OTPConfiguration'
+      provider:
+        description: Voice provider.
+        enum:
+        - twilio
+        - embedded
+        example: embedded
+        type: string
+        x-nullable: false
+    type: object
+  VonagePhoneProvider:
+    properties:
+      api_key:
+        type: string
+        x-nullable: false
+      api_secret:
+        type: string
+        x-nullable: false
+      from:
+        type: string
+        x-nullable: false
+    required:
+    - api_key
+    - api_secret
+    - from
+    title: VonagePhoneProvider holds Vonage-specific configuration.
     type: object
   Webhook:
     description: Custom Branding Webhook
@@ -18764,7 +18922,9 @@ definitions:
           - otp
           - email_otp
           - sms_otp
+          - voice_otp
           - webauthn
+          - usernameless_webauthn
           - push
           - symbol
           - qr_code

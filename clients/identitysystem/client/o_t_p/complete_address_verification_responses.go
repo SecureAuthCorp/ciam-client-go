@@ -456,7 +456,7 @@ func NewCompleteAddressVerificationPreconditionFailed() *CompleteAddressVerifica
 /*
 CompleteAddressVerificationPreconditionFailed describes a response with status code 412, with default header values.
 
-Payload too large
+Precondition failed
 */
 type CompleteAddressVerificationPreconditionFailed struct {
 	Payload *models.Error

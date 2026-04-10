@@ -56,7 +56,7 @@ type SelfUserWithDataV2 struct {
 
 	// preferred authentication mechanism
 	// Example: password
-	// Enum: ["totp","password","otp","email_otp","sms_otp","webauthn"]
+	// Enum: ["totp","password","otp","email_otp","sms_otp","voice_otp","webauthn","usernameless_webauthn","push","symbol","qr_code"]
 	PreferredAuthenticationMechanism string `json:"preferred_authentication_mechanism,omitempty" yaml:"preferred_authentication_mechanism,omitempty"`
 
 	// second factor authentication mechanisms
@@ -64,7 +64,7 @@ type SelfUserWithDataV2 struct {
 
 	// second factor preferred authentication mechanism
 	// Example: password
-	// Enum: ["totp","password","otp","email_otp","sms_otp","webauthn"]
+	// Enum: ["totp","password","otp","email_otp","sms_otp","voice_otp","webauthn","usernameless_webauthn","push","symbol","qr_code"]
 	SecondFactorPreferredAuthenticationMechanism string `json:"second_factor_preferred_authentication_mechanism,omitempty" yaml:"second_factor_preferred_authentication_mechanism,omitempty"`
 
 	// totp issuer
@@ -132,7 +132,7 @@ var selfUserWithDataV2AllowedAuthenticationMechanismsItemsEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["totp","password","otp","email_otp","sms_otp","webauthn"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["totp","password","otp","email_otp","sms_otp","voice_otp","webauthn","usernameless_webauthn","push","symbol","qr_code"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -301,7 +301,7 @@ var selfUserWithDataV2TypePreferredAuthenticationMechanismPropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["totp","password","otp","email_otp","sms_otp","webauthn"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["totp","password","otp","email_otp","sms_otp","voice_otp","webauthn","usernameless_webauthn","push","symbol","qr_code"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -326,8 +326,23 @@ const (
 	// SelfUserWithDataV2PreferredAuthenticationMechanismSmsOtp captures enum value "sms_otp"
 	SelfUserWithDataV2PreferredAuthenticationMechanismSmsOtp string = "sms_otp"
 
+	// SelfUserWithDataV2PreferredAuthenticationMechanismVoiceOtp captures enum value "voice_otp"
+	SelfUserWithDataV2PreferredAuthenticationMechanismVoiceOtp string = "voice_otp"
+
 	// SelfUserWithDataV2PreferredAuthenticationMechanismWebauthn captures enum value "webauthn"
 	SelfUserWithDataV2PreferredAuthenticationMechanismWebauthn string = "webauthn"
+
+	// SelfUserWithDataV2PreferredAuthenticationMechanismUsernamelessWebauthn captures enum value "usernameless_webauthn"
+	SelfUserWithDataV2PreferredAuthenticationMechanismUsernamelessWebauthn string = "usernameless_webauthn"
+
+	// SelfUserWithDataV2PreferredAuthenticationMechanismPush captures enum value "push"
+	SelfUserWithDataV2PreferredAuthenticationMechanismPush string = "push"
+
+	// SelfUserWithDataV2PreferredAuthenticationMechanismSymbol captures enum value "symbol"
+	SelfUserWithDataV2PreferredAuthenticationMechanismSymbol string = "symbol"
+
+	// SelfUserWithDataV2PreferredAuthenticationMechanismQrCode captures enum value "qr_code"
+	SelfUserWithDataV2PreferredAuthenticationMechanismQrCode string = "qr_code"
 )
 
 // prop value enum
@@ -372,7 +387,7 @@ var selfUserWithDataV2TypeSecondFactorPreferredAuthenticationMechanismPropEnum [
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["totp","password","otp","email_otp","sms_otp","webauthn"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["totp","password","otp","email_otp","sms_otp","voice_otp","webauthn","usernameless_webauthn","push","symbol","qr_code"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -397,8 +412,23 @@ const (
 	// SelfUserWithDataV2SecondFactorPreferredAuthenticationMechanismSmsOtp captures enum value "sms_otp"
 	SelfUserWithDataV2SecondFactorPreferredAuthenticationMechanismSmsOtp string = "sms_otp"
 
+	// SelfUserWithDataV2SecondFactorPreferredAuthenticationMechanismVoiceOtp captures enum value "voice_otp"
+	SelfUserWithDataV2SecondFactorPreferredAuthenticationMechanismVoiceOtp string = "voice_otp"
+
 	// SelfUserWithDataV2SecondFactorPreferredAuthenticationMechanismWebauthn captures enum value "webauthn"
 	SelfUserWithDataV2SecondFactorPreferredAuthenticationMechanismWebauthn string = "webauthn"
+
+	// SelfUserWithDataV2SecondFactorPreferredAuthenticationMechanismUsernamelessWebauthn captures enum value "usernameless_webauthn"
+	SelfUserWithDataV2SecondFactorPreferredAuthenticationMechanismUsernamelessWebauthn string = "usernameless_webauthn"
+
+	// SelfUserWithDataV2SecondFactorPreferredAuthenticationMechanismPush captures enum value "push"
+	SelfUserWithDataV2SecondFactorPreferredAuthenticationMechanismPush string = "push"
+
+	// SelfUserWithDataV2SecondFactorPreferredAuthenticationMechanismSymbol captures enum value "symbol"
+	SelfUserWithDataV2SecondFactorPreferredAuthenticationMechanismSymbol string = "symbol"
+
+	// SelfUserWithDataV2SecondFactorPreferredAuthenticationMechanismQrCode captures enum value "qr_code"
+	SelfUserWithDataV2SecondFactorPreferredAuthenticationMechanismQrCode string = "qr_code"
 )
 
 // prop value enum

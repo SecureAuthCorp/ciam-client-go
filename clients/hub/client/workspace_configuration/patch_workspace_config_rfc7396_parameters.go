@@ -79,15 +79,15 @@ type PatchWorkspaceConfigRfc7396Params struct {
 
 	The `mode` parameter defines
 	what happens if there are any conflicts when importing your configuration. For example, if a
-	client already exists within Cloudentity and you are trying to import a
+	client already exists within SecureAuth and you are trying to import a
 	configuration that also has a client with this ID, there are the following ways
-	Cloudentity can handle the request:
+	SecureAuth can handle the request:
 
-	`mode` set to `ignore`, Cloudentity ignores the changes that come from your configuration import.
+	`mode` set to `ignore`, SecureAuth ignores the changes that come from your configuration import.
 
-	`mode` set to `fail`, Cloudentity stops processing the import and returns an error.
+	`mode` set to `fail`, SecureAuth stops processing the import and returns an error.
 
-	`mode` set to `update`, Cloudentity updates the value from the previous configuration with the value
+	`mode` set to `update`, SecureAuth updates the value from the previous configuration with the value
 	provided in the request.
 
 	     Format: insertMode

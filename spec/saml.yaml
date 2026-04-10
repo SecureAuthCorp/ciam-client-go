@@ -817,7 +817,7 @@ definitions:
 host: localhost:8443
 info:
   description: |-
-    Cloudentity SAML API
+    SecureAuth SAML API
 
     The POST APIs support idempotency for safely retrying requests without accidentally performing the same operation twice.
 
@@ -828,13 +828,24 @@ info:
     3. Retry failed requests with the same key within 1 minute.
 
     Responses for replayed requests will include the X-Idempotent-Replayed: true header.
-  title: Cloudentity API
+  title: SecureAuth API
   version: latest
 paths:
+  /saml/certificate:
+    get:
+      description: Returns SAML IDP certificate in PEM format.
+      operationId: idpCertificate
+      responses:
+        "200":
+          $ref: '#/responses/samlIDPCertificateResponse'
+        "404":
+          $ref: '#/responses/genericError'
+      summary: SAML IDP certificate endpoint
+      tags:
+      - saml
   /saml/initiate:
     get:
-      description: Alpha SAML IDP initiated SSO endpoint available behind the feature
-        flag.
+      description: SAML IDP initiated SSO endpoint.
       operationId: idpInitiatedSso
       parameters:
       - description: Service Provider ID
@@ -846,7 +857,7 @@ paths:
           $ref: '#/responses/emptyResponse'
         "404":
           $ref: '#/responses/genericError'
-      summary: (Alpha) SAML IDP initiated SSO endpoint
+      summary: SAML IDP initiated SSO endpoint
       tags:
       - saml
   /saml/metadata:
@@ -958,6 +969,8 @@ responses:
     description: Precondition failed
     schema:
       $ref: '#/definitions/Error'
+  samlIDPCertificateResponse:
+    description: IDP Certificate
   samlIDPMetadataResponse:
     description: IDP Metadata
     schema:

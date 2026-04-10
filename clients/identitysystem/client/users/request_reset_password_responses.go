@@ -54,6 +54,12 @@ func (o *RequestResetPasswordReader) ReadResponse(response runtime.ClientRespons
 			return nil, err
 		}
 		return nil, result
+	case 429:
+		result := NewRequestResetPasswordTooManyRequests()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	default:
 		return nil, runtime.NewAPIError("[POST /system/pools/{ipID}/user/password/reset/request] requestResetPassword", response, response.Code())
 	}
@@ -304,7 +310,7 @@ func NewRequestResetPasswordPreconditionFailed() *RequestResetPasswordPreconditi
 /*
 RequestResetPasswordPreconditionFailed describes a response with status code 412, with default header values.
 
-Payload too large
+Precondition failed
 */
 type RequestResetPasswordPreconditionFailed struct {
 	Payload *models.Error
@@ -425,6 +431,76 @@ func (o *RequestResetPasswordUnprocessableEntity) GetPayload() *models.Error {
 }
 
 func (o *RequestResetPasswordUnprocessableEntity) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	o.Payload = new(models.Error)
+
+	// response payload
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+		return err
+	}
+
+	return nil
+}
+
+// NewRequestResetPasswordTooManyRequests creates a RequestResetPasswordTooManyRequests with default headers values
+func NewRequestResetPasswordTooManyRequests() *RequestResetPasswordTooManyRequests {
+	return &RequestResetPasswordTooManyRequests{}
+}
+
+/*
+RequestResetPasswordTooManyRequests describes a response with status code 429, with default header values.
+
+Too many requests
+*/
+type RequestResetPasswordTooManyRequests struct {
+	Payload *models.Error
+}
+
+// IsSuccess returns true when this request reset password too many requests response has a 2xx status code
+func (o *RequestResetPasswordTooManyRequests) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this request reset password too many requests response has a 3xx status code
+func (o *RequestResetPasswordTooManyRequests) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this request reset password too many requests response has a 4xx status code
+func (o *RequestResetPasswordTooManyRequests) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this request reset password too many requests response has a 5xx status code
+func (o *RequestResetPasswordTooManyRequests) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this request reset password too many requests response a status code equal to that given
+func (o *RequestResetPasswordTooManyRequests) IsCode(code int) bool {
+	return code == 429
+}
+
+// Code gets the status code for the request reset password too many requests response
+func (o *RequestResetPasswordTooManyRequests) Code() int {
+	return 429
+}
+
+func (o *RequestResetPasswordTooManyRequests) Error() string {
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /system/pools/{ipID}/user/password/reset/request][%d] requestResetPasswordTooManyRequests %s", 429, payload)
+}
+
+func (o *RequestResetPasswordTooManyRequests) String() string {
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /system/pools/{ipID}/user/password/reset/request][%d] requestResetPasswordTooManyRequests %s", 429, payload)
+}
+
+func (o *RequestResetPasswordTooManyRequests) GetPayload() *models.Error {
+	return o.Payload
+}
+
+func (o *RequestResetPasswordTooManyRequests) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.Error)
 

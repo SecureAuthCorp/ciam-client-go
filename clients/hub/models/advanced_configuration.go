@@ -24,6 +24,9 @@ type AdvancedConfiguration struct {
 	// This option overrides all urls advertised by the well known endpoint with their mtls alias
 	AdvertiseOnlyMtlsAliasesInWellKnown bool `json:"advertise_only_mtls_aliases_in_well_known,omitempty" yaml:"advertise_only_mtls_aliases_in_well_known,omitempty"`
 
+	// auto request recovery
+	AutoRequestRecovery bool `json:"auto_request_recovery,omitempty" yaml:"auto_request_recovery,omitempty"`
+
 	// Block response modes
 	BlockResponseModes bool `json:"block_response_modes,omitempty" yaml:"block_response_modes,omitempty"`
 
