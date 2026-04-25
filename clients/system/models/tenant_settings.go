@@ -24,6 +24,9 @@ type TenantSettings struct {
 	// default workspace id
 	DefaultWorkspaceID string `json:"default_workspace_id,omitempty" yaml:"default_workspace_id,omitempty"`
 
+	// message redaction
+	MessageRedaction *RedactionPolicy `json:"message_redaction,omitempty" yaml:"message_redaction,omitempty"`
+
 	// security
 	Security *SecureOptions `json:"security,omitempty" yaml:"security,omitempty"`
 
@@ -41,6 +44,10 @@ type TenantSettings struct {
 func (m *TenantSettings) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateMessageRedaction(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateSecurity(formats); err != nil {
 		res = append(res, err)
 	}
@@ -56,6 +63,25 @@ func (m *TenantSettings) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *TenantSettings) validateMessageRedaction(formats strfmt.Registry) error {
+	if swag.IsZero(m.MessageRedaction) { // not required
+		return nil
+	}
+
+	if m.MessageRedaction != nil {
+		if err := m.MessageRedaction.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("message_redaction")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("message_redaction")
+			}
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -120,6 +146,10 @@ func (m *TenantSettings) validateWorkforce(formats strfmt.Registry) error {
 func (m *TenantSettings) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.contextValidateMessageRedaction(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.contextValidateSecurity(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -135,6 +165,27 @@ func (m *TenantSettings) ContextValidate(ctx context.Context, formats strfmt.Reg
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *TenantSettings) contextValidateMessageRedaction(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.MessageRedaction != nil {
+
+		if swag.IsZero(m.MessageRedaction) { // not required
+			return nil
+		}
+
+		if err := m.MessageRedaction.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("message_redaction")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("message_redaction")
+			}
+			return err
+		}
+	}
+
 	return nil
 }
 

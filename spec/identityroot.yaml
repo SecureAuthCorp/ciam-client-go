@@ -572,6 +572,21 @@ definitions:
         x-nullable: false
     title: PoolLimits defines limits for user sub-entries within a pool.
     type: object
+  RedactionPolicy:
+    properties:
+      address:
+        description: Controls whether phone numbers are retained or obfuscated by
+          the provider.
+        example: retain
+        type: string
+        x-nullable: false
+      content:
+        description: Controls whether message body content is retained by the provider.
+        example: retain
+        type: string
+        x-nullable: false
+    title: RedactionPolicy controls message redaction at the SMS provider level.
+    type: object
   RequestCode:
     properties:
       address:
@@ -1104,6 +1119,8 @@ definitions:
         format: verifiableAddressID
         type: string
         x-nullable: false
+      message_redaction:
+        $ref: '#/definitions/RedactionPolicy'
       metadata:
         additionalProperties:
           type: object

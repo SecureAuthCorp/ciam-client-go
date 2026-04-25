@@ -3092,6 +3092,21 @@ definitions:
         type: string
         x-nullable: false
     type: object
+  RedactionPolicy:
+    properties:
+      address:
+        description: Controls whether phone numbers are retained or obfuscated by
+          the provider.
+        example: retain
+        type: string
+        x-nullable: false
+      content:
+        description: Controls whether message body content is retained by the provider.
+        example: retain
+        type: string
+        x-nullable: false
+    title: RedactionPolicy controls message redaction at the SMS provider level.
+    type: object
   RedirectURIs:
     description: |-
       SecureAuth uses redirect URIs to redirect users back to the application after they authorized the application. Along
@@ -4329,6 +4344,8 @@ definitions:
         format: serverID
         type: string
         x-nullable: false
+      message_redaction:
+        $ref: '#/definitions/RedactionPolicy'
       security:
         $ref: '#/definitions/SecureOptions'
       translations:
@@ -6860,6 +6877,10 @@ definitions:
         x-nullable: false
     type: object
   VonagePhoneProvider:
+    description: |-
+      VonagePhoneProvider holds Vonage-specific configuration. From and VoiceFrom
+      are orthogonal: From is the SMS sender (alpha or E.164), VoiceFrom is the
+      E.164 caller ID for voice. Required when voice is enabled.
     properties:
       api_key:
         type: string
@@ -6867,14 +6888,32 @@ definitions:
       api_secret:
         type: string
         x-nullable: false
+      application_id:
+        description: Vonage Application ID for voice API (optional — only needed for
+          voice calls).
+        type: string
+        x-nullable: false
       from:
+        type: string
+        x-nullable: false
+      private_key:
+        description: PEM-encoded RSA private key for voice API JWT auth (optional
+          — only needed for voice calls).
+        type: string
+        x-nullable: false
+      signature_secret:
+        description: Vonage account signature secret for webhook JWT verification
+          (optional — from Dashboard → Settings).
+        type: string
+        x-nullable: false
+      voice_from:
+        description: E.164 caller ID for voice calls (required when voice is enabled).
         type: string
         x-nullable: false
     required:
     - api_key
     - api_secret
     - from
-    title: VonagePhoneProvider holds Vonage-specific configuration.
     type: object
   WebAuthnSettings:
     properties:

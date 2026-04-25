@@ -14,7 +14,9 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// VonagePhoneProvider VonagePhoneProvider holds Vonage-specific configuration.
+// VonagePhoneProvider VonagePhoneProvider holds Vonage-specific configuration. From and VoiceFrom
+// are orthogonal: From is the SMS sender (alpha or E.164), VoiceFrom is the
+// E.164 caller ID for voice. Required when voice is enabled.
 //
 // swagger:model VonagePhoneProvider
 type VonagePhoneProvider struct {
@@ -27,9 +29,21 @@ type VonagePhoneProvider struct {
 	// Required: true
 	APISecret string `json:"api_secret" yaml:"api_secret"`
 
+	// Vonage Application ID for voice API (optional — only needed for voice calls).
+	ApplicationID string `json:"application_id,omitempty" yaml:"application_id,omitempty"`
+
 	// from
 	// Required: true
 	From string `json:"from" yaml:"from"`
+
+	// PEM-encoded RSA private key for voice API JWT auth (optional — only needed for voice calls).
+	PrivateKey string `json:"private_key,omitempty" yaml:"private_key,omitempty"`
+
+	// Vonage account signature secret for webhook JWT verification (optional — from Dashboard → Settings).
+	SignatureSecret string `json:"signature_secret,omitempty" yaml:"signature_secret,omitempty"`
+
+	// E.164 caller ID for voice calls (required when voice is enabled).
+	VoiceFrom string `json:"voice_from,omitempty" yaml:"voice_from,omitempty"`
 }
 
 // Validate validates this vonage phone provider

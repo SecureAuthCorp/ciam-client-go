@@ -35,6 +35,9 @@ type TransientOTPRequest struct {
 	// Example: 111111
 	Otp string `json:"otp,omitempty" yaml:"otp,omitempty"`
 
+	// redaction
+	Redaction *RedactionPolicy `json:"redaction,omitempty" yaml:"redaction,omitempty"`
+
 	// Optional XSRF state
 	// Example: c44sqtco4g2legl15m2g
 	State string `json:"state,omitempty" yaml:"state,omitempty"`
@@ -49,6 +52,10 @@ func (m *TransientOTPRequest) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateMechanism(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateRedaction(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -113,8 +120,57 @@ func (m *TransientOTPRequest) validateMechanism(formats strfmt.Registry) error {
 	return nil
 }
 
-// ContextValidate validates this transient o t p request based on context it is used
+func (m *TransientOTPRequest) validateRedaction(formats strfmt.Registry) error {
+	if swag.IsZero(m.Redaction) { // not required
+		return nil
+	}
+
+	if m.Redaction != nil {
+		if err := m.Redaction.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("redaction")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("redaction")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ContextValidate validate this transient o t p request based on the context it is used
 func (m *TransientOTPRequest) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateRedaction(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *TransientOTPRequest) contextValidateRedaction(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Redaction != nil {
+
+		if swag.IsZero(m.Redaction) { // not required
+			return nil
+		}
+
+		if err := m.Redaction.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("redaction")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("redaction")
+			}
+			return err
+		}
+	}
+
 	return nil
 }
 

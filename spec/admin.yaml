@@ -860,6 +860,32 @@ definitions:
     type: object
   AgentCapability:
     type: string
+  ApiKeyResponse:
+    description: API key object
+    properties:
+      created_at:
+        description: Creation time
+        format: date-time
+        type: string
+        x-nullable: false
+      expires_at:
+        description: Expiration time (null means never expires)
+        format: date-time
+        type: string
+        x-nullable: false
+      id:
+        description: API key ID
+        type: string
+        x-nullable: false
+      name:
+        description: API key name
+        type: string
+        x-nullable: false
+      token:
+        description: API key token (only returned on creation)
+        type: string
+        x-nullable: false
+    type: object
   ApigeeMetadata:
     properties:
       environment_name:
@@ -1623,6 +1649,8 @@ definitions:
         $ref: '#/definitions/UserIDAndIdentifierPayload'
       password_updated:
         $ref: '#/definitions/UserIDAndIdentifierPayload'
+      phone_delivery_received:
+        $ref: '#/definitions/MessageDeliveryReceiptPayload'
       policy_authorized:
         $ref: '#/definitions/PolicyEvaluatedPayload'
       policy_unauthorized:
@@ -6155,6 +6183,21 @@ definitions:
       same_site:
         $ref: '#/definitions/SameSite'
     type: object
+  CreateApiKeyRequest:
+    description: Create API key request
+    properties:
+      expires_at:
+        description: Expiration time (optional, null means never expires)
+        format: date-time
+        type: string
+        x-nullable: false
+      name:
+        description: API key name
+        type: string
+        x-nullable: false
+    required:
+    - name
+    type: object
   CreateClientAdminRequest:
     properties:
       agent_capability:
@@ -7871,6 +7914,11 @@ definitions:
         description: allow tenants to configure custom phone providers
         type: boolean
         x-nullable: false
+      agentic_ai_system_nav:
+        description: show full system nav in agentic AI workspaces (default off -
+          system nav is hidden)
+        type: boolean
+        x-nullable: false
       ai_security:
         description: AI Security
         type: boolean
@@ -7930,11 +7978,6 @@ definitions:
         x-nullable: false
       client_secrets_stored_as_one_way_hash:
         description: stores client secrets as one-way hashes
-        type: boolean
-        x-nullable: false
-      clone_workspace_scripts_fix:
-        description: generate random ids for scripts in the new workspace when using
-          clone workspace feature
         type: boolean
         x-nullable: false
       cloudentity_idp:
@@ -11389,6 +11432,16 @@ definitions:
         type: boolean
         x-nullable: false
     type: object
+  ListApiKeysResponse:
+    description: List API keys
+    properties:
+      api_keys:
+        description: list of API keys
+        items:
+          $ref: '#/definitions/ApiKeyResponse'
+        type: array
+        x-nullable: false
+    type: object
   LocalizedName:
     description: See http://docs.oasis-open.org/security/saml/v2.0/saml-metadata-2.0-os.pdf
       §2.2.4
@@ -11659,6 +11712,32 @@ definitions:
       $ref: '#/definitions/Mapping'
     title: An array of mappings
     type: array
+  MessageDeliveryReceiptPayload:
+    properties:
+      message_type:
+        enum:
+        - sms
+        - email
+        - voice
+        type: string
+        x-nullable: false
+      originating_event_id:
+        format: eventID
+        type: string
+        x-nullable: false
+      provider:
+        type: string
+        x-nullable: false
+      provider_message_id:
+        type: string
+        x-nullable: false
+      raw_payload:
+        type: object
+        x-nullable: false
+      status:
+        type: string
+        x-nullable: false
+    type: object
   MetaCredentials:
     description: Meta IDP specific credentials
     properties:
@@ -12425,6 +12504,8 @@ definitions:
       purpose:
         type: string
         x-nullable: false
+      redaction:
+        $ref: '#/definitions/RedactionPolicy'
       type:
         enum:
         - sms
@@ -13678,6 +13759,21 @@ definitions:
         items: {}
         type: array
         x-nullable: false
+    type: object
+  RedactionPolicy:
+    properties:
+      address:
+        description: Controls whether phone numbers are retained or obfuscated by
+          the provider.
+        example: retain
+        type: string
+        x-nullable: false
+      content:
+        description: Controls whether message body content is retained by the provider.
+        example: retain
+        type: string
+        x-nullable: false
+    title: RedactionPolicy controls message redaction at the SMS provider level.
     type: object
   RedirectURIs:
     description: |-
@@ -19302,6 +19398,8 @@ definitions:
         format: serverID
         type: string
         x-nullable: false
+      message_redaction:
+        $ref: '#/definitions/RedactionPolicy'
       security:
         $ref: '#/definitions/SecureOptions'
       translations:
@@ -20960,6 +21058,10 @@ definitions:
         x-nullable: false
     type: object
   VonagePhoneProvider:
+    description: |-
+      VonagePhoneProvider holds Vonage-specific configuration. From and VoiceFrom
+      are orthogonal: From is the SMS sender (alpha or E.164), VoiceFrom is the
+      E.164 caller ID for voice. Required when voice is enabled.
     properties:
       api_key:
         type: string
@@ -20967,14 +21069,32 @@ definitions:
       api_secret:
         type: string
         x-nullable: false
+      application_id:
+        description: Vonage Application ID for voice API (optional — only needed for
+          voice calls).
+        type: string
+        x-nullable: false
       from:
+        type: string
+        x-nullable: false
+      private_key:
+        description: PEM-encoded RSA private key for voice API JWT auth (optional
+          — only needed for voice calls).
+        type: string
+        x-nullable: false
+      signature_secret:
+        description: Vonage account signature secret for webhook JWT verification
+          (optional — from Dashboard → Settings).
+        type: string
+        x-nullable: false
+      voice_from:
+        description: E.164 caller ID for voice calls (required when voice is enabled).
         type: string
         x-nullable: false
     required:
     - api_key
     - api_secret
     - from
-    title: VonagePhoneProvider holds Vonage-specific configuration.
     type: object
   Webhook:
     description: Custom Branding Webhook
@@ -26961,6 +27081,153 @@ paths:
       summary: Update a CustomApp
       tags:
       - customApps
+  /servers/{wid}/custom-apps/{customAppID}/api-keys:
+    get:
+      description: Returns list of API keys for a custom app. Tokens are not included
+        in the response.
+      operationId: listApiKeys
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
+      - description: Authorization server id
+        in: path
+        name: wid
+        required: true
+        type: string
+      - description: CustomApp ID
+        in: path
+        name: customAppID
+        required: true
+        type: string
+      responses:
+        "200":
+          $ref: '#/responses/ListApiKeysResponseParams'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - admin: []
+      summary: List API Keys
+      tags:
+      - apiKeys
+    post:
+      description: Creates a new API key for a SCIM custom app. The token is returned
+        only on creation.
+      operationId: createApiKey
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
+      - description: Authorization server id
+        in: path
+        name: wid
+        required: true
+        type: string
+      - description: CustomApp ID
+        in: path
+        name: customAppID
+        required: true
+        type: string
+      - in: body
+        name: ApiKey
+        schema:
+          $ref: '#/definitions/CreateApiKeyRequest'
+      responses:
+        "201":
+          $ref: '#/responses/ApiKeyResponseParams'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - admin: []
+      summary: Create API Key
+      tags:
+      - apiKeys
+  /servers/{wid}/custom-apps/{customAppID}/api-keys/{apiKeyID}:
+    delete:
+      description: Deletes an API key.
+      operationId: deleteApiKey
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
+      - description: Authorization server id
+        in: path
+        name: wid
+        required: true
+        type: string
+      - description: CustomApp ID
+        in: path
+        name: customAppID
+        required: true
+        type: string
+      - description: API Key ID
+        in: path
+        name: apiKeyID
+        required: true
+        type: string
+      responses:
+        "204":
+          description: ' API key has been deleted'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - admin: []
+      summary: Delete API Key
+      tags:
+      - apiKeys
   /servers/{wid}/environment:
     get:
       description: Get workspace environment settings.
@@ -37390,6 +37657,30 @@ responses:
         type: string
     schema:
       $ref: '#/definitions/APIs'
+  ApiKeyResponseParams:
+    description: API key response
+    headers:
+      etag:
+        description: |-
+          The ETag HTTP header is an identifier for a specific version of a resource
+
+          in:header
+        format: etag
+        type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
+    schema:
+      $ref: '#/definitions/ApiKeyResponse'
   AuditEventsResponse:
     description: AuditEvents
     headers:
@@ -38214,6 +38505,30 @@ responses:
         type: string
     schema:
       $ref: '#/definitions/KeysResponse'
+  ListApiKeysResponseParams:
+    description: List API keys response
+    headers:
+      etag:
+        description: |-
+          The ETag HTTP header is an identifier for a specific version of a resource
+
+          in:header
+        format: etag
+        type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
+    schema:
+      $ref: '#/definitions/ListApiKeysResponse'
   MFAMethodResponse:
     description: MFA method
     headers:
