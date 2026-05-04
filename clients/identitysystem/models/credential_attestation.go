@@ -18,16 +18,16 @@ import (
 type CredentialAttestation struct {
 
 	// authenticator data
-	AuthenticatorData []uint8 `json:"authenticatorData" yaml:"authenticatorData"`
+	AuthenticatorData string `json:"authenticatorData,omitempty" yaml:"authenticatorData,omitempty"`
 
 	// client data hash
-	ClientDataHash []uint8 `json:"clientDataHash" yaml:"clientDataHash"`
+	ClientDataHash string `json:"clientDataHash,omitempty" yaml:"clientDataHash,omitempty"`
 
 	// client data JSON
-	ClientDataJSON []uint8 `json:"clientDataJSON" yaml:"clientDataJSON"`
+	ClientDataJSON string `json:"clientDataJSON,omitempty" yaml:"clientDataJSON,omitempty"`
 
 	// object
-	Object []uint8 `json:"object" yaml:"object"`
+	Object string `json:"object,omitempty" yaml:"object,omitempty"`
 
 	// public key algorithm
 	PublicKeyAlgorithm int64 `json:"publicKeyAlgorithm,omitempty" yaml:"publicKeyAlgorithm,omitempty"`

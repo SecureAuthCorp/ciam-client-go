@@ -35,10 +35,10 @@ type Credential struct {
 	Flags *CredentialFlags `json:"flags,omitempty" yaml:"flags,omitempty"`
 
 	// The Credential ID of the public key credential source. Described by the Credential Record 'id' field.
-	ID []uint8 `json:"id" yaml:"id"`
+	ID string `json:"id,omitempty" yaml:"id,omitempty"`
 
 	// The credential public key of the public key credential source. Described by the Credential Record 'publicKey field.
-	PublicKey []uint8 `json:"publicKey" yaml:"publicKey"`
+	PublicKey string `json:"publicKey,omitempty" yaml:"publicKey,omitempty"`
 
 	// The transport types the authenticator supports.
 	Transport []AuthenticatorTransport `json:"transport" yaml:"transport"`

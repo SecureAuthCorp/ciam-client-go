@@ -27,6 +27,9 @@ type UpdateUserVerifiableAddress struct {
 	// is allowed for 2FA
 	AllowedFor2fa bool `json:"allowed_for_2fa,omitempty" yaml:"allowed_for_2fa,omitempty"`
 
+	// message redaction
+	MessageRedaction *RedactionPolicy `json:"message_redaction,omitempty" yaml:"message_redaction,omitempty"`
+
 	// general purpose metadata
 	Metadata map[string]interface{} `json:"metadata,omitempty" yaml:"metadata,omitempty"`
 
@@ -55,6 +58,10 @@ func (m *UpdateUserVerifiableAddress) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateMessageRedaction(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validatePreferredContactMethod(formats); err != nil {
 		res = append(res, err)
 	}
@@ -77,6 +84,25 @@ func (m *UpdateUserVerifiableAddress) validateAddress(formats strfmt.Registry) e
 
 	if err := validate.RequiredString("address", "body", m.Address); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (m *UpdateUserVerifiableAddress) validateMessageRedaction(formats strfmt.Registry) error {
+	if swag.IsZero(m.MessageRedaction) { // not required
+		return nil
+	}
+
+	if m.MessageRedaction != nil {
+		if err := m.MessageRedaction.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("message_redaction")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("message_redaction")
+			}
+			return err
+		}
 	}
 
 	return nil
@@ -176,8 +202,38 @@ func (m *UpdateUserVerifiableAddress) validateVerified(formats strfmt.Registry) 
 	return nil
 }
 
-// ContextValidate validates this update user verifiable address based on context it is used
+// ContextValidate validate this update user verifiable address based on the context it is used
 func (m *UpdateUserVerifiableAddress) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateMessageRedaction(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *UpdateUserVerifiableAddress) contextValidateMessageRedaction(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.MessageRedaction != nil {
+
+		if swag.IsZero(m.MessageRedaction) { // not required
+			return nil
+		}
+
+		if err := m.MessageRedaction.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("message_redaction")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("message_redaction")
+			}
+			return err
+		}
+	}
+
 	return nil
 }
 

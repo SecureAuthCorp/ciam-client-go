@@ -20,7 +20,7 @@ type Authenticator struct {
 
 	// The AAGUID of the authenticator. An AAGUID is defined as an array containing the globally unique
 	// identifier of the authenticator model being sought.
-	AAGUID []uint8 `json:"AAGUID" yaml:"AAGUID"`
+	AAGUID string `json:"AAGUID,omitempty" yaml:"AAGUID,omitempty"`
 
 	// attachment
 	Attachment AuthenticatorAttachment `json:"attachment,omitempty" yaml:"attachment,omitempty"`

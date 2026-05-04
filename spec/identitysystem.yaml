@@ -18,7 +18,7 @@ definitions:
         x-nullable: false
       webauthn:
         items:
-          $ref: '#/definitions/Credential'
+          $ref: '#/definitions/WebAuthnCredential'
         type: array
         x-nullable: false
       webauthn_type:
@@ -66,6 +66,8 @@ definitions:
         description: is allowed for 2FA
         type: boolean
         x-nullable: false
+      message_redaction:
+        $ref: '#/definitions/RedactionPolicy'
       metadata:
         additionalProperties:
           type: object
@@ -242,10 +244,7 @@ definitions:
         description: |-
           The AAGUID of the authenticator. An AAGUID is defined as an array containing the globally unique
           identifier of the authenticator model being sought.
-        items:
-          format: uint8
-          type: integer
-        type: array
+        type: string
         x-nullable: false
       attachment:
         $ref: '#/definitions/AuthenticatorAttachment'
@@ -266,6 +265,20 @@ definitions:
         format: uint32
         type: integer
         x-nullable: false
+    type: object
+  AuthenticatorAssertionResponse:
+    description: |-
+      The AuthenticatorAssertionResponse contains the raw authenticator assertion data and is parsed into
+      [ParsedAssertionResponse].
+    properties:
+      authenticatorData:
+        $ref: '#/definitions/URLEncodedBase64'
+      clientDataJSON:
+        $ref: '#/definitions/URLEncodedBase64'
+      signature:
+        $ref: '#/definitions/URLEncodedBase64'
+      userHandle:
+        $ref: '#/definitions/URLEncodedBase64'
     type: object
   AuthenticatorAttachment:
     description: |-
@@ -392,6 +405,17 @@ definitions:
         format: int64
         type: integer
         x-nullable: false
+    type: object
+  BeginVerifyWebAuthnRequest:
+    description: Either userID or identifier must be provided.
+    properties:
+      identifier:
+        type: string
+        x-nullable: false
+      userID:
+        type: string
+        x-nullable: false
+    title: BeginVerifyWebAuthnRequest starts a WebAuthn assertion ceremony.
     type: object
   BulkSupport:
     properties:
@@ -541,7 +565,7 @@ definitions:
         type: string
         x-nullable: false
       new_web_authn:
-        $ref: '#/definitions/Credential'
+        $ref: '#/definitions/WebAuthnCredential'
       userID:
         type: string
         x-nullable: false
@@ -612,6 +636,22 @@ definitions:
     - code
     - new_totp_secret
     type: object
+  CompleteVerifyWebAuthnRequest:
+    description: |-
+      CompleteVerifyWebAuthnRequest is the body for both /webauthn/login/complete and
+      usernameless-webauthn/login/complete — the variants only differ in the begin flow
+      that produced session_id. The user identity is already bound to session_id at begin
+      time, so it is not repeated here.
+    properties:
+      assertion:
+        $ref: '#/definitions/CredentialAssertionResponse'
+      session_id:
+        type: string
+        x-nullable: false
+    required:
+    - session_id
+    - assertion
+    type: object
   ConfirmResetPassword:
     properties:
       code:
@@ -656,18 +696,12 @@ definitions:
       id:
         description: The Credential ID of the public key credential source. Described
           by the Credential Record 'id' field.
-        items:
-          format: uint8
-          type: integer
-        type: array
+        type: string
         x-nullable: false
       publicKey:
         description: The credential public key of the public key credential source.
           Described by the Credential Record 'publicKey field.
-        items:
-          format: uint8
-          type: integer
-        type: array
+        type: string
         x-nullable: false
       transport:
         description: The transport types the authenticator supports.
@@ -679,31 +713,48 @@ definitions:
       Credential contains all needed information about a WebAuthn credential for storage. This struct is effectively the
       Credential Record as described in the specification.
     type: object
+  CredentialAssertionResponse:
+    description: |-
+      The CredentialAssertionResponse is the raw response returned to the Relying Party from an authenticator when we request a
+      credential for login/assertion.
+    properties:
+      authenticatorAttachment:
+        type: string
+        x-nullable: false
+      clientExtensionResults:
+        $ref: '#/definitions/AuthenticationExtensionsClientOutputs'
+      id:
+        description: |-
+          ID is The credential’s identifier. The requirements for the
+          identifier are distinct for each type of credential. It might
+          represent a username for username/password tuples, for example.
+        type: string
+        x-nullable: false
+      rawId:
+        $ref: '#/definitions/URLEncodedBase64'
+      response:
+        $ref: '#/definitions/AuthenticatorAssertionResponse'
+      type:
+        description: |-
+          Type is the value of the object’s interface object's [[type]] slot,
+          which specifies the credential type represented by this object.
+          This should be type "public-key" for Webauthn credentials.
+        type: string
+        x-nullable: false
+    type: object
   CredentialAttestation:
     properties:
       authenticatorData:
-        items:
-          format: uint8
-          type: integer
-        type: array
+        type: string
         x-nullable: false
       clientDataHash:
-        items:
-          format: uint8
-          type: integer
-        type: array
+        type: string
         x-nullable: false
       clientDataJSON:
-        items:
-          format: uint8
-          type: integer
-        type: array
+        type: string
         x-nullable: false
       object:
-        items:
-          format: uint8
-          type: integer
-        type: array
+        type: string
         x-nullable: false
       publicKeyAlgorithm:
         format: int64
@@ -1471,7 +1522,7 @@ definitions:
       webauthn_credentials:
         example: public_key
         items:
-          $ref: '#/definitions/Credential'
+          $ref: '#/definitions/WebAuthnCredential'
         type: array
         x-nullable: false
       webauthn_type:
@@ -1519,6 +1570,8 @@ definitions:
         description: is allowed for 2FA
         type: boolean
         x-nullable: false
+      message_redaction:
+        $ref: '#/definitions/RedactionPolicy'
       metadata:
         additionalProperties:
           type: object
@@ -1993,6 +2046,54 @@ definitions:
     type: object
   PublicKeyCredentialHints:
     type: string
+  PublicKeyCredentialRequestOptions:
+    description: |-
+      WebAuthn Level 3: hints.
+
+      Specification: §5.5. Options for Assertion Generation (https://www.w3.org/TR/webauthn/#dictionary-assertion-options)
+    properties:
+      allowCredentials:
+        items:
+          $ref: '#/definitions/CredentialDescriptor'
+        type: array
+        x-nullable: false
+      challenge:
+        $ref: '#/definitions/URLEncodedBase64'
+      extensions:
+        $ref: '#/definitions/AuthenticationExtensions'
+      hints:
+        items:
+          $ref: '#/definitions/PublicKeyCredentialHints'
+        type: array
+        x-nullable: false
+      rpId:
+        type: string
+        x-nullable: false
+      timeout:
+        format: int64
+        type: integer
+        x-nullable: false
+      userVerification:
+        $ref: '#/definitions/UserVerificationRequirement'
+    title: |-
+      The PublicKeyCredentialRequestOptions dictionary supplies get() with the data it needs to generate an assertion.
+      Its challenge member MUST be present, while its other members are OPTIONAL.
+    type: object
+  RedactionPolicy:
+    properties:
+      address:
+        description: Controls whether phone numbers are retained or obfuscated by
+          the provider.
+        example: retain
+        type: string
+        x-nullable: false
+      content:
+        description: Controls whether message body content is retained by the provider.
+        example: retain
+        type: string
+        x-nullable: false
+    title: RedactionPolicy controls message redaction at the SMS provider level.
+    type: object
   RelyingPartyEntity:
     description: 'Specification: §5.4.2. Relying Party Parameters for Credential Generation
       (https://www.w3.org/TR/webauthn/#dictionary-rp-credential-params)'
@@ -2510,7 +2611,7 @@ definitions:
         x-nullable: false
       webauthn_credentials:
         items:
-          $ref: '#/definitions/Credential'
+          $ref: '#/definitions/WebAuthnCredential'
         type: array
         x-nullable: false
       webauthn_type:
@@ -2770,14 +2871,10 @@ definitions:
         x-nullable: false
     type: object
   URLEncodedBase64:
-    description: |-
-      When fields of this type are unmarshalled from JSON, the data is base64
-      decoded into a byte slice.
-    items:
-      format: uint8
-      type: integer
-    title: URLEncodedBase64 represents a byte slice holding URL-encoded base64 data.
-    type: array
+    description: Base64url-encoded data carried as an opaque string. Decoding to raw
+      bytes, if needed, is the consumer responsibility.
+    title: URLEncodedBase64 holds URL-encoded base64 data as an opaque string.
+    type: string
   UpdateUser:
     properties:
       business_metadata:
@@ -2828,6 +2925,8 @@ definitions:
         description: is allowed for 2FA
         type: boolean
         x-nullable: false
+      message_redaction:
+        $ref: '#/definitions/RedactionPolicy'
       metadata:
         additionalProperties:
           type: object
@@ -3238,6 +3337,8 @@ definitions:
         format: verifiableAddressID
         type: string
         x-nullable: false
+      message_redaction:
+        $ref: '#/definitions/RedactionPolicy'
       metadata:
         additionalProperties:
           type: object
@@ -3499,6 +3600,50 @@ definitions:
     - id
     - state
     - result
+    type: object
+  VerifyWebAuthnResponseData:
+    properties:
+      id:
+        format: userID
+        type: string
+        x-nullable: false
+      result:
+        enum:
+        - webauthn_correct
+        - webauthn_incorrect
+        type: string
+        x-nullable: false
+      state:
+        enum:
+        - valid
+        - must_be_reset
+        - must_be_changed
+        type: string
+        x-nullable: false
+    required:
+    - id
+    - state
+    - result
+    type: object
+  WebAuthnCredential:
+    $ref: '#/definitions/Credential'
+  WebAuthnLoginBeginData:
+    description: |-
+      WebAuthnLoginBeginData wraps the standard PublicKeyCredentialRequestOptions with a
+      session_id that the client must echo back at complete time. The session_id keys the
+      stored challenge so concurrent begins from different users (or the same user across
+      tabs/integrations) do not overwrite each other — this is what the cookie store does
+      implicitly in the browser flow.
+    properties:
+      mediation:
+        $ref: '#/definitions/CredentialMediationRequirement'
+      publicKey:
+        $ref: '#/definitions/PublicKeyCredentialRequestOptions'
+      session_id:
+        type: string
+        x-nullable: false
+    required:
+    - session_id
     type: object
   WebAuthnSettings:
     properties:
@@ -5938,6 +6083,99 @@ paths:
       summary: Request Reset Totp Secret
       tags:
       - Users
+  /system/pools/{ipID}/user/usernameless-webauthn/login/begin:
+    post:
+      description: |-
+        Starts a discoverable WebAuthn assertion ceremony. Returns a challenge with empty
+        `allowCredentials` so the authenticator picks a resident credential. The response also
+        carries a `session_id` the caller must echo back at complete time.
+      operationId: beginVerifyUsernamelessWebAuthn
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
+      - in: path
+        name: ipID
+        required: true
+        type: string
+      responses:
+        "200":
+          $ref: '#/responses/WebAuthnLoginBeginResponse'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "412":
+          $ref: '#/responses/preconditionFailedHTTPError'
+        "422":
+          $ref: '#/responses/unprocessableEntityHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - system:
+        - identity
+      summary: Begin Usernameless WebAuthn Login Verification
+      tags:
+      - Users
+  /system/pools/{ipID}/user/usernameless-webauthn/login/complete:
+    post:
+      description: |-
+        Verifies a discoverable WebAuthn assertion against the challenge previously generated by
+        `usernameless-webauthn/login/begin`. The user is resolved from the `userHandle` returned
+        by the authenticator. The `session_id` returned by begin must be passed back here.
+        Endpoint is protected by Brute Force mechanism.
+      operationId: completeVerifyUsernamelessWebAuthn
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
+      - in: path
+        name: ipID
+        required: true
+        type: string
+      - in: body
+        name: CompleteVerifyUsernamelessWebAuthn
+        schema:
+          $ref: '#/definitions/CompleteVerifyWebAuthnRequest'
+      responses:
+        "200":
+          $ref: '#/responses/VerifyWebAuthnResponse'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "412":
+          $ref: '#/responses/preconditionFailedHTTPError'
+        "422":
+          $ref: '#/responses/unprocessableEntityHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - system:
+        - identity
+      summary: Complete Usernameless WebAuthn Login Verification
+      tags:
+      - Users
   /system/pools/{ipID}/user/webauthn/add/complete:
     post:
       description: |-
@@ -6025,6 +6263,107 @@ paths:
       - system:
         - identity
       summary: Request Add WebAuthn
+      tags:
+      - Users
+  /system/pools/{ipID}/user/webauthn/login/begin:
+    post:
+      description: |-
+        Starts a WebAuthn assertion ceremony. Generates a challenge bound to the user identified
+        by `userID` or `identifier` and returns a `PublicKeyCredentialRequestOptions` payload
+        to be passed to `navigator.credentials.get()`. The response also carries a `session_id`
+        the caller must echo back at complete time so concurrent begins do not collide on the
+        shared session store.
+      operationId: beginVerifyWebAuthn
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
+      - in: path
+        name: ipID
+        required: true
+        type: string
+      - in: body
+        name: BeginVerifyWebAuthn
+        schema:
+          $ref: '#/definitions/BeginVerifyWebAuthnRequest'
+      responses:
+        "200":
+          $ref: '#/responses/WebAuthnLoginBeginResponse'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "412":
+          $ref: '#/responses/preconditionFailedHTTPError'
+        "422":
+          $ref: '#/responses/unprocessableEntityHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - system:
+        - identity
+      summary: Begin WebAuthn Login Verification
+      tags:
+      - Users
+  /system/pools/{ipID}/user/webauthn/login/complete:
+    post:
+      description: |-
+        Verifies a WebAuthn assertion against the challenge previously generated by `login/begin`.
+        The `session_id` returned by begin must be passed back here.
+        Endpoint is protected by Brute Force mechanism.
+        This endpoint is meant for integration when an external system verifies a user's WebAuthn assertion.
+      operationId: completeVerifyWebAuthn
+      parameters:
+      - description: A server will only return requested resources if the resource
+          matches one of the listed ETag value
+        format: etag
+        in: header
+        name: if-match
+        type: string
+      - description: Unique identifier included in audit events for request tracking
+        in: header
+        name: x-correlation-id
+        type: string
+      - description: Key used to safely retry failed requests without duplicate processing
+        in: header
+        name: x-idempotency-key
+        type: string
+      - in: path
+        name: ipID
+        required: true
+        type: string
+      - in: body
+        name: CompleteVerifyWebAuthn
+        schema:
+          $ref: '#/definitions/CompleteVerifyWebAuthnRequest'
+      responses:
+        "200":
+          $ref: '#/responses/VerifyWebAuthnResponse'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "412":
+          $ref: '#/responses/preconditionFailedHTTPError'
+        "422":
+          $ref: '#/responses/unprocessableEntityHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - system:
+        - identity
+      summary: Complete WebAuthn Login Verification
       tags:
       - Users
   /system/pools/{ipID}/users:
@@ -8904,6 +9243,10 @@ responses:
     description: Verify password response
     schema:
       $ref: '#/definitions/VerifyPasswordResponseDataV2'
+  VerifyWebAuthnResponse:
+    description: Verify WebAuthn response
+    schema:
+      $ref: '#/definitions/VerifyWebAuthnResponseData'
   WebAuthnCredentialBeginResponse:
     description: User WebAuthn credential data
     schema:
@@ -8912,6 +9255,10 @@ responses:
     description: User WebAuthn credential data
     schema:
       $ref: '#/definitions/Credential'
+  WebAuthnLoginBeginResponse:
+    description: Login challenge for WebAuthn assertion ceremony.
+    schema:
+      $ref: '#/definitions/WebAuthnLoginBeginData'
   badRequestHTTPError:
     description: Bad request
     schema:

@@ -11,13 +11,12 @@ import (
 	"github.com/go-openapi/strfmt"
 )
 
-// URLEncodedBase64 URLEncodedBase64 represents a byte slice holding URL-encoded base64 data.
+// URLEncodedBase64 URLEncodedBase64 holds URL-encoded base64 data as an opaque string.
 //
-// When fields of this type are unmarshalled from JSON, the data is base64
-// decoded into a byte slice.
+// Base64url-encoded data carried as an opaque string. Decoding to raw bytes, if needed, is the consumer responsibility.
 //
 // swagger:model URLEncodedBase64
-type URLEncodedBase64 []uint8
+type URLEncodedBase64 string
 
 // Validate validates this URL encoded base64
 func (m URLEncodedBase64) Validate(formats strfmt.Registry) error {

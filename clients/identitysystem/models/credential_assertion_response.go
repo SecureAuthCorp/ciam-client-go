@@ -13,10 +13,11 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// CredentialCreationResponse credential creation response
+// CredentialAssertionResponse The CredentialAssertionResponse is the raw response returned to the Relying Party from an authenticator when we request a
+// credential for login/assertion.
 //
-// swagger:model CredentialCreationResponse
-type CredentialCreationResponse struct {
+// swagger:model CredentialAssertionResponse
+type CredentialAssertionResponse struct {
 
 	// authenticator attachment
 	AuthenticatorAttachment string `json:"authenticatorAttachment,omitempty" yaml:"authenticatorAttachment,omitempty"`
@@ -33,7 +34,7 @@ type CredentialCreationResponse struct {
 	RawID URLEncodedBase64 `json:"rawId,omitempty" yaml:"rawId,omitempty"`
 
 	// response
-	Response *AuthenticatorAttestationResponse `json:"response,omitempty" yaml:"response,omitempty"`
+	Response *AuthenticatorAssertionResponse `json:"response,omitempty" yaml:"response,omitempty"`
 
 	// Type is the value of the object’s interface object's [[type]] slot,
 	// which specifies the credential type represented by this object.
@@ -41,8 +42,8 @@ type CredentialCreationResponse struct {
 	Type string `json:"type,omitempty" yaml:"type,omitempty"`
 }
 
-// Validate validates this credential creation response
-func (m *CredentialCreationResponse) Validate(formats strfmt.Registry) error {
+// Validate validates this credential assertion response
+func (m *CredentialAssertionResponse) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateClientExtensionResults(formats); err != nil {
@@ -63,7 +64,7 @@ func (m *CredentialCreationResponse) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *CredentialCreationResponse) validateClientExtensionResults(formats strfmt.Registry) error {
+func (m *CredentialAssertionResponse) validateClientExtensionResults(formats strfmt.Registry) error {
 	if swag.IsZero(m.ClientExtensionResults) { // not required
 		return nil
 	}
@@ -82,7 +83,7 @@ func (m *CredentialCreationResponse) validateClientExtensionResults(formats strf
 	return nil
 }
 
-func (m *CredentialCreationResponse) validateRawID(formats strfmt.Registry) error {
+func (m *CredentialAssertionResponse) validateRawID(formats strfmt.Registry) error {
 	if swag.IsZero(m.RawID) { // not required
 		return nil
 	}
@@ -99,7 +100,7 @@ func (m *CredentialCreationResponse) validateRawID(formats strfmt.Registry) erro
 	return nil
 }
 
-func (m *CredentialCreationResponse) validateResponse(formats strfmt.Registry) error {
+func (m *CredentialAssertionResponse) validateResponse(formats strfmt.Registry) error {
 	if swag.IsZero(m.Response) { // not required
 		return nil
 	}
@@ -118,8 +119,8 @@ func (m *CredentialCreationResponse) validateResponse(formats strfmt.Registry) e
 	return nil
 }
 
-// ContextValidate validate this credential creation response based on the context it is used
-func (m *CredentialCreationResponse) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+// ContextValidate validate this credential assertion response based on the context it is used
+func (m *CredentialAssertionResponse) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.contextValidateClientExtensionResults(ctx, formats); err != nil {
@@ -140,7 +141,7 @@ func (m *CredentialCreationResponse) ContextValidate(ctx context.Context, format
 	return nil
 }
 
-func (m *CredentialCreationResponse) contextValidateClientExtensionResults(ctx context.Context, formats strfmt.Registry) error {
+func (m *CredentialAssertionResponse) contextValidateClientExtensionResults(ctx context.Context, formats strfmt.Registry) error {
 
 	if swag.IsZero(m.ClientExtensionResults) { // not required
 		return nil
@@ -158,7 +159,7 @@ func (m *CredentialCreationResponse) contextValidateClientExtensionResults(ctx c
 	return nil
 }
 
-func (m *CredentialCreationResponse) contextValidateRawID(ctx context.Context, formats strfmt.Registry) error {
+func (m *CredentialAssertionResponse) contextValidateRawID(ctx context.Context, formats strfmt.Registry) error {
 
 	if swag.IsZero(m.RawID) { // not required
 		return nil
@@ -176,7 +177,7 @@ func (m *CredentialCreationResponse) contextValidateRawID(ctx context.Context, f
 	return nil
 }
 
-func (m *CredentialCreationResponse) contextValidateResponse(ctx context.Context, formats strfmt.Registry) error {
+func (m *CredentialAssertionResponse) contextValidateResponse(ctx context.Context, formats strfmt.Registry) error {
 
 	if m.Response != nil {
 
@@ -198,7 +199,7 @@ func (m *CredentialCreationResponse) contextValidateResponse(ctx context.Context
 }
 
 // MarshalBinary interface implementation
-func (m *CredentialCreationResponse) MarshalBinary() ([]byte, error) {
+func (m *CredentialAssertionResponse) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -206,8 +207,8 @@ func (m *CredentialCreationResponse) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *CredentialCreationResponse) UnmarshalBinary(b []byte) error {
-	var res CredentialCreationResponse
+func (m *CredentialAssertionResponse) UnmarshalBinary(b []byte) error {
+	var res CredentialAssertionResponse
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

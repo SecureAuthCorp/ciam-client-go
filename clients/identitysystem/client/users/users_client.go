@@ -62,6 +62,10 @@ type ClientService interface {
 
 	BeginUsernamelessWebAuthnCredentialsGeneration(params *BeginUsernamelessWebAuthnCredentialsGenerationParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*BeginUsernamelessWebAuthnCredentialsGenerationOK, error)
 
+	BeginVerifyUsernamelessWebAuthn(params *BeginVerifyUsernamelessWebAuthnParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*BeginVerifyUsernamelessWebAuthnOK, error)
+
+	BeginVerifyWebAuthn(params *BeginVerifyWebAuthnParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*BeginVerifyWebAuthnOK, error)
+
 	BeginWebAuthnCredentialsGeneration(params *BeginWebAuthnCredentialsGenerationParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*BeginWebAuthnCredentialsGenerationOK, error)
 
 	ChangePassword(params *ChangePasswordParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ChangePasswordNoContent, error)
@@ -75,6 +79,10 @@ type ClientService interface {
 	CompleteResetTotp(params *CompleteResetTotpParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*CompleteResetTotpNoContent, error)
 
 	CompleteUsernamelessWebAuthnCredentialsGeneration(params *CompleteUsernamelessWebAuthnCredentialsGenerationParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*CompleteUsernamelessWebAuthnCredentialsGenerationOK, error)
+
+	CompleteVerifyUsernamelessWebAuthn(params *CompleteVerifyUsernamelessWebAuthnParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*CompleteVerifyUsernamelessWebAuthnOK, error)
+
+	CompleteVerifyWebAuthn(params *CompleteVerifyWebAuthnParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*CompleteVerifyWebAuthnOK, error)
 
 	CompleteWebAuthnCredentialsGeneration(params *CompleteWebAuthnCredentialsGenerationParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*CompleteWebAuthnCredentialsGenerationOK, error)
 
@@ -283,6 +291,96 @@ func (a *Client) BeginUsernamelessWebAuthnCredentialsGeneration(params *BeginUse
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for beginUsernamelessWebAuthnCredentialsGeneration: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+	BeginVerifyUsernamelessWebAuthn begins usernameless web authn login verification
+
+	Starts a discoverable WebAuthn assertion ceremony. Returns a challenge with empty
+
+`allowCredentials` so the authenticator picks a resident credential. The response also
+carries a `session_id` the caller must echo back at complete time.
+*/
+func (a *Client) BeginVerifyUsernamelessWebAuthn(params *BeginVerifyUsernamelessWebAuthnParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*BeginVerifyUsernamelessWebAuthnOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewBeginVerifyUsernamelessWebAuthnParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "beginVerifyUsernamelessWebAuthn",
+		Method:             "POST",
+		PathPattern:        "/system/pools/{ipID}/user/usernameless-webauthn/login/begin",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &BeginVerifyUsernamelessWebAuthnReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*BeginVerifyUsernamelessWebAuthnOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for beginVerifyUsernamelessWebAuthn: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+	BeginVerifyWebAuthn begins web authn login verification
+
+	Starts a WebAuthn assertion ceremony. Generates a challenge bound to the user identified
+
+by `userID` or `identifier` and returns a `PublicKeyCredentialRequestOptions` payload
+to be passed to `navigator.credentials.get()`. The response also carries a `session_id`
+the caller must echo back at complete time so concurrent begins do not collide on the
+shared session store.
+*/
+func (a *Client) BeginVerifyWebAuthn(params *BeginVerifyWebAuthnParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*BeginVerifyWebAuthnOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewBeginVerifyWebAuthnParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "beginVerifyWebAuthn",
+		Method:             "POST",
+		PathPattern:        "/system/pools/{ipID}/user/webauthn/login/begin",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &BeginVerifyWebAuthnReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*BeginVerifyWebAuthnOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for beginVerifyWebAuthn: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 
@@ -594,6 +692,96 @@ func (a *Client) CompleteUsernamelessWebAuthnCredentialsGeneration(params *Compl
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for completeUsernamelessWebAuthnCredentialsGeneration: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+	CompleteVerifyUsernamelessWebAuthn completes usernameless web authn login verification
+
+	Verifies a discoverable WebAuthn assertion against the challenge previously generated by
+
+`usernameless-webauthn/login/begin`. The user is resolved from the `userHandle` returned
+by the authenticator. The `session_id` returned by begin must be passed back here.
+Endpoint is protected by Brute Force mechanism.
+*/
+func (a *Client) CompleteVerifyUsernamelessWebAuthn(params *CompleteVerifyUsernamelessWebAuthnParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*CompleteVerifyUsernamelessWebAuthnOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewCompleteVerifyUsernamelessWebAuthnParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "completeVerifyUsernamelessWebAuthn",
+		Method:             "POST",
+		PathPattern:        "/system/pools/{ipID}/user/usernameless-webauthn/login/complete",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &CompleteVerifyUsernamelessWebAuthnReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*CompleteVerifyUsernamelessWebAuthnOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for completeVerifyUsernamelessWebAuthn: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+	CompleteVerifyWebAuthn completes web authn login verification
+
+	Verifies a WebAuthn assertion against the challenge previously generated by `login/begin`.
+
+The `session_id` returned by begin must be passed back here.
+Endpoint is protected by Brute Force mechanism.
+This endpoint is meant for integration when an external system verifies a user's WebAuthn assertion.
+*/
+func (a *Client) CompleteVerifyWebAuthn(params *CompleteVerifyWebAuthnParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*CompleteVerifyWebAuthnOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewCompleteVerifyWebAuthnParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "completeVerifyWebAuthn",
+		Method:             "POST",
+		PathPattern:        "/system/pools/{ipID}/user/webauthn/login/complete",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &CompleteVerifyWebAuthnReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*CompleteVerifyWebAuthnOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for completeVerifyWebAuthn: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 
