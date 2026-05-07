@@ -13,7 +13,11 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// CredentialCreationResponse credential creation response
+// CredentialCreationResponse CredentialCreationResponse is the raw response returned to the Relying Party from the client for a credential
+// registration ceremony. It contains the [AuthenticatorAttestationResponse] which holds the attestation object
+// and client data.
+//
+// Specification: §5.4. Options for Credential Creation (https://www.w3.org/TR/webauthn/#sctn-credentialcreationoptions-extension)
 //
 // swagger:model CredentialCreationResponse
 type CredentialCreationResponse struct {

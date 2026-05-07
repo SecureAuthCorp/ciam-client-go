@@ -189,6 +189,9 @@ type AuditEventPayloads struct {
 	// password updated
 	PasswordUpdated *UserIDAndIdentifierPayload `json:"password_updated,omitempty" yaml:"password_updated,omitempty"`
 
+	// phone delivery received
+	PhoneDeliveryReceived *MessageDeliveryReceiptPayload `json:"phone_delivery_received,omitempty" yaml:"phone_delivery_received,omitempty"`
+
 	// policy authorized
 	PolicyAuthorized *PolicyEvaluatedPayload `json:"policy_authorized,omitempty" yaml:"policy_authorized,omitempty"`
 
@@ -527,6 +530,10 @@ func (m *AuditEventPayloads) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validatePasswordUpdated(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validatePhoneDeliveryReceived(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -1763,6 +1770,25 @@ func (m *AuditEventPayloads) validatePasswordUpdated(formats strfmt.Registry) er
 	return nil
 }
 
+func (m *AuditEventPayloads) validatePhoneDeliveryReceived(formats strfmt.Registry) error {
+	if swag.IsZero(m.PhoneDeliveryReceived) { // not required
+		return nil
+	}
+
+	if m.PhoneDeliveryReceived != nil {
+		if err := m.PhoneDeliveryReceived.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("phone_delivery_received")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("phone_delivery_received")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (m *AuditEventPayloads) validatePolicyAuthorized(formats strfmt.Registry) error {
 	if swag.IsZero(m.PolicyAuthorized) { // not required
 		return nil
@@ -2676,6 +2702,10 @@ func (m *AuditEventPayloads) ContextValidate(ctx context.Context, formats strfmt
 	}
 
 	if err := m.contextValidatePasswordUpdated(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidatePhoneDeliveryReceived(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -4018,6 +4048,27 @@ func (m *AuditEventPayloads) contextValidatePasswordUpdated(ctx context.Context,
 				return ve.ValidateName("password_updated")
 			} else if ce, ok := err.(*errors.CompositeError); ok {
 				return ce.ValidateName("password_updated")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *AuditEventPayloads) contextValidatePhoneDeliveryReceived(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.PhoneDeliveryReceived != nil {
+
+		if swag.IsZero(m.PhoneDeliveryReceived) { // not required
+			return nil
+		}
+
+		if err := m.PhoneDeliveryReceived.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("phone_delivery_received")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("phone_delivery_received")
 			}
 			return err
 		}

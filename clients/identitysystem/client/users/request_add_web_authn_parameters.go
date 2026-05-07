@@ -64,7 +64,7 @@ RequestAddWebAuthnParams contains all the parameters to send to the API endpoint
 type RequestAddWebAuthnParams struct {
 
 	// RequestAddWebAuthn.
-	RequestAddWebAuthn *models.RequestAddOrResetCredential
+	RequestAddWebAuthn *models.RequestAddWebAuthn
 
 	/* CodeTypeInMessage.
 
@@ -149,13 +149,13 @@ func (o *RequestAddWebAuthnParams) SetHTTPClient(client *http.Client) {
 }
 
 // WithRequestAddWebAuthn adds the requestAddWebAuthn to the request add web authn params
-func (o *RequestAddWebAuthnParams) WithRequestAddWebAuthn(requestAddWebAuthn *models.RequestAddOrResetCredential) *RequestAddWebAuthnParams {
+func (o *RequestAddWebAuthnParams) WithRequestAddWebAuthn(requestAddWebAuthn *models.RequestAddWebAuthn) *RequestAddWebAuthnParams {
 	o.SetRequestAddWebAuthn(requestAddWebAuthn)
 	return o
 }
 
 // SetRequestAddWebAuthn adds the requestAddWebAuthn to the request add web authn params
-func (o *RequestAddWebAuthnParams) SetRequestAddWebAuthn(requestAddWebAuthn *models.RequestAddOrResetCredential) {
+func (o *RequestAddWebAuthnParams) SetRequestAddWebAuthn(requestAddWebAuthn *models.RequestAddWebAuthn) {
 	o.RequestAddWebAuthn = requestAddWebAuthn
 }
 

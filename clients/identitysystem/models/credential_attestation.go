@@ -12,24 +12,38 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// CredentialAttestation credential attestation
+// CredentialAttestation CredentialAttestation holds the raw attestation data from a registration ceremony. These values are intentionally
+// stored in their original unparsed form rather than as parsed structures. This is critical because:
+//
+// It enables the [Credential] to be verified against the FIDO Metadata Service at a later date using
+// [Credential.Verify], even long after the registration ceremony has completed.
+// The WebAuthn specification evolves over time, introducing new validation procedures. Preserving the raw data
+// ensures that credentials created today can be re-validated against future rules without requiring re-registration.
+// Raw data serves as an auditable record of exactly what the authenticator and client provided during registration,
+// independent of how the library parsed it at that point in time.
+//
+// Implementers MUST persist all fields of this struct.
 //
 // swagger:model CredentialAttestation
 type CredentialAttestation struct {
 
-	// authenticator data
+	// AuthenticatorData is the raw authenticator data from the registration response as provided in the
+	// RegistrationResponseJSON. This is the unparsed byte representation that can be re-parsed for future validation.
 	AuthenticatorData string `json:"authenticatorData,omitempty" yaml:"authenticatorData,omitempty"`
 
-	// client data hash
+	// ClientDataHash is the SHA-256 hash of ClientDataJSON computed during registration verification. If empty,
+	// [Credential.Verify] will recompute it from ClientDataJSON.
 	ClientDataHash string `json:"clientDataHash,omitempty" yaml:"clientDataHash,omitempty"`
 
-	// client data JSON
+	// ClientDataJSON is the raw JSON-encoded client data from the registration response. This is the verbatim value
+	// provided by the client and is used to recompute the client data hash during later verification.
 	ClientDataJSON string `json:"clientDataJSON,omitempty" yaml:"clientDataJSON,omitempty"`
 
-	// object
+	// Object is the raw CBOR-encoded attestation object from the registration response. This contains the attestation
+	// statement, format, and authenticator data needed by [Credential.Verify] to re-perform attestation verification.
 	Object string `json:"object,omitempty" yaml:"object,omitempty"`
 
-	// public key algorithm
+	// PublicKeyAlgorithm is the COSE algorithm identifier for the credential's public key.
 	PublicKeyAlgorithm int64 `json:"publicKeyAlgorithm,omitempty" yaml:"publicKeyAlgorithm,omitempty"`
 }
 

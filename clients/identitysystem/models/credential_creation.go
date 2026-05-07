@@ -13,7 +13,11 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// CredentialCreation credential creation
+// CredentialCreation CredentialCreation is the top-level request object for credential registration. It wraps
+// [PublicKeyCredentialCreationOptions] and an optional mediation requirement. This is the object that should be
+// serialized and sent to the client to initiate the navigator.credentials.create() call.
+//
+// Specification: §5.4. Options for Credential Creation (https://www.w3.org/TR/webauthn/#dictionary-makecredentialoptions)
 //
 // swagger:model CredentialCreation
 type CredentialCreation struct {
