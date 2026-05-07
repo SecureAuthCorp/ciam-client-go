@@ -807,6 +807,21 @@ definitions:
         type: boolean
         x-nullable: false
     type: object
+  RedactionPolicy:
+    properties:
+      address:
+        description: Controls whether phone numbers are retained or obfuscated by
+          the provider.
+        example: retain
+        type: string
+        x-nullable: false
+      content:
+        description: Controls whether message body content is retained by the provider.
+        example: retain
+        type: string
+        x-nullable: false
+    title: RedactionPolicy controls message redaction at the SMS provider level.
+    type: object
   ScopeWithServicePublicResponse:
     properties:
       scope_description:
@@ -870,6 +885,8 @@ definitions:
         format: OTP
         type: string
         x-nullable: false
+      redaction:
+        $ref: '#/definitions/RedactionPolicy'
       state:
         description: Optional XSRF state
         example: c44sqtco4g2legl15m2g
