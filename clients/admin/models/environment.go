@@ -41,6 +41,9 @@ type Environment struct {
 	// allow tenants to configure custom phone providers
 	AdvancedPhone bool `json:"advanced_phone,omitempty" yaml:"advanced_phone,omitempty"`
 
+	// show full system nav in agentic AI workspaces (default off - system nav is hidden)
+	AgenticAiSystemNav bool `json:"agentic_ai_system_nav,omitempty" yaml:"agentic_ai_system_nav,omitempty"`
+
 	// AI Security
 	AiSecurity bool `json:"ai_security,omitempty" yaml:"ai_security,omitempty"`
 
@@ -90,9 +93,6 @@ type Environment struct {
 
 	// stores client secrets as one-way hashes
 	ClientSecretsStoredAsOneWayHash bool `json:"client_secrets_stored_as_one_way_hash,omitempty" yaml:"client_secrets_stored_as_one_way_hash,omitempty"`
-
-	// generate random ids for scripts in the new workspace when using clone workspace feature
-	CloneWorkspaceScriptsFix bool `json:"clone_workspace_scripts_fix,omitempty" yaml:"clone_workspace_scripts_fix,omitempty"`
 
 	// SecureAuth IDP
 	CloudentityIdp bool `json:"cloudentity_idp,omitempty" yaml:"cloudentity_idp,omitempty"`

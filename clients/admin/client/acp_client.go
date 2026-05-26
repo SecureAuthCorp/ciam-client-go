@@ -12,6 +12,7 @@ import (
 
 	"github.com/cloudentity/acp-client-go/clients/admin/client/a_c_rs"
 	"github.com/cloudentity/acp-client-go/clients/admin/client/agentic_ai"
+	"github.com/cloudentity/acp-client-go/clients/admin/client/api_keys"
 	"github.com/cloudentity/acp-client-go/clients/admin/client/apis"
 	"github.com/cloudentity/acp-client-go/clients/admin/client/audit_events"
 	"github.com/cloudentity/acp-client-go/clients/admin/client/authorization_details"
@@ -94,6 +95,7 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *Acp {
 	cli.Transport = transport
 	cli.AcRs = a_c_rs.New(transport, formats)
 	cli.AgenticAi = agentic_ai.New(transport, formats)
+	cli.APIKeys = api_keys.New(transport, formats)
 	cli.Apis = apis.New(transport, formats)
 	cli.AuditEvents = audit_events.New(transport, formats)
 	cli.AuthorizationDetails = authorization_details.New(transport, formats)
@@ -178,6 +180,8 @@ type Acp struct {
 
 	AgenticAi agentic_ai.ClientService
 
+	APIKeys api_keys.ClientService
+
 	Apis apis.ClientService
 
 	AuditEvents audit_events.ClientService
@@ -258,6 +262,7 @@ func (c *Acp) SetTransport(transport runtime.ClientTransport) {
 	c.Transport = transport
 	c.AcRs.SetTransport(transport)
 	c.AgenticAi.SetTransport(transport)
+	c.APIKeys.SetTransport(transport)
 	c.Apis.SetTransport(transport)
 	c.AuditEvents.SetTransport(transport)
 	c.AuthorizationDetails.SetTransport(transport)

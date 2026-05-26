@@ -32,6 +32,9 @@ type OTPPayload struct {
 	// purpose
 	Purpose string `json:"purpose,omitempty" yaml:"purpose,omitempty"`
 
+	// redaction
+	Redaction *RedactionPolicy `json:"redaction,omitempty" yaml:"redaction,omitempty"`
+
 	// type
 	// Enum: ["sms","email","voice"]
 	Type string `json:"type,omitempty" yaml:"type,omitempty"`
@@ -44,6 +47,10 @@ type OTPPayload struct {
 func (m *OTPPayload) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateRedaction(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateType(formats); err != nil {
 		res = append(res, err)
 	}
@@ -51,6 +58,25 @@ func (m *OTPPayload) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *OTPPayload) validateRedaction(formats strfmt.Registry) error {
+	if swag.IsZero(m.Redaction) { // not required
+		return nil
+	}
+
+	if m.Redaction != nil {
+		if err := m.Redaction.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("redaction")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("redaction")
+			}
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -99,8 +125,38 @@ func (m *OTPPayload) validateType(formats strfmt.Registry) error {
 	return nil
 }
 
-// ContextValidate validates this o t p payload based on context it is used
+// ContextValidate validate this o t p payload based on the context it is used
 func (m *OTPPayload) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateRedaction(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *OTPPayload) contextValidateRedaction(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Redaction != nil {
+
+		if swag.IsZero(m.Redaction) { // not required
+			return nil
+		}
+
+		if err := m.Redaction.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("redaction")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("redaction")
+			}
+			return err
+		}
+	}
+
 	return nil
 }
 
