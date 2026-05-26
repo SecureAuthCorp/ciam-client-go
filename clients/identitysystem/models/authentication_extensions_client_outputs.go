@@ -11,7 +11,10 @@ import (
 	"github.com/go-openapi/strfmt"
 )
 
-// AuthenticationExtensionsClientOutputs authentication extensions client outputs
+// AuthenticationExtensionsClientOutputs AuthenticationExtensionsClientOutputs represents the IDL of the same name. It is a map of extension identifier
+// strings to their output values, returned by the client after a create() or get() call.
+//
+// Specification: §5.9. Authentication Extensions Client Outputs (https://www.w3.org/TR/webauthn/#iface-authentication-extensions-client-outputs)
 //
 // swagger:model AuthenticationExtensionsClientOutputs
 type AuthenticationExtensionsClientOutputs map[string]interface{}

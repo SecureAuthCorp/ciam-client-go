@@ -136,6 +136,10 @@ func (m *CredentialDescriptor) ContextValidate(ctx context.Context, formats strf
 
 func (m *CredentialDescriptor) contextValidateID(ctx context.Context, formats strfmt.Registry) error {
 
+	if swag.IsZero(m.ID) { // not required
+		return nil
+	}
+
 	if err := m.ID.ContextValidate(ctx, formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("id")

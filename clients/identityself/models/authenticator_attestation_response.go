@@ -164,6 +164,10 @@ func (m *AuthenticatorAttestationResponse) ContextValidate(ctx context.Context, 
 
 func (m *AuthenticatorAttestationResponse) contextValidateAttestationObject(ctx context.Context, formats strfmt.Registry) error {
 
+	if swag.IsZero(m.AttestationObject) { // not required
+		return nil
+	}
+
 	if err := m.AttestationObject.ContextValidate(ctx, formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("attestationObject")
@@ -177,6 +181,10 @@ func (m *AuthenticatorAttestationResponse) contextValidateAttestationObject(ctx 
 }
 
 func (m *AuthenticatorAttestationResponse) contextValidateAuthenticatorData(ctx context.Context, formats strfmt.Registry) error {
+
+	if swag.IsZero(m.AuthenticatorData) { // not required
+		return nil
+	}
 
 	if err := m.AuthenticatorData.ContextValidate(ctx, formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
@@ -192,6 +200,10 @@ func (m *AuthenticatorAttestationResponse) contextValidateAuthenticatorData(ctx 
 
 func (m *AuthenticatorAttestationResponse) contextValidateClientDataJSON(ctx context.Context, formats strfmt.Registry) error {
 
+	if swag.IsZero(m.ClientDataJSON) { // not required
+		return nil
+	}
+
 	if err := m.ClientDataJSON.ContextValidate(ctx, formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("clientDataJSON")
@@ -205,6 +217,10 @@ func (m *AuthenticatorAttestationResponse) contextValidateClientDataJSON(ctx con
 }
 
 func (m *AuthenticatorAttestationResponse) contextValidatePublicKey(ctx context.Context, formats strfmt.Registry) error {
+
+	if swag.IsZero(m.PublicKey) { // not required
+		return nil
+	}
 
 	if err := m.PublicKey.ContextValidate(ctx, formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {

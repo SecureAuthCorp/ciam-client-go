@@ -2892,6 +2892,17 @@ definitions:
         $ref: '#/definitions/OtpConfig'
       pair_device:
         $ref: '#/definitions/OtpConfig'
+      require_user_confirmation_before_send:
+        description: |-
+          RequireUserConfirmationBeforeSend is a flow-level toggle (it does not
+          correspond to any of the per-purpose OtpConfig fields above) that affects
+          only the hosted web login UI. When true, the OTP is not auto-sent: the user
+          lands on the OTP send view and must click Continue to trigger delivery.
+          Applies to primary login (LoginFlow) and forced re-authentication / MFA
+          challenge (ForcedAuthnFlow). API-driven OTP triggers (the OTP send
+          endpoints) are unaffected.
+        type: boolean
+        x-nullable: false
       reset_password:
         $ref: '#/definitions/OtpConfig'
       reset_totp:
@@ -4321,6 +4332,13 @@ definitions:
         x-nullable: false
       customer_id:
         type: string
+        x-nullable: false
+      disable_delivery_callback_url:
+        description: |-
+          When true, do not push a per-call delivery callback URL to TeleSign.
+          Use this if your TeleSign account is pre-configured with a webhook URL
+          you manage yourself. Applies to both SMS and voice.
+        type: boolean
         x-nullable: false
       from:
         type: string
@@ -6722,6 +6740,13 @@ definitions:
       auth_token:
         type: string
         x-nullable: false
+      disable_delivery_callback_url:
+        description: |-
+          When true, do not push a per-call delivery callback URL to Twilio.
+          Use this if your Twilio account is pre-configured with a webhook URL
+          you manage yourself. Applies to both SMS and voice.
+        type: boolean
+        x-nullable: false
       from:
         type: string
         x-nullable: false
@@ -6892,6 +6917,13 @@ definitions:
         description: Vonage Application ID for voice API (optional — only needed for
           voice calls).
         type: string
+        x-nullable: false
+      disable_delivery_callback_url:
+        description: |-
+          When true, do not push a per-call delivery callback URL to Vonage.
+          Use this if your Vonage account is pre-configured with a webhook URL
+          you manage yourself. Applies to both SMS and voice.
+        type: boolean
         x-nullable: false
       from:
         type: string

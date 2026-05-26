@@ -25,7 +25,7 @@ type FilePaymentConsentFileResource struct {
 	ConsentID string `json:"consent_id,omitempty" yaml:"consent_id,omitempty"`
 
 	// file
-	File []uint8 `json:"file" yaml:"file"`
+	File string `json:"file,omitempty" yaml:"file,omitempty"`
 
 	// Server / Workspace identifier.
 	// Example: \"server\

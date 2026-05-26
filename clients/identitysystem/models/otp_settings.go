@@ -33,6 +33,15 @@ type OtpSettings struct {
 	// pair device
 	PairDevice *OtpConfig `json:"pair_device,omitempty" yaml:"pair_device,omitempty"`
 
+	// RequireUserConfirmationBeforeSend is a flow-level toggle (it does not
+	// correspond to any of the per-purpose OtpConfig fields above) that affects
+	// only the hosted web login UI. When true, the OTP is not auto-sent: the user
+	// lands on the OTP send view and must click Continue to trigger delivery.
+	// Applies to primary login (LoginFlow) and forced re-authentication / MFA
+	// challenge (ForcedAuthnFlow). API-driven OTP triggers (the OTP send
+	// endpoints) are unaffected.
+	RequireUserConfirmationBeforeSend bool `json:"require_user_confirmation_before_send,omitempty" yaml:"require_user_confirmation_before_send,omitempty"`
+
 	// reset password
 	ResetPassword *OtpConfig `json:"reset_password,omitempty" yaml:"reset_password,omitempty"`
 

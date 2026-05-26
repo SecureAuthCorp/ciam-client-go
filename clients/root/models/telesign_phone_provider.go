@@ -27,6 +27,11 @@ type TelesignPhoneProvider struct {
 	// Required: true
 	CustomerID string `json:"customer_id" yaml:"customer_id"`
 
+	// When true, do not push a per-call delivery callback URL to TeleSign.
+	// Use this if your TeleSign account is pre-configured with a webhook URL
+	// you manage yourself. Applies to both SMS and voice.
+	DisableDeliveryCallbackURL bool `json:"disable_delivery_callback_url,omitempty" yaml:"disable_delivery_callback_url,omitempty"`
+
 	// from
 	From string `json:"from,omitempty" yaml:"from,omitempty"`
 }

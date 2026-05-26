@@ -44,7 +44,7 @@ type NewUserCredential struct {
 
 	// webauthn credentials
 	// Example: public_key
-	WebauthnCredentials []*Credential `json:"webauthn_credentials" yaml:"webauthn_credentials"`
+	WebauthnCredentials []*WebAuthnCredential `json:"webauthn_credentials" yaml:"webauthn_credentials"`
 
 	// webauthn type
 	// Enum: ["regular","discoverable"]

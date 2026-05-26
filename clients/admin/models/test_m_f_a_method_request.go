@@ -22,6 +22,14 @@ type TestMFAMethodRequest struct {
 	// address
 	// Required: true
 	Address string `json:"address" yaml:"address"`
+
+	// ProviderIndex, when set, forces the test to route through the
+	// provider at this position in the tenant's phone provider config
+	// (0 = primary, 1+ = fallback). Only valid when the tenant has the
+	// advanced_phone feature enabled and at least one configured provider.
+	// When omitted, the default routing chain is used.
+	// Minimum: 0
+	ProviderIndex int64 `json:"provider_index,omitempty" yaml:"provider_index,omitempty"`
 }
 
 // Validate validates this test m f a method request
@@ -29,6 +37,10 @@ func (m *TestMFAMethodRequest) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateAddress(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateProviderIndex(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -41,6 +53,18 @@ func (m *TestMFAMethodRequest) Validate(formats strfmt.Registry) error {
 func (m *TestMFAMethodRequest) validateAddress(formats strfmt.Registry) error {
 
 	if err := validate.RequiredString("address", "body", m.Address); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *TestMFAMethodRequest) validateProviderIndex(formats strfmt.Registry) error {
+	if swag.IsZero(m.ProviderIndex) { // not required
+		return nil
+	}
+
+	if err := validate.MinimumInt("provider_index", "body", m.ProviderIndex, 0, false); err != nil {
 		return err
 	}
 

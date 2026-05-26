@@ -87,6 +87,9 @@ type AuditEventPayloads struct {
 	// dcr rejected
 	DcrRejected *DCRRejectedEventPayload `json:"dcr_rejected,omitempty" yaml:"dcr_rejected,omitempty"`
 
+	// dcr revoked
+	DcrRevoked *DcrAccessRevokedPayload `json:"dcr_revoked,omitempty" yaml:"dcr_revoked,omitempty"`
+
 	// device add completed
 	DeviceAddCompleted *UserIDAndIdentifierPayload `json:"device_add_completed,omitempty" yaml:"device_add_completed,omitempty"`
 
@@ -394,6 +397,10 @@ func (m *AuditEventPayloads) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateDcrRejected(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateDcrRevoked(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -1116,6 +1123,25 @@ func (m *AuditEventPayloads) validateDcrRejected(formats strfmt.Registry) error 
 				return ve.ValidateName("dcr_rejected")
 			} else if ce, ok := err.(*errors.CompositeError); ok {
 				return ce.ValidateName("dcr_rejected")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *AuditEventPayloads) validateDcrRevoked(formats strfmt.Registry) error {
+	if swag.IsZero(m.DcrRevoked) { // not required
+		return nil
+	}
+
+	if m.DcrRevoked != nil {
+		if err := m.DcrRevoked.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("dcr_revoked")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("dcr_revoked")
 			}
 			return err
 		}
@@ -2569,6 +2595,10 @@ func (m *AuditEventPayloads) ContextValidate(ctx context.Context, formats strfmt
 		res = append(res, err)
 	}
 
+	if err := m.contextValidateDcrRevoked(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.contextValidateDeviceAddCompleted(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -3334,6 +3364,27 @@ func (m *AuditEventPayloads) contextValidateDcrRejected(ctx context.Context, for
 				return ve.ValidateName("dcr_rejected")
 			} else if ce, ok := err.(*errors.CompositeError); ok {
 				return ce.ValidateName("dcr_rejected")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *AuditEventPayloads) contextValidateDcrRevoked(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.DcrRevoked != nil {
+
+		if swag.IsZero(m.DcrRevoked) { // not required
+			return nil
+		}
+
+		if err := m.DcrRevoked.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("dcr_revoked")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("dcr_revoked")
 			}
 			return err
 		}

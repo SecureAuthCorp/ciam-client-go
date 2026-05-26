@@ -347,6 +347,17 @@ definitions:
         $ref: '#/definitions/OtpConfig'
       pair_device:
         $ref: '#/definitions/OtpConfig'
+      require_user_confirmation_before_send:
+        description: |-
+          RequireUserConfirmationBeforeSend is a flow-level toggle (it does not
+          correspond to any of the per-purpose OtpConfig fields above) that affects
+          only the hosted web login UI. When true, the OTP is not auto-sent: the user
+          lands on the OTP send view and must click Continue to trigger delivery.
+          Applies to primary login (LoginFlow) and forced re-authentication / MFA
+          challenge (ForcedAuthnFlow). API-driven OTP triggers (the OTP send
+          endpoints) are unaffected.
+        type: boolean
+        x-nullable: false
       reset_password:
         $ref: '#/definitions/OtpConfig'
       reset_totp:

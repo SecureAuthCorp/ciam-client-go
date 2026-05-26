@@ -1686,6 +1686,8 @@ definitions:
         $ref: '#/definitions/DCRCreatedEventPayload'
       dcr_rejected:
         $ref: '#/definitions/DCRRejectedEventPayload'
+      dcr_revoked:
+        $ref: '#/definitions/DcrAccessRevokedPayload'
       device_add_completed:
         $ref: '#/definitions/UserIDAndIdentifierPayload'
       device_add_requested:
@@ -6130,6 +6132,18 @@ definitions:
         type: string
         x-nullable: false
     type: object
+  DcrAccessRevokedPayload:
+    properties:
+      client_id:
+        type: string
+        x-nullable: false
+      revoke_claim_grants:
+        type: boolean
+        x-nullable: false
+      revoke_scope_grants:
+        type: boolean
+        x-nullable: false
+    type: object
   DeviceAuthorizationConfiguration:
     properties:
       request_ttl:
@@ -6912,10 +6926,7 @@ definitions:
         type: string
         x-nullable: false
       file:
-        items:
-          format: uint8
-          type: integer
-        type: array
+        type: string
         x-nullable: false
       server_id:
         description: Server / Workspace identifier.
@@ -13060,6 +13071,10 @@ definitions:
         description: May act claims
         type: object
         x-nullable: false
+      name_id:
+        description: SAML subject identifier.
+        type: string
+        x-nullable: false
       organization_id:
         description: ID of the Organization
         format: serverID
@@ -13275,6 +13290,10 @@ definitions:
           type: object
         description: May act claims
         type: object
+        x-nullable: false
+      name_id:
+        description: SAML subject identifier.
+        type: string
         x-nullable: false
       organization_id:
         description: ID of the Organization
@@ -17641,6 +17660,13 @@ definitions:
       customer_id:
         type: string
         x-nullable: false
+      disable_delivery_callback_url:
+        description: |-
+          When true, do not push a per-call delivery callback URL to TeleSign.
+          Use this if your TeleSign account is pre-configured with a webhook URL
+          you manage yourself. Applies to both SMS and voice.
+        type: boolean
+        x-nullable: false
       from:
         type: string
         x-nullable: false
@@ -18122,6 +18148,13 @@ definitions:
     properties:
       auth_token:
         type: string
+        x-nullable: false
+      disable_delivery_callback_url:
+        description: |-
+          When true, do not push a per-call delivery callback URL to Twilio.
+          Use this if your Twilio account is pre-configured with a webhook URL
+          you manage yourself. Applies to both SMS and voice.
+        type: boolean
         x-nullable: false
       from:
         type: string
@@ -18607,6 +18640,13 @@ definitions:
         description: Vonage Application ID for voice API (optional — only needed for
           voice calls).
         type: string
+        x-nullable: false
+      disable_delivery_callback_url:
+        description: |-
+          When true, do not push a per-call delivery callback URL to Vonage.
+          Use this if your Vonage account is pre-configured with a webhook URL
+          you manage yourself. Applies to both SMS and voice.
+        type: boolean
         x-nullable: false
       from:
         type: string

@@ -60,9 +60,6 @@ type Environment struct {
 	// Format: duration
 	AnalyticsDuration strfmt.Duration `json:"analytics_duration,omitempty" yaml:"analytics_duration,omitempty"`
 
-	// application quickstart tab
-	AppQuickstart bool `json:"app_quickstart,omitempty" yaml:"app_quickstart,omitempty"`
-
 	// application launch dashboard
 	ApplicationLaunchDashboard bool `json:"application_launch_dashboard,omitempty" yaml:"application_launch_dashboard,omitempty"`
 
@@ -181,9 +178,6 @@ type Environment struct {
 	// insecure token exchange public clients
 	InsecureTokenExchangePublicClients bool `json:"insecure_token_exchange_public_clients,omitempty" yaml:"insecure_token_exchange_public_clients,omitempty"`
 
-	// internationalization
-	Internationalization bool `json:"internationalization,omitempty" yaml:"internationalization,omitempty"`
-
 	// allow any system client with manage_logins scope to manage login sessions without being linked to an IDP
 	ManageLoginsAnySystemClient bool `json:"manage_logins_any_system_client,omitempty" yaml:"manage_logins_any_system_client,omitempty"`
 
@@ -192,6 +186,9 @@ type Environment struct {
 
 	// publish events to NATS
 	Nats bool `json:"nats,omitempty" yaml:"nats,omitempty"`
+
+	// drop outbound message events at publish time so no email/SMS/voice is dispatched; intended for perf-test tenants
+	NoopMessageSending bool `json:"noop_message_sending,omitempty" yaml:"noop_message_sending,omitempty"`
 
 	// openbanking brasil
 	Obbr bool `json:"obbr,omitempty" yaml:"obbr,omitempty"`
@@ -231,9 +228,6 @@ type Environment struct {
 
 	// SAML IDP overrides per SP
 	SamlIdpOverridesPerSp bool `json:"saml_idp_overrides_per_sp,omitempty" yaml:"saml_idp_overrides_per_sp,omitempty"`
-
-	// SCIMv2 support
-	ScimV2 bool `json:"scim_v2,omitempty" yaml:"scim_v2,omitempty"`
 
 	// scope transient_otp
 	ScopeTransientOtp bool `json:"scope_transient_otp,omitempty" yaml:"scope_transient_otp,omitempty"`
@@ -276,9 +270,6 @@ type Environment struct {
 
 	// User-friendly credentials setup
 	UserFriendlyCredentialsSetup bool `json:"user_friendly_credentials_setup,omitempty" yaml:"user_friendly_credentials_setup,omitempty"`
-
-	// Usernameless WebAuthn (discoverable passkeys)
-	UsernamelessWebauthn bool `json:"usernameless_webauthn,omitempty" yaml:"usernameless_webauthn,omitempty"`
 
 	// version
 	Version string `json:"version,omitempty" yaml:"version,omitempty"`

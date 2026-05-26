@@ -11,7 +11,6 @@ import (
 	"github.com/go-openapi/strfmt"
 
 	"github.com/cloudentity/acp-client-go/clients/admin/client/a_c_rs"
-	"github.com/cloudentity/acp-client-go/clients/admin/client/agentic_ai"
 	"github.com/cloudentity/acp-client-go/clients/admin/client/api_keys"
 	"github.com/cloudentity/acp-client-go/clients/admin/client/apis"
 	"github.com/cloudentity/acp-client-go/clients/admin/client/audit_events"
@@ -94,7 +93,6 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *Acp {
 	cli := new(Acp)
 	cli.Transport = transport
 	cli.AcRs = a_c_rs.New(transport, formats)
-	cli.AgenticAi = agentic_ai.New(transport, formats)
 	cli.APIKeys = api_keys.New(transport, formats)
 	cli.Apis = apis.New(transport, formats)
 	cli.AuditEvents = audit_events.New(transport, formats)
@@ -178,8 +176,6 @@ func (cfg *TransportConfig) WithSchemes(schemes []string) *TransportConfig {
 type Acp struct {
 	AcRs a_c_rs.ClientService
 
-	AgenticAi agentic_ai.ClientService
-
 	APIKeys api_keys.ClientService
 
 	Apis apis.ClientService
@@ -261,7 +257,6 @@ type Acp struct {
 func (c *Acp) SetTransport(transport runtime.ClientTransport) {
 	c.Transport = transport
 	c.AcRs.SetTransport(transport)
-	c.AgenticAi.SetTransport(transport)
 	c.APIKeys.SetTransport(transport)
 	c.Apis.SetTransport(transport)
 	c.AuditEvents.SetTransport(transport)

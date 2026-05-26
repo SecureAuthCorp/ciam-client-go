@@ -23,6 +23,11 @@ type TwilioPhoneProvider struct {
 	// Required: true
 	AuthToken string `json:"auth_token" yaml:"auth_token"`
 
+	// When true, do not push a per-call delivery callback URL to Twilio.
+	// Use this if your Twilio account is pre-configured with a webhook URL
+	// you manage yourself. Applies to both SMS and voice.
+	DisableDeliveryCallbackURL bool `json:"disable_delivery_callback_url,omitempty" yaml:"disable_delivery_callback_url,omitempty"`
+
 	// from
 	// Required: true
 	From string `json:"from" yaml:"from"`
