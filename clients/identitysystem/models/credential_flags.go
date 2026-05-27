@@ -12,7 +12,10 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// CredentialFlags credential flags
+// CredentialFlags CredentialFlags contains the boolean flags derived from the authenticator data during registration or login.
+//
+// These flags indicate the state of user presence, user verification, and backup eligibility/state at the time
+// the credential was used.
 //
 // swagger:model CredentialFlags
 type CredentialFlags struct {

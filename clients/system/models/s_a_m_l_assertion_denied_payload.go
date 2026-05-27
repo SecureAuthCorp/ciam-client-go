@@ -100,6 +100,9 @@ type SAMLAssertionDeniedPayload struct {
 	// May act claims
 	MayActClaims map[string]interface{} `json:"may_act_claims,omitempty" yaml:"may_act_claims,omitempty"`
 
+	// SAML subject identifier.
+	NameID string `json:"name_id,omitempty" yaml:"name_id,omitempty"`
+
 	// ID of the Organization
 	OrganizationID string `json:"organization_id,omitempty" yaml:"organization_id,omitempty"`
 

@@ -17,15 +17,38 @@ import (
 // Credential Credential contains all needed information about a WebAuthn credential for storage. This struct is effectively the
 // Credential Record as described in the specification.
 //
+// Provided this data structure is preserved properly, a Credential can be verified against the FIDO Metadata Service
+// at a later date using the [Credential.Verify] method with a [metadata.Provider].
+//
+// It is strongly recommended for the best security that a [Credential] is encrypted at rest with the exception of the
+// ID and the value you use to lookup the user. This prevents a person with access to the database being able to
+// compromise privacy by being able to view this data, as well as prevents them being able to compromise security by
+// adding or modifying a Credential without them also having access to the encryption key.
+//
+// For consolidated persistence guidance; recommended schema shape, required lookup columns, and which fields
+// must be written back on every successful FinishLogin / ValidateLogin; see the [Storage] section of the
+// [github.com/go-webauthn/webauthn/webauthn] package documentation.
+//
 // See: §4. Terminology: Credential Record (https://www.w3.org/TR/webauthn-3/#credential-record)
 //
 // swagger:model Credential
+//
+// [Storage]: https://pkg.go.dev/github.com/go-webauthn/webauthn/webauthn#hdr-Storage
 type Credential struct {
 
 	// attestation
 	Attestation *CredentialAttestation `json:"attestation,omitempty" yaml:"attestation,omitempty"`
 
-	// The attestation format used (if any) by the authenticator when creating the credential.
+	// AttestationFormat is the attestation statement format identifier ("packed", "tpm", "android-key",
+	// "android-safetynet", "fido-u2f", "apple", "compound", "none"); see §8 of the WebAuthn specification and
+	// the AttestationFormat constants in the protocol package.
+	AttestationFormat string `json:"attestationFormat,omitempty" yaml:"attestationFormat,omitempty"`
+
+	// AttestationType is the attestation type as conveyed by the authenticator during the registration ceremonyl
+	// one of the values defined by [metadata.AuthenticatorAttestationType] ("basic_full", "basic_surrogate",
+	// "attca", "anonca", "ecdaa", "none"). Prior releases incorrectly stored the attestation FORMAT here; see the
+	// custom [Credential.UnmarshalJSON] for the backward-compatibility migration applied when decoding such
+	// records.
 	AttestationType string `json:"attestationType,omitempty" yaml:"attestationType,omitempty"`
 
 	// authenticator
@@ -34,13 +57,14 @@ type Credential struct {
 	// flags
 	Flags *CredentialFlags `json:"flags,omitempty" yaml:"flags,omitempty"`
 
-	// The Credential ID of the public key credential source. Described by the Credential Record 'id' field.
-	ID []uint8 `json:"id" yaml:"id"`
+	// The ID is the ID of the public key credential source. Described by the Credential Record 'id' field.
+	ID string `json:"id,omitempty" yaml:"id,omitempty"`
 
-	// The credential public key of the public key credential source. Described by the Credential Record 'publicKey field.
-	PublicKey []uint8 `json:"publicKey" yaml:"publicKey"`
+	// The credential public key of the public key credential source. Described by the Credential Record 'publicKey'
+	// field.
+	PublicKey string `json:"publicKey,omitempty" yaml:"publicKey,omitempty"`
 
-	// The transport types the authenticator supports.
+	// Transport types the authenticator supports. Described by the Credential Record 'transports' field.
 	Transport []AuthenticatorTransport `json:"transport" yaml:"transport"`
 }
 

@@ -32,7 +32,7 @@ type CompleteAddWebAuthn struct {
 
 	// new web authn
 	// Required: true
-	NewWebAuthn *Credential `json:"new_web_authn" yaml:"new_web_authn"`
+	NewWebAuthn *WebAuthnCredential `json:"new_web_authn" yaml:"new_web_authn"`
 
 	// user ID
 	UserID string `json:"userID,omitempty" yaml:"userID,omitempty"`

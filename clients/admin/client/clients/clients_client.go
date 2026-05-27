@@ -105,6 +105,8 @@ type ClientService interface {
 
 	ParseCertificate(params *ParseCertificateParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ParseCertificateOK, error)
 
+	RevokeDcrAccess(params *RevokeDcrAccessParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RevokeDcrAccessNoContent, error)
+
 	RevokeRotatedClientSecrets(params *RevokeRotatedClientSecretsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RevokeRotatedClientSecretsNoContent, error)
 
 	RotateClientSecret(params *RotateClientSecretParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RotateClientSecretOK, error)
@@ -522,6 +524,54 @@ func (a *Client) ParseCertificate(params *ParseCertificateParams, authInfo runti
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for parseCertificate: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+	RevokeDcrAccess revokes access for a d c r registered client
+
+	Revokes all access tokens and refresh tokens for the specified
+
+dynamically-registered client across all subjects. By default also deletes
+scope grants and claim grants for that client; set preserve_scope_grants
+or preserve_claim_grants to true to keep them. The OAuth client record
+itself is preserved.
+
+Returns 400 if the client is not dynamically registered.
+*/
+func (a *Client) RevokeDcrAccess(params *RevokeDcrAccessParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RevokeDcrAccessNoContent, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewRevokeDcrAccessParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "revokeDcrAccess",
+		Method:             "POST",
+		PathPattern:        "/clients/{cid}/revokeDcrAccess",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &RevokeDcrAccessReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*RevokeDcrAccessNoContent)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for revokeDcrAccess: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

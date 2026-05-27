@@ -1581,6 +1581,8 @@ definitions:
         $ref: '#/definitions/DCRCreatedEventPayload'
       dcr_rejected:
         $ref: '#/definitions/DCRRejectedEventPayload'
+      dcr_revoked:
+        $ref: '#/definitions/DcrAccessRevokedPayload'
       device_add_completed:
         $ref: '#/definitions/UserIDAndIdentifierPayload'
       device_add_requested:
@@ -7553,6 +7555,18 @@ definitions:
         type: string
         x-nullable: false
     type: object
+  DcrAccessRevokedPayload:
+    properties:
+      client_id:
+        type: string
+        x-nullable: false
+      revoke_claim_grants:
+        type: boolean
+        x-nullable: false
+      revoke_scope_grants:
+        type: boolean
+        x-nullable: false
+    type: object
   DefaultBruteForceLimit:
     properties:
       block_duration:
@@ -7937,10 +7951,6 @@ definitions:
         format: duration
         type: string
         x-nullable: false
-      app_quickstart:
-        description: application quickstart tab
-        type: boolean
-        x-nullable: false
       application_launch_dashboard:
         description: application launch dashboard
         type: boolean
@@ -8091,10 +8101,6 @@ definitions:
         description: insecure token exchange public clients
         type: boolean
         x-nullable: false
-      internationalization:
-        description: internationalization
-        type: boolean
-        x-nullable: false
       manage_logins_any_system_client:
         description: allow any system client with manage_logins scope to manage login
           sessions without being linked to an IDP
@@ -8106,6 +8112,11 @@ definitions:
         x-nullable: false
       nats:
         description: publish events to NATS
+        type: boolean
+        x-nullable: false
+      noop_message_sending:
+        description: drop outbound message events at publish time so no email/SMS/voice
+          is dispatched; intended for perf-test tenants
         type: boolean
         x-nullable: false
       obbr:
@@ -8155,10 +8166,6 @@ definitions:
         x-nullable: false
       saml_idp_overrides_per_sp:
         description: SAML IDP overrides per SP
-        type: boolean
-        x-nullable: false
-      scim_v2:
-        description: SCIMv2 support
         type: boolean
         x-nullable: false
       scope_transient_otp:
@@ -8217,10 +8224,6 @@ definitions:
         x-nullable: false
       user_friendly_credentials_setup:
         description: User-friendly credentials setup
-        type: boolean
-        x-nullable: false
-      usernameless_webauthn:
-        description: Usernameless WebAuthn (discoverable passkeys)
         type: boolean
         x-nullable: false
       version:
@@ -13947,6 +13950,23 @@ definitions:
     type: string
   RevocationReason:
     type: string
+  RevokeDcrAccessBody:
+    properties:
+      preserve_claim_grants:
+        description: |-
+          Preserve claim grants for the client across all subjects. When false
+          (the default), claim grants are deleted along with the access tokens;
+          set true to keep them. The body itself is optional.
+        type: boolean
+        x-nullable: false
+      preserve_scope_grants:
+        description: |-
+          Preserve scope grants for the client across all subjects. When false
+          (the default), scope grants are deleted along with the access tokens;
+          set true to keep them. The body itself is optional.
+        type: boolean
+        x-nullable: false
+    type: object
   RevokeIdentityPoolRoleRequest:
     properties:
       identity_pool_id:
@@ -14428,6 +14448,10 @@ definitions:
         description: May act claims
         type: object
         x-nullable: false
+      name_id:
+        description: SAML subject identifier.
+        type: string
+        x-nullable: false
       organization_id:
         description: ID of the Organization
         format: serverID
@@ -14643,6 +14667,10 @@ definitions:
           type: object
         description: May act claims
         type: object
+        x-nullable: false
+      name_id:
+        description: SAML subject identifier.
+        type: string
         x-nullable: false
       organization_id:
         description: ID of the Organization
@@ -19110,6 +19138,13 @@ definitions:
       customer_id:
         type: string
         x-nullable: false
+      disable_delivery_callback_url:
+        description: |-
+          When true, do not push a per-call delivery callback URL to TeleSign.
+          Use this if your TeleSign account is pre-configured with a webhook URL
+          you manage yourself. Applies to both SMS and voice.
+        type: boolean
+        x-nullable: false
       from:
         type: string
         x-nullable: false
@@ -19464,6 +19499,17 @@ definitions:
       address:
         type: string
         x-nullable: false
+      provider_index:
+        description: |-
+          ProviderIndex, when set, forces the test to route through the
+          provider at this position in the tenant's phone provider config
+          (0 = primary, 1+ = fallback). Only valid when the tenant has the
+          advanced_phone feature enabled and at least one configured provider.
+          When omitted, the default routing chain is used.
+        format: int64
+        minimum: 0
+        type: integer
+        x-nullable: false
     required:
     - address
     type: object
@@ -19790,6 +19836,13 @@ definitions:
     properties:
       auth_token:
         type: string
+        x-nullable: false
+      disable_delivery_callback_url:
+        description: |-
+          When true, do not push a per-call delivery callback URL to Twilio.
+          Use this if your Twilio account is pre-configured with a webhook URL
+          you manage yourself. Applies to both SMS and voice.
+        type: boolean
         x-nullable: false
       from:
         type: string
@@ -21074,6 +21127,13 @@ definitions:
           voice calls).
         type: string
         x-nullable: false
+      disable_delivery_callback_url:
+        description: |-
+          When true, do not push a per-call delivery callback URL to Vonage.
+          Use this if your Vonage account is pre-configured with a webhook URL
+          you manage yourself. Applies to both SMS and voice.
+        type: boolean
+        x-nullable: false
       from:
         type: string
         x-nullable: false
@@ -22296,51 +22356,6 @@ paths:
       summary: Update consent action
       tags:
       - consents
-  /agentic-ai/{wid}/package:
-    get:
-      description: Get package an agentic-ai specification.
-      operationId: getAgenticAIPackage
-      parameters:
-      - description: A server will only return requested resources if the resource
-          matches one of the listed ETag value
-        format: etag
-        in: header
-        name: if-match
-        type: string
-      - description: Unique identifier included in audit events for request tracking
-        in: header
-        name: x-correlation-id
-        type: string
-      - description: Key used to safely retry failed requests without duplicate processing
-        in: header
-        name: x-idempotency-key
-        type: string
-      - default: default
-        description: ID of your authorization server (workspace)
-        in: path
-        name: wid
-        required: true
-        type: string
-      produces:
-      - application/octet-stream
-      responses:
-        "200":
-          $ref: '#/responses/agenticAIPackage'
-        "400":
-          $ref: '#/responses/badRequestHTTPError'
-        "401":
-          $ref: '#/responses/unauthorizedHTTPError'
-        "403":
-          $ref: '#/responses/forbiddenHTTPError'
-        "404":
-          $ref: '#/responses/notFoundHTTPError'
-        "429":
-          $ref: '#/responses/tooManyRequestsHTTPError'
-      security:
-      - admin: []
-      summary: Get package for an agentic-ai specification.
-      tags:
-      - agentic-ai
   /apis:
     post:
       description: It is not possible to create APIs for a service with imported specification.
@@ -23216,6 +23231,45 @@ paths:
       security:
       - admin: []
       summary: Update client
+      tags:
+      - clients
+  /clients/{cid}/revokeDcrAccess:
+    post:
+      description: |-
+        Revokes all access tokens and refresh tokens for the specified
+        dynamically-registered client across all subjects. By default also deletes
+        scope grants and claim grants for that client; set preserve_scope_grants
+        or preserve_claim_grants to true to keep them. The OAuth client record
+        itself is preserved.
+
+        Returns 400 if the client is not dynamically registered.
+      operationId: revokeDcrAccess
+      parameters:
+      - description: Client id
+        in: path
+        name: cid
+        required: true
+        type: string
+      - in: body
+        name: Body
+        schema:
+          $ref: '#/definitions/RevokeDcrAccessBody'
+      responses:
+        "204":
+          description: ' Client access has been revoked'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - admin: []
+      summary: Revoke access for a DCR-registered client
       tags:
       - clients
   /clients/{cid}/revokeRotatedSecrets:
@@ -40067,30 +40121,6 @@ responses:
         type: string
     schema:
       $ref: '#/definitions/WorkspacesResponse'
-  agenticAIPackage:
-    description: Agentic AI package
-    headers:
-      etag:
-        description: |-
-          The ETag HTTP header is an identifier for a specific version of a resource
-
-          in:header
-        format: etag
-        type: string
-      x-external-error:
-        description: |-
-          Indicates that a 5xx error was caused by tenant-provided code
-
-          in:header
-        type: string
-      x-trace-id:
-        description: |-
-          OpenTelemetry trace identifier
-
-          in:header
-        type: string
-    schema:
-      type: file
   badRequestHTTPError:
     description: Bad request
     schema:

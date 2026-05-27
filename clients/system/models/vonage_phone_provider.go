@@ -32,6 +32,11 @@ type VonagePhoneProvider struct {
 	// Vonage Application ID for voice API (optional — only needed for voice calls).
 	ApplicationID string `json:"application_id,omitempty" yaml:"application_id,omitempty"`
 
+	// When true, do not push a per-call delivery callback URL to Vonage.
+	// Use this if your Vonage account is pre-configured with a webhook URL
+	// you manage yourself. Applies to both SMS and voice.
+	DisableDeliveryCallbackURL bool `json:"disable_delivery_callback_url,omitempty" yaml:"disable_delivery_callback_url,omitempty"`
+
 	// from
 	// Required: true
 	From string `json:"from" yaml:"from"`

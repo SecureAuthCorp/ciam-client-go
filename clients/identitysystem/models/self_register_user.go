@@ -38,7 +38,7 @@ type SelfRegisterUser struct {
 	TotpSecret string `json:"totp_secret,omitempty" yaml:"totp_secret,omitempty"`
 
 	// webauthn credentials
-	WebauthnCredentials []*Credential `json:"webauthn_credentials" yaml:"webauthn_credentials"`
+	WebauthnCredentials []*WebAuthnCredential `json:"webauthn_credentials" yaml:"webauthn_credentials"`
 
 	// webauthn type
 	// Enum: ["regular","discoverable"]

@@ -22,7 +22,7 @@ type SetWebAuthn struct {
 
 	// new webauthn
 	// Required: true
-	NewWebauthn *Credential `json:"new_webauthn" yaml:"new_webauthn"`
+	NewWebauthn *WebAuthnCredential `json:"new_webauthn" yaml:"new_webauthn"`
 
 	// type
 	// Enum: ["regular","discoverable"]
