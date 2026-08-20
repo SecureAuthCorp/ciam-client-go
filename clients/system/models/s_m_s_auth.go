@@ -8,59 +8,24 @@ package models
 import (
 	"context"
 
-	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
 )
 
-// SMSAuth s m s auth
+// SMSAuth Deprecated: legacy SMS credentials, no longer used at runtime.
 //
 // swagger:model SMSAuth
 type SMSAuth struct {
 
-	// The Twilio Auth Token.
-	// Required: true
-	AuthToken string `json:"auth_token" yaml:"auth_token"`
+	// auth token
+	AuthToken string `json:"auth_token,omitempty" yaml:"auth_token,omitempty"`
 
-	// The Twilio Account SID.
-	// Required: true
-	Sid string `json:"sid" yaml:"sid"`
+	// sid
+	Sid string `json:"sid,omitempty" yaml:"sid,omitempty"`
 }
 
 // Validate validates this s m s auth
 func (m *SMSAuth) Validate(formats strfmt.Registry) error {
-	var res []error
-
-	if err := m.validateAuthToken(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateSid(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-func (m *SMSAuth) validateAuthToken(formats strfmt.Registry) error {
-
-	if err := validate.RequiredString("auth_token", "body", m.AuthToken); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *SMSAuth) validateSid(formats strfmt.Registry) error {
-
-	if err := validate.RequiredString("sid", "body", m.Sid); err != nil {
-		return err
-	}
-
 	return nil
 }
 

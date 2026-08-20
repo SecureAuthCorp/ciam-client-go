@@ -27,7 +27,7 @@ type SMSSettings struct {
 
 	// Custom SMS From phone number.
 	//
-	// If not set, the default is used.
+	// Deprecated: not used at runtime; the sender ID is configured per-tenant.
 	CustomSource string `json:"custom_source,omitempty" yaml:"custom_source,omitempty"`
 
 	// otp
@@ -35,7 +35,7 @@ type SMSSettings struct {
 
 	// SMS provider.
 	// Example: embedded
-	// Enum: ["twilio","embedded"]
+	// Enum: ["embedded"]
 	Provider string `json:"provider,omitempty" yaml:"provider,omitempty"`
 }
 
@@ -80,7 +80,7 @@ var sMSSettingsTypeProviderPropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["twilio","embedded"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["embedded"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -89,9 +89,6 @@ func init() {
 }
 
 const (
-
-	// SMSSettingsProviderTwilio captures enum value "twilio"
-	SMSSettingsProviderTwilio string = "twilio"
 
 	// SMSSettingsProviderEmbedded captures enum value "embedded"
 	SMSSettingsProviderEmbedded string = "embedded"

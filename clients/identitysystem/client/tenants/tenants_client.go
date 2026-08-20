@@ -56,6 +56,8 @@ type ClientOption func(*runtime.ClientOperation)
 
 // ClientService is the interface for Client methods
 type ClientService interface {
+	ExportPoolUsers(params *ExportPoolUsersParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ExportPoolUsersOK, error)
+
 	ExportTenantConfiguration(params *ExportTenantConfigurationParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ExportTenantConfigurationOK, error)
 
 	ImportTenantConfiguration(params *ImportTenantConfigurationParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ImportTenantConfigurationNoContent, error)
@@ -63,6 +65,53 @@ type ClientService interface {
 	PatchTenantConfiguration(params *PatchTenantConfigurationParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*PatchTenantConfigurationNoContent, error)
 
 	SetTransport(transport runtime.ClientTransport)
+}
+
+/*
+	ExportPoolUsers exports users with credentials
+
+	Exports a page of users from the specified pool as a TenantDump populated with
+
+only user entries (users, credentials, identifiers, verifiable addresses, and
+non-expired codes). Each page is directly importable via PUT /configuration.
+
+Results are sorted by user ID. To page, pass the id of the last returned user
+as after_user_id; a page with fewer than limit users is the last page.
+*/
+func (a *Client) ExportPoolUsers(params *ExportPoolUsersParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ExportPoolUsersOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewExportPoolUsersParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "exportPoolUsers",
+		Method:             "GET",
+		PathPattern:        "/configuration/pools/{ipID}/users",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &ExportPoolUsersReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*ExportPoolUsersOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for exportPoolUsers: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*

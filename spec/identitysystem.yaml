@@ -1341,6 +1341,12 @@ definitions:
         - pair_device
         type: string
         x-nullable: false
+      metadata:
+        additionalProperties:
+          type: object
+        description: metadata associated with the code when it was generated
+        type: object
+        x-nullable: false
       password_set:
         type: boolean
         x-nullable: false
@@ -3631,6 +3637,21 @@ definitions:
         type: array
         x-nullable: false
     type: object
+  VerifyCodeResult:
+    properties:
+      id:
+        format: userID
+        type: string
+        x-nullable: false
+      metadata:
+        additionalProperties:
+          type: object
+        description: metadata associated with the code when it was generated
+        type: object
+        x-nullable: false
+    required:
+    - id
+    type: object
   VerifyOTP:
     properties:
       code:
@@ -3773,6 +3794,14 @@ definitions:
     type: object
   WebAuthnSettings:
     properties:
+      require_user_interaction_before_prompt:
+        description: |-
+          RequireUserInteractionBeforePrompt, when true, stops the hosted web login UI
+          from auto-initiating the browser passkey prompt on page load; the user must
+          click Continue. Default false preserves auto-prompt behavior. API-driven
+          WebAuthn flows are unaffected.
+        type: boolean
+        x-nullable: false
       rp_id:
         type: string
         x-nullable: false
@@ -3893,6 +3922,68 @@ paths:
       - system:
         - manage_configuration
       summary: Imports configuration
+      tags:
+      - tenants
+  /configuration/pools/{ipID}/users:
+    get:
+      description: |-
+        Exports a page of users from the specified pool as a TenantDump populated with
+        only user entries (users, credentials, identifiers, verifiable addresses, and
+        non-expired codes). Each page is directly importable via PUT /configuration.
+
+        Results are sorted by user ID. To page, pass the id of the last returned user
+        as after_user_id; a page with fewer than limit users is the last page.
+      operationId: exportPoolUsers
+      parameters:
+      - in: path
+        name: ipID
+        required: true
+        type: string
+      - description: optional list users after given id
+        in: query
+        name: after_user_id
+        type: string
+      - description: optional list users before given id
+        in: query
+        name: before_user_id
+        type: string
+      - description: optional order users by given direction
+        in: query
+        name: order
+        type: string
+      - default: 20
+        description: optional limit results
+        format: int64
+        in: query
+        maximum: 100
+        minimum: 1
+        name: limit
+        type: integer
+      - description: |-
+          optional query filter (url-encoded JSON), e.g. {"user_key":"john"}
+          supported parameters: user_key, payload, metadata, business_metadata
+        in: query
+        name: query
+        type: string
+      responses:
+        "200":
+          $ref: '#/responses/TenantDump'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "422":
+          $ref: '#/responses/unprocessableEntityHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - system:
+        - read_configuration
+      summary: Export users with credentials
       tags:
       - tenants
   /system/pools:
@@ -5515,7 +5606,7 @@ paths:
           $ref: '#/definitions/BaseVerifyOTP'
       responses:
         "200":
-          $ref: '#/responses/UserIDResponse'
+          $ref: '#/responses/VerifyCodeResponse'
         "401":
           $ref: '#/responses/unauthorizedHTTPError'
         "412":
@@ -5731,7 +5822,7 @@ paths:
           $ref: '#/definitions/VerifyOTP'
       responses:
         "200":
-          $ref: '#/responses/UserIDResponse'
+          $ref: '#/responses/VerifyCodeResponse'
         "401":
           $ref: '#/responses/unauthorizedHTTPError'
         "412":
@@ -9361,6 +9452,30 @@ responses:
     description: Identity Users
     schema:
       $ref: '#/definitions/Users'
+  VerifyCodeResponse:
+    description: OTP
+    headers:
+      etag:
+        description: |-
+          The ETag HTTP header is an identifier for a specific version of a resource
+
+          in:header
+        format: etag
+        type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
+    schema:
+      $ref: '#/definitions/VerifyCodeResult'
   VerifyPasswordResponse:
     description: Password correct
     schema:

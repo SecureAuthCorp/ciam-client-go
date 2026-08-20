@@ -21,6 +21,11 @@ import (
 // swagger:model Service
 type Service struct {
 
+	// Controls which audience is injected into access tokens for scopes mapped to this service
+	// Example: spiffe
+	// Enum: ["spiffe","custom","none"]
+	AudienceMode string `json:"audience_mode,omitempty" yaml:"audience_mode,omitempty"`
+
 	// Authorization server identifier
 	// Example: my-server
 	AuthorizationServerID string `json:"authorization_server_id,omitempty" yaml:"authorization_server_id,omitempty"`
@@ -72,6 +77,10 @@ type Service struct {
 func (m *Service) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateAudienceMode(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateCapabilities(formats); err != nil {
 		res = append(res, err)
 	}
@@ -87,6 +96,51 @@ func (m *Service) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+var serviceTypeAudienceModePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["spiffe","custom","none"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		serviceTypeAudienceModePropEnum = append(serviceTypeAudienceModePropEnum, v)
+	}
+}
+
+const (
+
+	// ServiceAudienceModeSpiffe captures enum value "spiffe"
+	ServiceAudienceModeSpiffe string = "spiffe"
+
+	// ServiceAudienceModeCustom captures enum value "custom"
+	ServiceAudienceModeCustom string = "custom"
+
+	// ServiceAudienceModeNone captures enum value "none"
+	ServiceAudienceModeNone string = "none"
+)
+
+// prop value enum
+func (m *Service) validateAudienceModeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, serviceTypeAudienceModePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *Service) validateAudienceMode(formats strfmt.Registry) error {
+	if swag.IsZero(m.AudienceMode) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateAudienceModeEnum("audience_mode", "body", m.AudienceMode); err != nil {
+		return err
+	}
+
 	return nil
 }
 

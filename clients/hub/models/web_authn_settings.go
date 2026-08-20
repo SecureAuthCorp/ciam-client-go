@@ -17,6 +17,12 @@ import (
 // swagger:model WebAuthnSettings
 type WebAuthnSettings struct {
 
+	// RequireUserInteractionBeforePrompt, when true, stops the hosted web login UI
+	// from auto-initiating the browser passkey prompt on page load; the user must
+	// click Continue. Default false preserves auto-prompt behavior. API-driven
+	// WebAuthn flows are unaffected.
+	RequireUserInteractionBeforePrompt bool `json:"require_user_interaction_before_prompt,omitempty" yaml:"require_user_interaction_before_prompt,omitempty"`
+
 	// rp id
 	RpID string `json:"rp_id,omitempty" yaml:"rp_id,omitempty"`
 

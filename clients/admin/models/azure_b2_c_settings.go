@@ -36,6 +36,15 @@ type AzureB2CSettings struct {
 	// Example: true
 	FetchGroups bool `json:"fetch_groups,omitempty" yaml:"fetch_groups,omitempty"`
 
+	// Forward the original request's `id_token_hint` to the upstream IdP.
+	ForwardIDTokenHint bool `json:"forward_id_token_hint,omitempty" yaml:"forward_id_token_hint,omitempty"`
+
+	// Forward the original request's `max_age` to the upstream IdP.
+	ForwardMaxAge bool `json:"forward_max_age,omitempty" yaml:"forward_max_age,omitempty"`
+
+	// Forward the original request's `prompt` to the upstream IdP.
+	ForwardPrompt bool `json:"forward_prompt,omitempty" yaml:"forward_prompt,omitempty"`
+
 	// If enabled, users' data is collected from the Microsoft Graph API
 	//
 	// You can only get user's data if you are entitled to call the Microsoft Graph API.

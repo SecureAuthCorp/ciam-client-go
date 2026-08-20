@@ -48,6 +48,12 @@ func (o *CreateScriptReader) ReadResponse(response runtime.ClientResponse, consu
 			return nil, err
 		}
 		return nil, result
+	case 409:
+		result := NewCreateScriptConflict()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	case 429:
 		result := NewCreateScriptTooManyRequests()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -370,6 +376,76 @@ func (o *CreateScriptForbidden) GetPayload() *models.Error {
 }
 
 func (o *CreateScriptForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	o.Payload = new(models.Error)
+
+	// response payload
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+		return err
+	}
+
+	return nil
+}
+
+// NewCreateScriptConflict creates a CreateScriptConflict with default headers values
+func NewCreateScriptConflict() *CreateScriptConflict {
+	return &CreateScriptConflict{}
+}
+
+/*
+CreateScriptConflict describes a response with status code 409, with default header values.
+
+Conflict
+*/
+type CreateScriptConflict struct {
+	Payload *models.Error
+}
+
+// IsSuccess returns true when this create script conflict response has a 2xx status code
+func (o *CreateScriptConflict) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this create script conflict response has a 3xx status code
+func (o *CreateScriptConflict) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this create script conflict response has a 4xx status code
+func (o *CreateScriptConflict) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this create script conflict response has a 5xx status code
+func (o *CreateScriptConflict) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this create script conflict response a status code equal to that given
+func (o *CreateScriptConflict) IsCode(code int) bool {
+	return code == 409
+}
+
+// Code gets the status code for the create script conflict response
+func (o *CreateScriptConflict) Code() int {
+	return 409
+}
+
+func (o *CreateScriptConflict) Error() string {
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /servers/{wid}/scripts][%d] createScriptConflict %s", 409, payload)
+}
+
+func (o *CreateScriptConflict) String() string {
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /servers/{wid}/scripts][%d] createScriptConflict %s", 409, payload)
+}
+
+func (o *CreateScriptConflict) GetPayload() *models.Error {
+	return o.Payload
+}
+
+func (o *CreateScriptConflict) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.Error)
 

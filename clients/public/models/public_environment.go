@@ -29,9 +29,6 @@ type PublicEnvironment struct {
 	// ai security public url
 	AiSecurityPublicURL string `json:"ai_security_public_url,omitempty" yaml:"ai_security_public_url,omitempty"`
 
-	// If application_launch_dashboard is enabled
-	ApplicationLaunchDashboard bool `json:"application_launch_dashboard,omitempty" yaml:"application_launch_dashboard,omitempty"`
-
 	// If b2b_orgs_client_side_search is enabled
 	B2bOrgsClientSideSearch bool `json:"b2b_orgs_client_side_search,omitempty" yaml:"b2b_orgs_client_side_search,omitempty"`
 

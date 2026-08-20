@@ -28,11 +28,11 @@ type TreeCustomApp struct {
 
 	// Type of the custom app
 	// Example: post-authn
-	// Enum: ["post-authn","scim"]
+	// Enum: ["post-authn","scim","radius"]
 	Type string `json:"type,omitempty" yaml:"type,omitempty"`
 
 	// URL of the CustomApp.
-	// Required for type 'post-authn'. Not allowed for type 'scim'.
+	// Required for type 'post-authn'. Not allowed for types 'scim' and 'radius'.
 	URL string `json:"url,omitempty" yaml:"url,omitempty"`
 }
 
@@ -77,7 +77,7 @@ var treeCustomAppTypeTypePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["post-authn","scim"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["post-authn","scim","radius"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -92,6 +92,9 @@ const (
 
 	// TreeCustomAppTypeScim captures enum value "scim"
 	TreeCustomAppTypeScim string = "scim"
+
+	// TreeCustomAppTypeRadius captures enum value "radius"
+	TreeCustomAppTypeRadius string = "radius"
 )
 
 // prop value enum

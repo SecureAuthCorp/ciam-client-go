@@ -750,6 +750,12 @@ definitions:
           with their mtls alias
         type: boolean
         x-nullable: false
+      allow_organization_selection:
+        description: |-
+          Allow the user to select one of their organizations after authentication (application-membership
+          org-selector login step). Disabled by default.
+        type: boolean
+        x-nullable: false
       auto_request_recovery:
         description: auto request recovery
         type: boolean
@@ -760,6 +766,14 @@ definitions:
         x-nullable: false
       cookies_configuration:
         $ref: '#/definitions/CookiesConfiguration'
+      cross_organization_application_membership:
+        description: |-
+          Allow cross-organization application membership across this workspace's org tree — granting a
+          user whose identity pool lives in one org access to an application in another org of the same
+          tree, and honoring such grants at token time. Disabled by default. Set on the tree-root
+          workspace; governs the whole tree. Role assignment is unaffected (that stays flag-gated).
+        type: boolean
+        x-nullable: false
       disable_dcr_client_certificate_bound_access_tokens:
         description: |-
           Disable certificate-bound access tokens for new DCR clients
@@ -800,6 +814,13 @@ definitions:
         x-nullable: false
       enforce_acr_values:
         description: Enforce acr values
+        type: boolean
+        x-nullable: false
+      enforce_application_membership_default:
+        description: |-
+          Default value stamped onto the enforce_application_membership toggle of applications created in
+          this workspace. Applied at creation only — changing it later does not affect existing applications.
+          Disabled by default. Only meaningful while the applications_membership feature is enabled.
         type: boolean
         x-nullable: false
       ignore_unknown_scopes_for_dcr:
@@ -1882,6 +1903,19 @@ definitions:
         example: dev-318ay013.us.auth0.com
         type: string
         x-nullable: false
+      forward_id_token_hint:
+        description: Forward the original request's `id_token_hint` to the upstream
+          IdP.
+        type: boolean
+        x-nullable: false
+      forward_max_age:
+        description: Forward the original request's `max_age` to the upstream IdP.
+        type: boolean
+        x-nullable: false
+      forward_prompt:
+        description: Forward the original request's `prompt` to the upstream IdP.
+        type: boolean
+        x-nullable: false
       get_user_info:
         description: If enabled, users' data is collected by calling the `userinfo`
           endpoint.
@@ -2385,6 +2419,19 @@ definitions:
         example: true
         type: boolean
         x-nullable: false
+      forward_id_token_hint:
+        description: Forward the original request's `id_token_hint` to the upstream
+          IdP.
+        type: boolean
+        x-nullable: false
+      forward_max_age:
+        description: Forward the original request's `max_age` to the upstream IdP.
+        type: boolean
+        x-nullable: false
+      forward_prompt:
+        description: Forward the original request's `prompt` to the upstream IdP.
+        type: boolean
+        x-nullable: false
       get_user:
         description: |-
           If enabled, users' data is collected from the Microsoft Graph API
@@ -2600,6 +2647,19 @@ definitions:
           and manage different types of groups and group functionality according to your scenario.
 
           You can only get groups data if you are entitled to call the Microsoft Graph API.
+        type: boolean
+        x-nullable: false
+      forward_id_token_hint:
+        description: Forward the original request's `id_token_hint` to the upstream
+          IdP.
+        type: boolean
+        x-nullable: false
+      forward_max_age:
+        description: Forward the original request's `max_age` to the upstream IdP.
+        type: boolean
+        x-nullable: false
+      forward_prompt:
+        description: Forward the original request's `prompt` to the upstream IdP.
         type: boolean
         x-nullable: false
       get_user:
@@ -3414,6 +3474,13 @@ definitions:
       dynamically_registered:
         type: boolean
         x-nullable: false
+      enforce_application_membership:
+        description: |-
+          Enforce application membership for this application. When true, a user token is issued only if the
+          user has membership/access to this application in the resolved organization. Defaults to false and,
+          on creation, to the workspace-level default. Only meaningful while the applications_membership feature is enabled.
+        type: boolean
+        x-nullable: false
       fdx:
         $ref: '#/definitions/FDXMetadata'
       grant_types:
@@ -3723,6 +3790,14 @@ definitions:
 
           [Read more](https://openid.net/specs/openid-connect-core-1_0.html)
         type: string
+        x-nullable: false
+      skip_dbfp:
+        description: |-
+          Skip device-based fingerprint (DBFP) collection for this client.
+          If true, the interactive DBFP collection step is skipped during login, which lets
+          non-interactive clients (e.g. backend HTTP clients that cannot execute the collection
+          JavaScript) complete the authorization flow. Risk inference is unaffected.
+        type: boolean
         x-nullable: false
       software_id:
         description: |-
@@ -4190,6 +4265,13 @@ definitions:
       dynamically_registered:
         type: boolean
         x-nullable: false
+      enforce_application_membership:
+        description: |-
+          Enforce application membership for this application. When true, a user token is issued only if the
+          user has membership/access to this application in the resolved organization. Defaults to false and,
+          on creation, to the workspace-level default. Only meaningful while the applications_membership feature is enabled.
+        type: boolean
+        x-nullable: false
       fdx:
         $ref: '#/definitions/FDXMetadata'
       grant_types:
@@ -4503,6 +4585,14 @@ definitions:
         x-nullable: false
       server_mtls_issuer_url:
         type: string
+        x-nullable: false
+      skip_dbfp:
+        description: |-
+          Skip device-based fingerprint (DBFP) collection for this client.
+          If true, the interactive DBFP collection step is skipped during login, which lets
+          non-interactive clients (e.g. backend HTTP clients that cannot execute the collection
+          JavaScript) complete the authorization flow. Risk inference is unaffected.
+        type: boolean
         x-nullable: false
       software_id:
         description: |-
@@ -4955,6 +5045,13 @@ definitions:
       dynamically_registered:
         type: boolean
         x-nullable: false
+      enforce_application_membership:
+        description: |-
+          Enforce application membership for this application. When true, a user token is issued only if the
+          user has membership/access to this application in the resolved organization. Defaults to false and,
+          on creation, to the workspace-level default. Only meaningful while the applications_membership feature is enabled.
+        type: boolean
+        x-nullable: false
       grant_types:
         default:
         - authorization_code
@@ -5170,6 +5267,14 @@ definitions:
 
           [Read more](https://openid.net/specs/openid-connect-core-1_0.html)
         type: string
+        x-nullable: false
+      skip_dbfp:
+        description: |-
+          Skip device-based fingerprint (DBFP) collection for this client.
+          If true, the interactive DBFP collection step is skipped during login, which lets
+          non-interactive clients (e.g. backend HTTP clients that cannot execute the collection
+          JavaScript) complete the authorization flow. Risk inference is unaffected.
+        type: boolean
         x-nullable: false
       software_statement:
         description: |-
@@ -5658,6 +5763,19 @@ definitions:
         description: Cognito app client ID from your application settings
         example: client
         type: string
+        x-nullable: false
+      forward_id_token_hint:
+        description: Forward the original request's `id_token_hint` to the upstream
+          IdP.
+        type: boolean
+        x-nullable: false
+      forward_max_age:
+        description: Forward the original request's `max_age` to the upstream IdP.
+        type: boolean
+        x-nullable: false
+      forward_prompt:
+        description: Forward the original request's `prompt` to the upstream IdP.
+        type: boolean
         x-nullable: false
       get_user_info:
         description: If enabled, additional user data is collected from the `userinfo`
@@ -6468,6 +6586,13 @@ definitions:
           If true, the authorization server will reject token requests from this client that do not contain the DPoP header.
         type: boolean
         x-nullable: false
+      enforce_application_membership:
+        description: |-
+          Enforce application membership for this application. When true, a user token is issued only if the
+          user has membership/access to this application in the resolved organization. Defaults to false and,
+          on creation, to the workspace-level default. Only meaningful while the applications_membership feature is enabled.
+        type: boolean
+        x-nullable: false
       fdx:
         $ref: '#/definitions/FDXMetadata'
       grant_types:
@@ -6706,6 +6831,14 @@ definitions:
 
           [Read more](https://openid.net/specs/openid-connect-core-1_0.html)
         type: string
+        x-nullable: false
+      skip_dbfp:
+        description: |-
+          Skip device-based fingerprint (DBFP) collection for this client.
+          If true, the interactive DBFP collection step is skipped during login, which lets
+          non-interactive clients (e.g. backend HTTP clients that cannot execute the collection
+          JavaScript) complete the authorization flow. Risk inference is unaffected.
+        type: boolean
         x-nullable: false
       software_statement:
         description: |-
@@ -7064,7 +7197,7 @@ definitions:
       identity_pool_id:
         description: |-
           IdentityPoolID associated with the CustomApp.
-          Required for type 'scim'. Not allowed for type 'post-authn'.
+          Required for type 'scim'. Not allowed for types 'post-authn' and 'radius'.
         format: poolID
         type: string
         x-nullable: false
@@ -7089,13 +7222,14 @@ definitions:
         enum:
         - post-authn
         - scim
+        - radius
         example: post-authn
         type: string
         x-nullable: false
       url:
         description: |-
           URL of the CustomApp.
-          Required for type 'post-authn'. Not allowed for type 'scim'.
+          Required for type 'post-authn'. Not allowed for types 'scim' and 'radius'.
         type: string
         x-nullable: false
     required:
@@ -7121,7 +7255,7 @@ definitions:
       identity_pool_id:
         description: |-
           IdentityPoolID associated with the CustomApp.
-          Required for type 'scim'. Not allowed for type 'post-authn'.
+          Required for type 'scim'. Not allowed for types 'post-authn' and 'radius'.
         format: poolID
         type: string
         x-nullable: false
@@ -7146,13 +7280,14 @@ definitions:
         enum:
         - post-authn
         - scim
+        - radius
         example: post-authn
         type: string
         x-nullable: false
       url:
         description: |-
           URL of the CustomApp.
-          Required for type 'post-authn'. Not allowed for type 'scim'.
+          Required for type 'post-authn'. Not allowed for types 'scim' and 'radius'.
         type: string
         x-nullable: false
     required:
@@ -7908,6 +8043,11 @@ definitions:
         description: reject bot user agents in activation handler
         type: boolean
         x-nullable: false
+      activation_captcha:
+        description: require a captcha on the activation link before the activation
+          code is consumed; supersedes two_step_activation and activation_bot_protection
+        type: boolean
+        x-nullable: false
       active_directory_idp:
         description: Active Directory IDP
         type: boolean
@@ -7922,10 +8062,6 @@ definitions:
         x-nullable: false
       admin_workspace_access:
         description: admin workspace access
-        type: boolean
-        x-nullable: false
-      advanced_phone:
-        description: allow tenants to configure custom phone providers
         type: boolean
         x-nullable: false
       agentic_ai_system_nav:
@@ -7951,8 +8087,9 @@ definitions:
         format: duration
         type: string
         x-nullable: false
-      application_launch_dashboard:
-        description: application launch dashboard
+      applications_membership:
+        description: applications membership — assignment of applications to organizations
+          / users / groups (in development)
         type: boolean
         x-nullable: false
       audit_events_duration:
@@ -7971,7 +8108,8 @@ definitions:
       brute_force_limits:
         $ref: '#/definitions/DefaultBruteForceLimits'
       built_in_advanced_phone_providers:
-        description: send SMS using built-in advanced phone providers
+        description: route SMS and voice sends through the platform-default phone
+          provider chain
         type: boolean
         x-nullable: false
       cache_access_tokens:
@@ -7984,6 +8122,11 @@ definitions:
         x-nullable: false
       cdr_disable_unique_software_id:
         description: disable unique software id for CDR
+        type: boolean
+        x-nullable: false
+      client_id_metadata_document:
+        description: client ID metadata documents — accept an https client_id resolved
+          by fetching the client's own metadata document (draft-ietf-oauth-client-id-metadata-document)
         type: boolean
         x-nullable: false
       client_secrets_stored_as_one_way_hash:
@@ -8029,14 +8172,6 @@ definitions:
         description: disable audit events
         type: boolean
         x-nullable: false
-      disable_embedded_sms_provider:
-        description: disable embedded sms provider
-        type: boolean
-        x-nullable: false
-      disable_embedded_voice_provider:
-        description: disable embedded voice provider
-        type: boolean
-        x-nullable: false
       disable_identity_pool_self_user_apis_without_scopes:
         description: disable Identity Pool Self User APIs without scopes
         type: boolean
@@ -8065,6 +8200,10 @@ definitions:
         description: drop tokens on password reset
         type: boolean
         x-nullable: false
+      embeddable_components:
+        description: embeddable web components bundle served at /embed/v1
+        type: boolean
+        x-nullable: false
       embedded_idps_enabled:
         type: boolean
         x-nullable: false
@@ -8086,12 +8225,21 @@ definitions:
           tools
         type: boolean
         x-nullable: false
+      id_jag:
+        description: ID-JAG — issue and redeem Identity Assertion JWT Authorization
+          Grants for cross-app access (draft-ietf-oauth-identity-assertion-authz-grant)
+        type: boolean
+        x-nullable: false
       identity_assurance:
         description: identity assurance
         type: boolean
         x-nullable: false
       image_proxy_url:
         type: string
+        x-nullable: false
+      insecure_allow_internal_webhook_targets:
+        description: disables SSRF protection for webhook delivery
+        type: boolean
         x-nullable: false
       insecure_disable_csrf:
         description: disable csrf
@@ -8116,7 +8264,7 @@ definitions:
         x-nullable: false
       noop_message_sending:
         description: drop outbound message events at publish time so no email/SMS/voice
-          is dispatched; intended for perf-test tenants
+          is dispatched; intended for perf-test tenants; admin workspace is excluded
         type: boolean
         x-nullable: false
       obbr:
@@ -8214,10 +8362,6 @@ definitions:
         description: Two-step activation flow to prevent email scanner auto-activation
         type: boolean
         x-nullable: false
-      use_new_dn_format:
-        description: Use new DN format
-        type: boolean
-        x-nullable: false
       user_cross_organization_role_assignment:
         description: User cross-organization role assignment
         type: boolean
@@ -8228,10 +8372,6 @@ definitions:
         x-nullable: false
       version:
         type: string
-        x-nullable: false
-      voice_otp:
-        description: enable voice OTP authn method
-        type: boolean
         x-nullable: false
       wildcard_tenant_id_must_match_path_tenant_id:
         description: require that the wildcard tenant id matches the path param tenant
@@ -9037,11 +9177,89 @@ definitions:
         type: string
         x-nullable: false
     type: object
+  GatewayWithCounts:
+    properties:
+      authorization_server_id:
+        description: authorization server id
+        example: default
+        format: serverID
+        type: string
+        x-nullable: false
+      client_id:
+        description: id of a client created for this gateway for authentication
+        format: clientID
+        type: string
+        x-nullable: false
+      create_and_bind_services_automatically:
+        description: if true services are created automatically for each new discovered
+          api group
+        type: boolean
+        x-nullable: false
+      default_policy_id:
+        description: default policy id assigned to new APIs
+        format: policyID
+        type: string
+        x-nullable: false
+      description:
+        description: description
+        type: string
+        x-nullable: false
+      id:
+        description: unique gateway id
+        example: "1"
+        format: gatewayID
+        type: string
+        x-nullable: false
+      last_active:
+        description: last time a client fetched configuration
+        format: date-time
+        type: string
+        x-nullable: false
+      name:
+        description: gateway name
+        example: SecureAuth Pyron
+        type: string
+        x-nullable: false
+      number_of_apis_with_connected_services:
+        description: number of api groups bound to a service
+        format: int64
+        type: integer
+        x-nullable: false
+      number_of_apis_without_connected_services:
+        description: number of api groups not bound to any service
+        format: int64
+        type: integer
+        x-nullable: false
+      number_of_services_with_connected_gateway:
+        description: number of services connected to this gateway
+        format: int64
+        type: integer
+        x-nullable: false
+      tenant_id:
+        description: tenant id
+        example: default
+        format: tenantID
+        type: string
+        x-nullable: false
+      token_exchange:
+        $ref: '#/definitions/GatewayTokenExchangeSettings'
+      token_exchange_client_id:
+        description: Token exchange client id
+        format: clientID
+        type: string
+        x-nullable: false
+      type:
+        description: 'gateway type, one of: pyron, aws'
+        example: pyron
+        format: gatewayType
+        type: string
+        x-nullable: false
+    type: object
   Gateways:
     properties:
       gateways:
         items:
-          $ref: '#/definitions/Gateway'
+          $ref: '#/definitions/GatewayWithCounts'
         type: array
         x-nullable: false
     type: object
@@ -9609,6 +9827,19 @@ definitions:
         example: client
         type: string
         x-nullable: false
+      forward_id_token_hint:
+        description: Forward the original request's `id_token_hint` to the upstream
+          IdP.
+        type: boolean
+        x-nullable: false
+      forward_max_age:
+        description: Forward the original request's `max_age` to the upstream IdP.
+        type: boolean
+        x-nullable: false
+      forward_prompt:
+        description: Forward the original request's `prompt` to the upstream IdP.
+        type: boolean
+        x-nullable: false
       get_user_info:
         description: If enabled, users' data is collected by calling the `userinfo`
           endpoint.
@@ -9794,6 +10025,19 @@ definitions:
         x-nullable: false
       fetch_groups:
         description: Fetch user groups
+        type: boolean
+        x-nullable: false
+      forward_id_token_hint:
+        description: Forward the original request's `id_token_hint` to the upstream
+          IdP.
+        type: boolean
+        x-nullable: false
+      forward_max_age:
+        description: Forward the original request's `max_age` to the upstream IdP.
+        type: boolean
+        x-nullable: false
+      forward_prompt:
+        description: Forward the original request's `prompt` to the upstream IdP.
         type: boolean
         x-nullable: false
       hosted_domains:
@@ -10697,6 +10941,16 @@ definitions:
     type: object
   ImportServiceConfigurationResult:
     properties:
+      audience_mode:
+        description: Controls which audience is injected into access tokens for scopes
+          mapped to this service
+        enum:
+        - spiffe
+        - custom
+        - none
+        example: spiffe
+        type: string
+        x-nullable: false
       authorization_server_id:
         description: Authorization server identifier
         example: my-server
@@ -11002,6 +11256,19 @@ definitions:
 
           If you want to fetch groups from the IntelliTrust™ IDP, you need to add the `groups` claim
           for your application on the IDP side.
+        type: boolean
+        x-nullable: false
+      forward_id_token_hint:
+        description: Forward the original request's `id_token_hint` to the upstream
+          IdP.
+        type: boolean
+        x-nullable: false
+      forward_max_age:
+        description: Forward the original request's `max_age` to the upstream IdP.
+        type: boolean
+        x-nullable: false
+      forward_prompt:
+        description: Forward the original request's `prompt` to the upstream IdP.
         type: boolean
         x-nullable: false
       get_user_info:
@@ -11413,6 +11680,19 @@ definitions:
         description: OAuth client application identifier
         example: client
         type: string
+        x-nullable: false
+      forward_id_token_hint:
+        description: Forward the original request's `id_token_hint` to the upstream
+          IdP.
+        type: boolean
+        x-nullable: false
+      forward_max_age:
+        description: Forward the original request's `max_age` to the upstream IdP.
+        type: boolean
+        x-nullable: false
+      forward_prompt:
+        description: Forward the original request's `prompt` to the upstream IdP.
+        type: boolean
         x-nullable: false
       get_user_info:
         description: If enabled, users' data is collected by calling the `userinfo`
@@ -12042,6 +12322,19 @@ definitions:
         example: client
         type: string
         x-nullable: false
+      forward_id_token_hint:
+        description: Forward the original request's `id_token_hint` to the upstream
+          IdP.
+        type: boolean
+        x-nullable: false
+      forward_max_age:
+        description: Forward the original request's `max_age` to the upstream IdP.
+        type: boolean
+        x-nullable: false
+      forward_prompt:
+        description: Forward the original request's `prompt` to the upstream IdP.
+        type: boolean
+        x-nullable: false
       get_user:
         description: |-
           If enabled, users' data is collected from the Microsoft Graph API
@@ -12441,6 +12734,19 @@ definitions:
         example: client
         type: string
         x-nullable: false
+      forward_id_token_hint:
+        description: Forward the original request's `id_token_hint` to the upstream
+          IdP.
+        type: boolean
+        x-nullable: false
+      forward_max_age:
+        description: Forward the original request's `max_age` to the upstream IdP.
+        type: boolean
+        x-nullable: false
+      forward_prompt:
+        description: Forward the original request's `prompt` to the upstream IdP.
+        type: boolean
+        x-nullable: false
       get_user_info:
         description: If enabled, users' data is collected by calling the `userinfo`
           endpoint.
@@ -12673,6 +12979,19 @@ definitions:
         example: dev-316761.okta.com
         type: string
         x-nullable: false
+      forward_id_token_hint:
+        description: Forward the original request's `id_token_hint` to the upstream
+          IdP.
+        type: boolean
+        x-nullable: false
+      forward_max_age:
+        description: Forward the original request's `max_age` to the upstream IdP.
+        type: boolean
+        x-nullable: false
+      forward_prompt:
+        description: Forward the original request's `prompt` to the upstream IdP.
+        type: boolean
+        x-nullable: false
       get_user_info:
         description: If enabled, users' data is collected by calling the `userinfo`
           endpoint.
@@ -12876,6 +13195,19 @@ definitions:
           for your organization
         example: dev-316761.okta.com
         type: string
+        x-nullable: false
+      forward_id_token_hint:
+        description: Forward the original request's `id_token_hint` to the upstream
+          IdP.
+        type: boolean
+        x-nullable: false
+      forward_max_age:
+        description: Forward the original request's `max_age` to the upstream IdP.
+        type: boolean
+        x-nullable: false
+      forward_prompt:
+        description: Forward the original request's `prompt` to the upstream IdP.
+        type: boolean
         x-nullable: false
       get_user_info:
         description: If enabled, users' data is collected by calling the `userinfo`
@@ -13330,17 +13662,23 @@ definitions:
     title: PhoneProvider defines a single phone messaging provider.
     type: object
   PhoneProviderConfig:
-    description: Providers is an ordered list — position in the array determines fallback
-      priority.
+    description: |-
+      Providers is consulted only when Mode is custom. Active is derived from
+      Mode (true when Mode is non-empty) and kept for back-compat reads.
     properties:
       active:
         type: boolean
+        x-nullable: false
+      mode:
+        enum:
+        - built_in
+        - custom
+        type: string
         x-nullable: false
       providers:
         items:
           $ref: '#/definitions/PhoneProvider'
         maxItems: 5
-        minItems: 1
         type: array
         x-nullable: false
       tenant_id:
@@ -13348,7 +13686,7 @@ definitions:
         type: string
         x-nullable: false
     required:
-    - providers
+    - mode
     title: PhoneProviderConfig represents a tenant's phone provider configuration.
     type: object
   Policies:
@@ -15259,16 +15597,12 @@ definitions:
   SMSAuth:
     properties:
       auth_token:
-        description: The Twilio Auth Token.
         type: string
         x-nullable: false
       sid:
-        description: The Twilio Account SID.
         type: string
         x-nullable: false
-    required:
-    - sid
-    - auth_token
+    title: 'Deprecated: legacy SMS credentials, no longer used at runtime.'
     type: object
   SMSSettings:
     properties:
@@ -15283,7 +15617,7 @@ definitions:
         description: |-
           Custom SMS From phone number.
 
-          If not set, the default is used.
+          Deprecated: not used at runtime; the sender ID is configured per-tenant.
         type: string
         x-nullable: false
       otp:
@@ -15291,7 +15625,6 @@ definitions:
       provider:
         description: SMS provider.
         enum:
-        - twilio
         - embedded
         example: embedded
         type: string
@@ -15995,7 +16328,6 @@ definitions:
         x-nullable: false
     type: object
   SecureOptions:
-    description: nolint
     properties:
       AllowedHosts:
         description: AllowedHosts is a slice of fully qualified domain names that
@@ -18349,6 +18681,16 @@ definitions:
     type: object
   Service:
     properties:
+      audience_mode:
+        description: Controls which audience is injected into access tokens for scopes
+          mapped to this service
+        enum:
+        - spiffe
+        - custom
+        - none
+        example: spiffe
+        type: string
+        x-nullable: false
       authorization_server_id:
         description: Authorization server identifier
         example: my-server
@@ -18422,6 +18764,16 @@ definitions:
     type: object
   ServiceAuditPayload:
     properties:
+      audience_mode:
+        description: Controls which audience is injected into access tokens for scopes
+          mapped to this service
+        enum:
+        - spiffe
+        - custom
+        - none
+        example: spiffe
+        type: string
+        x-nullable: false
       capabilities:
         description: Service capabilities
         items:
@@ -18488,6 +18840,16 @@ definitions:
   ServiceResponse:
     properties:
       audience:
+        type: string
+        x-nullable: false
+      audience_mode:
+        description: Controls which audience is injected into access tokens for scopes
+          mapped to this service
+        enum:
+        - spiffe
+        - custom
+        - none
+        example: spiffe
         type: string
         x-nullable: false
       authorization_server_id:
@@ -18578,6 +18940,16 @@ definitions:
       audience:
         type: string
         x-nullable: false
+      audience_mode:
+        description: Controls which audience is injected into access tokens for scopes
+          mapped to this service
+        enum:
+        - spiffe
+        - custom
+        - none
+        example: spiffe
+        type: string
+        x-nullable: false
       authorization_server_id:
         description: Authorization server identifier
         example: my-server
@@ -18652,6 +19024,16 @@ definitions:
   ServiceWithScopesResponse:
     properties:
       audience:
+        type: string
+        x-nullable: false
+      audience_mode:
+        description: Controls which audience is injected into access tokens for scopes
+          mapped to this service
+        enum:
+        - spiffe
+        - custom
+        - none
+        example: spiffe
         type: string
         x-nullable: false
       authorization_server_id:
@@ -19503,8 +19885,8 @@ definitions:
         description: |-
           ProviderIndex, when set, forces the test to route through the
           provider at this position in the tenant's phone provider config
-          (0 = primary, 1+ = fallback). Only valid when the tenant has the
-          advanced_phone feature enabled and at least one configured provider.
+          (0 = primary, 1+ = fallback). Requires the tenant to have an
+          active phone provider config with at least one configured provider.
           When omitted, the default routing chain is used.
         format: int64
         minimum: 0
@@ -20210,6 +20592,13 @@ definitions:
           If true, the authorization server will reject token requests from this client that do not contain the DPoP header.
         type: boolean
         x-nullable: false
+      enforce_application_membership:
+        description: |-
+          Enforce application membership for this application. When true, a user token is issued only if the
+          user has membership/access to this application in the resolved organization. Defaults to false and,
+          on creation, to the workspace-level default. Only meaningful while the applications_membership feature is enabled.
+        type: boolean
+        x-nullable: false
       fdx:
         $ref: '#/definitions/FDXMetadata'
       grant_types:
@@ -20515,6 +20904,14 @@ definitions:
 
           [Read more](https://openid.net/specs/openid-connect-core-1_0.html)
         type: string
+        x-nullable: false
+      skip_dbfp:
+        description: |-
+          Skip device-based fingerprint (DBFP) collection for this client.
+          If true, the interactive DBFP collection step is skipped during login, which lets
+          non-interactive clients (e.g. backend HTTP clients that cannot execute the collection
+          JavaScript) complete the authorization flow. Risk inference is unaffected.
+        type: boolean
         x-nullable: false
       software_statement:
         description: |-
@@ -21079,16 +21476,12 @@ definitions:
   VoiceAuth:
     properties:
       auth_token:
-        description: The Twilio Auth Token.
         type: string
         x-nullable: false
       sid:
-        description: The Twilio Account SID.
         type: string
         x-nullable: false
-    required:
-    - sid
-    - auth_token
+    title: 'Deprecated: legacy voice credentials, no longer used at runtime.'
     type: object
   VoiceSettings:
     properties:
@@ -21096,7 +21489,7 @@ definitions:
         description: |-
           Custom voice call From phone number.
 
-          If not set, the default is used.
+          Deprecated: not used at runtime; the sender ID is configured per-tenant.
         type: string
         x-nullable: false
       otp:
@@ -21104,7 +21497,6 @@ definitions:
       provider:
         description: Voice provider.
         enum:
-        - twilio
         - embedded
         example: embedded
         type: string
@@ -21615,6 +22007,12 @@ definitions:
       manage_apis:
         type: boolean
         x-nullable: false
+      manage_application_assignment:
+        type: boolean
+        x-nullable: false
+      manage_application_membership:
+        type: boolean
+        x-nullable: false
       manage_auditor_role:
         type: boolean
         x-nullable: false
@@ -21670,6 +22068,12 @@ definitions:
         type: boolean
         x-nullable: false
       read_apis:
+        type: boolean
+        x-nullable: false
+      read_application_assignment:
+        type: boolean
+        x-nullable: false
+      read_application_membership:
         type: boolean
         x-nullable: false
       read_audit_events:
@@ -24678,6 +25082,18 @@ paths:
         in: query
         name: parent_id
         type: string
+      - description: 'optional: scope to organizations within this workspace/org subtree
+          (all descendants, up to MaxOrganizationDepth levels)'
+        format: serverID
+        in: query
+        name: within_workspace_id
+        type: string
+      - description: 'optional: scope to organizations in the same top-level workspace
+          tree as this workspace/org'
+        format: serverID
+        in: query
+        name: in_tree_of_workspace_id
+        type: string
       - description: |-
           optional list organizations after given id
           AfterServerID
@@ -25009,8 +25425,6 @@ paths:
           $ref: '#/responses/unauthorizedHTTPError'
         "403":
           $ref: '#/responses/forbiddenHTTPError'
-        "404":
-          $ref: '#/responses/notFoundHTTPError'
         "429":
           $ref: '#/responses/tooManyRequestsHTTPError'
       security:
@@ -27225,6 +27639,8 @@ paths:
           $ref: '#/responses/forbiddenHTTPError'
         "404":
           $ref: '#/responses/notFoundHTTPError'
+        "422":
+          $ref: '#/responses/unprocessableEntityHTTPError'
         "429":
           $ref: '#/responses/tooManyRequestsHTTPError'
       security:
@@ -34312,6 +34728,8 @@ paths:
           $ref: '#/responses/unauthorizedHTTPError'
         "403":
           $ref: '#/responses/forbiddenHTTPError'
+        "409":
+          $ref: '#/responses/conflictHTTPError'
         "429":
           $ref: '#/responses/tooManyRequestsHTTPError'
       security:
@@ -37196,6 +37614,12 @@ paths:
         minimum: 1
         name: limit
         type: integer
+      - description: 'optional: scope to organizations in the same top-level workspace
+          tree as this workspace/org'
+        format: serverID
+        in: query
+        name: in_tree_of_workspace_id
+        type: string
       responses:
         "200":
           $ref: '#/responses/UserOrgs'

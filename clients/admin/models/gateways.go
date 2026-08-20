@@ -20,7 +20,7 @@ import (
 type Gateways struct {
 
 	// gateways
-	Gateways []*Gateway `json:"gateways" yaml:"gateways"`
+	Gateways []*GatewayWithCounts `json:"gateways" yaml:"gateways"`
 }
 
 // Validate validates this gateways

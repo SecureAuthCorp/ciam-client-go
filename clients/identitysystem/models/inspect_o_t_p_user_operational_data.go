@@ -25,6 +25,9 @@ type InspectOTPUserOperationalData struct {
 	// Enum: ["activation","reset_password","reset_totp","enroll_webauthn","challenge","verify_address","authentication","pair_device"]
 	CodeType string `json:"code_type" yaml:"code_type"`
 
+	// metadata associated with the code when it was generated
+	Metadata map[string]interface{} `json:"metadata,omitempty" yaml:"metadata,omitempty"`
+
 	// password set
 	// Required: true
 	PasswordSet bool `json:"password_set" yaml:"password_set"`

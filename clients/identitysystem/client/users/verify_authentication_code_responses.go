@@ -61,7 +61,7 @@ func NewVerifyAuthenticationCodeOK() *VerifyAuthenticationCodeOK {
 /*
 VerifyAuthenticationCodeOK describes a response with status code 200, with default header values.
 
-User
+OTP
 */
 type VerifyAuthenticationCodeOK struct {
 
@@ -85,7 +85,7 @@ type VerifyAuthenticationCodeOK struct {
 	*/
 	XTraceID string
 
-	Payload *models.UserID
+	Payload *models.VerifyCodeResult
 }
 
 // IsSuccess returns true when this verify authentication code o k response has a 2xx status code
@@ -128,7 +128,7 @@ func (o *VerifyAuthenticationCodeOK) String() string {
 	return fmt.Sprintf("[POST /system/pools/{ipID}/user/authentication-code/verify][%d] verifyAuthenticationCodeOK %s", 200, payload)
 }
 
-func (o *VerifyAuthenticationCodeOK) GetPayload() *models.UserID {
+func (o *VerifyAuthenticationCodeOK) GetPayload() *models.VerifyCodeResult {
 	return o.Payload
 }
 
@@ -155,7 +155,7 @@ func (o *VerifyAuthenticationCodeOK) readResponse(response runtime.ClientRespons
 		o.XTraceID = hdrXTraceID
 	}
 
-	o.Payload = new(models.UserID)
+	o.Payload = new(models.VerifyCodeResult)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

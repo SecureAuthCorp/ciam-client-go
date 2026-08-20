@@ -24,6 +24,11 @@ type TreeService struct {
 	// apis
 	Apis TreeAPIs `json:"apis,omitempty" yaml:"apis,omitempty"`
 
+	// Controls which audience is injected into access tokens for scopes mapped to this service
+	// Example: spiffe
+	// Enum: ["spiffe","custom","none"]
+	AudienceMode string `json:"audience_mode,omitempty" yaml:"audience_mode,omitempty"`
+
 	// Service capabilities
 	Capabilities []ServiceCapability `json:"capabilities" yaml:"capabilities"`
 
@@ -70,6 +75,10 @@ func (m *TreeService) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateAudienceMode(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateCapabilities(formats); err != nil {
 		res = append(res, err)
 	}
@@ -106,6 +115,51 @@ func (m *TreeService) validateApis(formats strfmt.Registry) error {
 			}
 			return err
 		}
+	}
+
+	return nil
+}
+
+var treeServiceTypeAudienceModePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["spiffe","custom","none"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		treeServiceTypeAudienceModePropEnum = append(treeServiceTypeAudienceModePropEnum, v)
+	}
+}
+
+const (
+
+	// TreeServiceAudienceModeSpiffe captures enum value "spiffe"
+	TreeServiceAudienceModeSpiffe string = "spiffe"
+
+	// TreeServiceAudienceModeCustom captures enum value "custom"
+	TreeServiceAudienceModeCustom string = "custom"
+
+	// TreeServiceAudienceModeNone captures enum value "none"
+	TreeServiceAudienceModeNone string = "none"
+)
+
+// prop value enum
+func (m *TreeService) validateAudienceModeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, treeServiceTypeAudienceModePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *TreeService) validateAudienceMode(formats strfmt.Registry) error {
+	if swag.IsZero(m.AudienceMode) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateAudienceModeEnum("audience_mode", "body", m.AudienceMode); err != nil {
+		return err
 	}
 
 	return nil

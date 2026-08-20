@@ -88,6 +88,9 @@ type WellKnown struct {
 	// values for. Note that for privacy or other reasons, this might not be an exhaustive list.
 	ClaimsSupported []string `json:"claims_supported" yaml:"claims_supported"`
 
+	// Boolean value indicating whether the authorization server accepts a client_id that is an https URL pointing at the client's own metadata document
+	ClientIDMetadataDocumentSupported bool `json:"client_id_metadata_document_supported,omitempty" yaml:"client_id_metadata_document_supported,omitempty"`
+
 	// List of supported Proof Key for Code Exchange (PKCE) code challenge methods
 	CodeChallengeMethodsSupported []string `json:"code_challenge_methods_supported" yaml:"code_challenge_methods_supported"`
 

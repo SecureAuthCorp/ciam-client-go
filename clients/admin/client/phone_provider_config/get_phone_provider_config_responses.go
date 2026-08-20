@@ -42,12 +42,6 @@ func (o *GetPhoneProviderConfigReader) ReadResponse(response runtime.ClientRespo
 			return nil, err
 		}
 		return nil, result
-	case 404:
-		result := NewGetPhoneProviderConfigNotFound()
-		if err := result.readResponse(response, consumer, o.formats); err != nil {
-			return nil, err
-		}
-		return nil, result
 	case 429:
 		result := NewGetPhoneProviderConfigTooManyRequests()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -300,76 +294,6 @@ func (o *GetPhoneProviderConfigForbidden) GetPayload() *models.Error {
 }
 
 func (o *GetPhoneProviderConfigForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
-	o.Payload = new(models.Error)
-
-	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
-		return err
-	}
-
-	return nil
-}
-
-// NewGetPhoneProviderConfigNotFound creates a GetPhoneProviderConfigNotFound with default headers values
-func NewGetPhoneProviderConfigNotFound() *GetPhoneProviderConfigNotFound {
-	return &GetPhoneProviderConfigNotFound{}
-}
-
-/*
-GetPhoneProviderConfigNotFound describes a response with status code 404, with default header values.
-
-Not found
-*/
-type GetPhoneProviderConfigNotFound struct {
-	Payload *models.Error
-}
-
-// IsSuccess returns true when this get phone provider config not found response has a 2xx status code
-func (o *GetPhoneProviderConfigNotFound) IsSuccess() bool {
-	return false
-}
-
-// IsRedirect returns true when this get phone provider config not found response has a 3xx status code
-func (o *GetPhoneProviderConfigNotFound) IsRedirect() bool {
-	return false
-}
-
-// IsClientError returns true when this get phone provider config not found response has a 4xx status code
-func (o *GetPhoneProviderConfigNotFound) IsClientError() bool {
-	return true
-}
-
-// IsServerError returns true when this get phone provider config not found response has a 5xx status code
-func (o *GetPhoneProviderConfigNotFound) IsServerError() bool {
-	return false
-}
-
-// IsCode returns true when this get phone provider config not found response a status code equal to that given
-func (o *GetPhoneProviderConfigNotFound) IsCode(code int) bool {
-	return code == 404
-}
-
-// Code gets the status code for the get phone provider config not found response
-func (o *GetPhoneProviderConfigNotFound) Code() int {
-	return 404
-}
-
-func (o *GetPhoneProviderConfigNotFound) Error() string {
-	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[GET /phone-provider-config][%d] getPhoneProviderConfigNotFound %s", 404, payload)
-}
-
-func (o *GetPhoneProviderConfigNotFound) String() string {
-	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[GET /phone-provider-config][%d] getPhoneProviderConfigNotFound %s", 404, payload)
-}
-
-func (o *GetPhoneProviderConfigNotFound) GetPayload() *models.Error {
-	return o.Payload
-}
-
-func (o *GetPhoneProviderConfigNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.Error)
 

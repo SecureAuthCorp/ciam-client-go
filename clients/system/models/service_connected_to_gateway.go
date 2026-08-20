@@ -27,6 +27,11 @@ type ServiceConnectedToGateway struct {
 	// api group metadata
 	APIGroupMetadata *APIGroupMetadata `json:"api_group_metadata,omitempty" yaml:"api_group_metadata,omitempty"`
 
+	// Controls which audience is injected into access tokens for scopes mapped to this service
+	// Example: spiffe
+	// Enum: ["spiffe","custom","none"]
+	AudienceMode string `json:"audience_mode,omitempty" yaml:"audience_mode,omitempty"`
+
 	// Authorization server identifier
 	// Example: my-server
 	AuthorizationServerID string `json:"authorization_server_id,omitempty" yaml:"authorization_server_id,omitempty"`
@@ -82,6 +87,10 @@ func (m *ServiceConnectedToGateway) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateAudienceMode(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateCapabilities(formats); err != nil {
 		res = append(res, err)
 	}
@@ -114,6 +123,51 @@ func (m *ServiceConnectedToGateway) validateAPIGroupMetadata(formats strfmt.Regi
 			}
 			return err
 		}
+	}
+
+	return nil
+}
+
+var serviceConnectedToGatewayTypeAudienceModePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["spiffe","custom","none"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		serviceConnectedToGatewayTypeAudienceModePropEnum = append(serviceConnectedToGatewayTypeAudienceModePropEnum, v)
+	}
+}
+
+const (
+
+	// ServiceConnectedToGatewayAudienceModeSpiffe captures enum value "spiffe"
+	ServiceConnectedToGatewayAudienceModeSpiffe string = "spiffe"
+
+	// ServiceConnectedToGatewayAudienceModeCustom captures enum value "custom"
+	ServiceConnectedToGatewayAudienceModeCustom string = "custom"
+
+	// ServiceConnectedToGatewayAudienceModeNone captures enum value "none"
+	ServiceConnectedToGatewayAudienceModeNone string = "none"
+)
+
+// prop value enum
+func (m *ServiceConnectedToGateway) validateAudienceModeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, serviceConnectedToGatewayTypeAudienceModePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *ServiceConnectedToGateway) validateAudienceMode(formats strfmt.Registry) error {
+	if swag.IsZero(m.AudienceMode) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateAudienceModeEnum("audience_mode", "body", m.AudienceMode); err != nil {
+		return err
 	}
 
 	return nil

@@ -54,6 +54,12 @@ func (o *CreateAPIKeyReader) ReadResponse(response runtime.ClientResponse, consu
 			return nil, err
 		}
 		return nil, result
+	case 422:
+		result := NewCreateAPIKeyUnprocessableEntity()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	case 429:
 		result := NewCreateAPIKeyTooManyRequests()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -446,6 +452,76 @@ func (o *CreateAPIKeyNotFound) GetPayload() *models.Error {
 }
 
 func (o *CreateAPIKeyNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	o.Payload = new(models.Error)
+
+	// response payload
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+		return err
+	}
+
+	return nil
+}
+
+// NewCreateAPIKeyUnprocessableEntity creates a CreateAPIKeyUnprocessableEntity with default headers values
+func NewCreateAPIKeyUnprocessableEntity() *CreateAPIKeyUnprocessableEntity {
+	return &CreateAPIKeyUnprocessableEntity{}
+}
+
+/*
+CreateAPIKeyUnprocessableEntity describes a response with status code 422, with default header values.
+
+Unprocessable entity
+*/
+type CreateAPIKeyUnprocessableEntity struct {
+	Payload *models.Error
+}
+
+// IsSuccess returns true when this create Api key unprocessable entity response has a 2xx status code
+func (o *CreateAPIKeyUnprocessableEntity) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this create Api key unprocessable entity response has a 3xx status code
+func (o *CreateAPIKeyUnprocessableEntity) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this create Api key unprocessable entity response has a 4xx status code
+func (o *CreateAPIKeyUnprocessableEntity) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this create Api key unprocessable entity response has a 5xx status code
+func (o *CreateAPIKeyUnprocessableEntity) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this create Api key unprocessable entity response a status code equal to that given
+func (o *CreateAPIKeyUnprocessableEntity) IsCode(code int) bool {
+	return code == 422
+}
+
+// Code gets the status code for the create Api key unprocessable entity response
+func (o *CreateAPIKeyUnprocessableEntity) Code() int {
+	return 422
+}
+
+func (o *CreateAPIKeyUnprocessableEntity) Error() string {
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /servers/{wid}/custom-apps/{customAppID}/api-keys][%d] createApiKeyUnprocessableEntity %s", 422, payload)
+}
+
+func (o *CreateAPIKeyUnprocessableEntity) String() string {
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /servers/{wid}/custom-apps/{customAppID}/api-keys][%d] createApiKeyUnprocessableEntity %s", 422, payload)
+}
+
+func (o *CreateAPIKeyUnprocessableEntity) GetPayload() *models.Error {
+	return o.Payload
+}
+
+func (o *CreateAPIKeyUnprocessableEntity) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.Error)
 

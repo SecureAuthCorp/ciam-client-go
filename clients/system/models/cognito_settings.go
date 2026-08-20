@@ -21,6 +21,15 @@ type CognitoSettings struct {
 	// Example: client
 	ClientID string `json:"client_id,omitempty" yaml:"client_id,omitempty"`
 
+	// Forward the original request's `id_token_hint` to the upstream IdP.
+	ForwardIDTokenHint bool `json:"forward_id_token_hint,omitempty" yaml:"forward_id_token_hint,omitempty"`
+
+	// Forward the original request's `max_age` to the upstream IdP.
+	ForwardMaxAge bool `json:"forward_max_age,omitempty" yaml:"forward_max_age,omitempty"`
+
+	// Forward the original request's `prompt` to the upstream IdP.
+	ForwardPrompt bool `json:"forward_prompt,omitempty" yaml:"forward_prompt,omitempty"`
+
 	// If enabled, additional user data is collected from the `userinfo` Cognito API
 	GetUserInfo bool `json:"get_user_info,omitempty" yaml:"get_user_info,omitempty"`
 

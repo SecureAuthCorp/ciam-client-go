@@ -61,7 +61,7 @@ func NewVerifyOTPOK() *VerifyOTPOK {
 /*
 VerifyOTPOK describes a response with status code 200, with default header values.
 
-User
+OTP
 */
 type VerifyOTPOK struct {
 
@@ -85,7 +85,7 @@ type VerifyOTPOK struct {
 	*/
 	XTraceID string
 
-	Payload *models.UserID
+	Payload *models.VerifyCodeResult
 }
 
 // IsSuccess returns true when this verify o t p o k response has a 2xx status code
@@ -128,7 +128,7 @@ func (o *VerifyOTPOK) String() string {
 	return fmt.Sprintf("[POST /system/pools/{ipID}/user/otp/verify][%d] verifyOTPOK %s", 200, payload)
 }
 
-func (o *VerifyOTPOK) GetPayload() *models.UserID {
+func (o *VerifyOTPOK) GetPayload() *models.VerifyCodeResult {
 	return o.Payload
 }
 
@@ -155,7 +155,7 @@ func (o *VerifyOTPOK) readResponse(response runtime.ClientResponse, consumer run
 		o.XTraceID = hdrXTraceID
 	}
 
-	o.Payload = new(models.UserID)
+	o.Payload = new(models.VerifyCodeResult)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
