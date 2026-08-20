@@ -34,6 +34,12 @@ type SMSSettings struct {
 	Otp *OTPConfiguration `json:"otp,omitempty" yaml:"otp,omitempty"`
 
 	// SMS provider.
+	//
+	// Deprecated: kept for existing legacy configuration only; it no longer selects a
+	// messaging provider. SMS delivery routes through the tenant's phone provider
+	// configuration (phone_provider_config), which is where any new setup belongs.
+	// "embedded" is the only value still accepted here; the retired "twilio" value is
+	// tolerated on write so existing configuration keeps round-tripping.
 	// Example: embedded
 	// Enum: ["embedded"]
 	Provider string `json:"provider,omitempty" yaml:"provider,omitempty"`

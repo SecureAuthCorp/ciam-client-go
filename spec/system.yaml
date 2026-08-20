@@ -14087,6 +14087,10 @@ definitions:
         x-nullable: false
     type: object
   SMSAuth:
+    description: |-
+      Deprecated: kept for existing legacy configuration only and not used at runtime. Any new
+      setup, including Twilio, belongs in the tenant's phone provider configuration
+      (phone_provider_config).
     properties:
       auth_token:
         type: string
@@ -14094,7 +14098,7 @@ definitions:
       sid:
         type: string
         x-nullable: false
-    title: 'Deprecated: legacy SMS credentials, no longer used at runtime.'
+    title: Legacy Twilio SMS credentials.
     type: object
   SMSSettings:
     properties:
@@ -14115,7 +14119,14 @@ definitions:
       otp:
         $ref: '#/definitions/OTPConfiguration'
       provider:
-        description: SMS provider.
+        description: |-
+          SMS provider.
+
+          Deprecated: kept for existing legacy configuration only; it no longer selects a
+          messaging provider. SMS delivery routes through the tenant's phone provider
+          configuration (phone_provider_config), which is where any new setup belongs.
+          "embedded" is the only value still accepted here; the retired "twilio" value is
+          tolerated on write so existing configuration keeps round-tripping.
         enum:
         - embedded
         example: embedded
@@ -18839,6 +18850,10 @@ definitions:
         $ref: '#/definitions/RequestedVerifiedClaims'
     type: object
   VoiceAuth:
+    description: |-
+      Deprecated: kept for existing legacy configuration only and not used at runtime. Any new
+      setup, including Twilio, belongs in the tenant's phone provider configuration
+      (phone_provider_config).
     properties:
       auth_token:
         type: string
@@ -18846,7 +18861,7 @@ definitions:
       sid:
         type: string
         x-nullable: false
-    title: 'Deprecated: legacy voice credentials, no longer used at runtime.'
+    title: Legacy Twilio voice credentials.
     type: object
   VoiceSettings:
     properties:
@@ -18860,7 +18875,14 @@ definitions:
       otp:
         $ref: '#/definitions/OTPConfiguration'
       provider:
-        description: Voice provider.
+        description: |-
+          Voice provider.
+
+          Deprecated: kept for existing legacy configuration only; it no longer selects a
+          messaging provider. Voice delivery routes through the tenant's phone provider
+          configuration (phone_provider_config), which is where any new setup belongs.
+          "embedded" is the only value still accepted here; the retired "twilio" value is
+          tolerated on write so existing configuration keeps round-tripping.
         enum:
         - embedded
         example: embedded

@@ -12,7 +12,11 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// VoiceAuth Deprecated: legacy voice credentials, no longer used at runtime.
+// VoiceAuth Legacy Twilio voice credentials.
+//
+// Deprecated: kept for existing legacy configuration only and not used at runtime. Any new
+// setup, including Twilio, belongs in the tenant's phone provider configuration
+// (phone_provider_config).
 //
 // swagger:model VoiceAuth
 type VoiceAuth struct {

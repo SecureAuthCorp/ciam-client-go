@@ -12,7 +12,11 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// SMSAuth Deprecated: legacy SMS credentials, no longer used at runtime.
+// SMSAuth Legacy Twilio SMS credentials.
+//
+// Deprecated: kept for existing legacy configuration only and not used at runtime. Any new
+// setup, including Twilio, belongs in the tenant's phone provider configuration
+// (phone_provider_config).
 //
 // swagger:model SMSAuth
 type SMSAuth struct {
