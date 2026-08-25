@@ -21,6 +21,11 @@ import (
 // swagger:model ServiceAuditPayload
 type ServiceAuditPayload struct {
 
+	// Controls which audience is injected into access tokens for scopes mapped to this service
+	// Example: spiffe
+	// Enum: ["spiffe","custom","none"]
+	AudienceMode string `json:"audience_mode,omitempty" yaml:"audience_mode,omitempty"`
+
 	// Service capabilities
 	Capabilities []ServiceCapability `json:"capabilities" yaml:"capabilities"`
 
@@ -64,6 +69,10 @@ type ServiceAuditPayload struct {
 func (m *ServiceAuditPayload) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateAudienceMode(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateCapabilities(formats); err != nil {
 		res = append(res, err)
 	}
@@ -79,6 +88,51 @@ func (m *ServiceAuditPayload) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+var serviceAuditPayloadTypeAudienceModePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["spiffe","custom","none"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		serviceAuditPayloadTypeAudienceModePropEnum = append(serviceAuditPayloadTypeAudienceModePropEnum, v)
+	}
+}
+
+const (
+
+	// ServiceAuditPayloadAudienceModeSpiffe captures enum value "spiffe"
+	ServiceAuditPayloadAudienceModeSpiffe string = "spiffe"
+
+	// ServiceAuditPayloadAudienceModeCustom captures enum value "custom"
+	ServiceAuditPayloadAudienceModeCustom string = "custom"
+
+	// ServiceAuditPayloadAudienceModeNone captures enum value "none"
+	ServiceAuditPayloadAudienceModeNone string = "none"
+)
+
+// prop value enum
+func (m *ServiceAuditPayload) validateAudienceModeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, serviceAuditPayloadTypeAudienceModePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *ServiceAuditPayload) validateAudienceMode(formats strfmt.Registry) error {
+	if swag.IsZero(m.AudienceMode) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateAudienceModeEnum("audience_mode", "body", m.AudienceMode); err != nil {
+		return err
+	}
+
 	return nil
 }
 

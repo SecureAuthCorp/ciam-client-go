@@ -7,6 +7,7 @@ package models
 
 import (
 	"context"
+	"encoding/json"
 	"strconv"
 
 	"github.com/go-openapi/errors"
@@ -17,7 +18,8 @@ import (
 
 // PhoneProviderConfig PhoneProviderConfig represents a tenant's phone provider configuration.
 //
-// Providers is an ordered list — position in the array determines fallback priority.
+// Providers is consulted only when Mode is custom. Active is derived from
+// Mode (true when Mode is non-empty) and kept for back-compat reads.
 //
 // swagger:model PhoneProviderConfig
 type PhoneProviderConfig struct {
@@ -25,10 +27,13 @@ type PhoneProviderConfig struct {
 	// active
 	Active bool `json:"active,omitempty" yaml:"active,omitempty"`
 
-	// providers
+	// mode
 	// Required: true
+	// Enum: ["built_in","custom"]
+	Mode string `json:"mode" yaml:"mode"`
+
+	// providers
 	// Max Items: 5
-	// Min Items: 1
 	Providers []*PhoneProvider `json:"providers" yaml:"providers"`
 
 	// tenant id
@@ -38,6 +43,10 @@ type PhoneProviderConfig struct {
 // Validate validates this phone provider config
 func (m *PhoneProviderConfig) Validate(formats strfmt.Registry) error {
 	var res []error
+
+	if err := m.validateMode(formats); err != nil {
+		res = append(res, err)
+	}
 
 	if err := m.validateProviders(formats); err != nil {
 		res = append(res, err)
@@ -49,17 +58,55 @@ func (m *PhoneProviderConfig) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *PhoneProviderConfig) validateProviders(formats strfmt.Registry) error {
+var phoneProviderConfigTypeModePropEnum []interface{}
 
-	if err := validate.Required("providers", "body", m.Providers); err != nil {
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["built_in","custom"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		phoneProviderConfigTypeModePropEnum = append(phoneProviderConfigTypeModePropEnum, v)
+	}
+}
+
+const (
+
+	// PhoneProviderConfigModeBuiltIn captures enum value "built_in"
+	PhoneProviderConfigModeBuiltIn string = "built_in"
+
+	// PhoneProviderConfigModeCustom captures enum value "custom"
+	PhoneProviderConfigModeCustom string = "custom"
+)
+
+// prop value enum
+func (m *PhoneProviderConfig) validateModeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, phoneProviderConfigTypeModePropEnum, true); err != nil {
 		return err
+	}
+	return nil
+}
+
+func (m *PhoneProviderConfig) validateMode(formats strfmt.Registry) error {
+
+	if err := validate.RequiredString("mode", "body", m.Mode); err != nil {
+		return err
+	}
+
+	// value enum
+	if err := m.validateModeEnum("mode", "body", m.Mode); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *PhoneProviderConfig) validateProviders(formats strfmt.Registry) error {
+	if swag.IsZero(m.Providers) { // not required
+		return nil
 	}
 
 	iProvidersSize := int64(len(m.Providers))
-
-	if err := validate.MinItems("providers", "body", iProvidersSize, 1); err != nil {
-		return err
-	}
 
 	if err := validate.MaxItems("providers", "body", iProvidersSize, 5); err != nil {
 		return err

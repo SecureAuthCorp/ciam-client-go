@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// SecureOptions nolint
+// SecureOptions secure options
 //
 // swagger:model SecureOptions
 type SecureOptions struct {

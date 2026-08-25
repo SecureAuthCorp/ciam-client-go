@@ -25,8 +25,8 @@ type TestMFAMethodRequest struct {
 
 	// ProviderIndex, when set, forces the test to route through the
 	// provider at this position in the tenant's phone provider config
-	// (0 = primary, 1+ = fallback). Only valid when the tenant has the
-	// advanced_phone feature enabled and at least one configured provider.
+	// (0 = primary, 1+ = fallback). Requires the tenant to have an
+	// active phone provider config with at least one configured provider.
 	// When omitted, the default routing chain is used.
 	// Minimum: 0
 	ProviderIndex int64 `json:"provider_index,omitempty" yaml:"provider_index,omitempty"`

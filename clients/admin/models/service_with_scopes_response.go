@@ -24,6 +24,11 @@ type ServiceWithScopesResponse struct {
 	// audience
 	Audience string `json:"audience,omitempty" yaml:"audience,omitempty"`
 
+	// Controls which audience is injected into access tokens for scopes mapped to this service
+	// Example: spiffe
+	// Enum: ["spiffe","custom","none"]
+	AudienceMode string `json:"audience_mode,omitempty" yaml:"audience_mode,omitempty"`
+
 	// Authorization server identifier
 	// Example: my-server
 	AuthorizationServerID string `json:"authorization_server_id,omitempty" yaml:"authorization_server_id,omitempty"`
@@ -78,6 +83,10 @@ type ServiceWithScopesResponse struct {
 func (m *ServiceWithScopesResponse) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateAudienceMode(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateCapabilities(formats); err != nil {
 		res = append(res, err)
 	}
@@ -97,6 +106,51 @@ func (m *ServiceWithScopesResponse) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+var serviceWithScopesResponseTypeAudienceModePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["spiffe","custom","none"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		serviceWithScopesResponseTypeAudienceModePropEnum = append(serviceWithScopesResponseTypeAudienceModePropEnum, v)
+	}
+}
+
+const (
+
+	// ServiceWithScopesResponseAudienceModeSpiffe captures enum value "spiffe"
+	ServiceWithScopesResponseAudienceModeSpiffe string = "spiffe"
+
+	// ServiceWithScopesResponseAudienceModeCustom captures enum value "custom"
+	ServiceWithScopesResponseAudienceModeCustom string = "custom"
+
+	// ServiceWithScopesResponseAudienceModeNone captures enum value "none"
+	ServiceWithScopesResponseAudienceModeNone string = "none"
+)
+
+// prop value enum
+func (m *ServiceWithScopesResponse) validateAudienceModeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, serviceWithScopesResponseTypeAudienceModePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *ServiceWithScopesResponse) validateAudienceMode(formats strfmt.Registry) error {
+	if swag.IsZero(m.AudienceMode) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateAudienceModeEnum("audience_mode", "body", m.AudienceMode); err != nil {
+		return err
+	}
+
 	return nil
 }
 

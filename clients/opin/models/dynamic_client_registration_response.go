@@ -172,6 +172,11 @@ type DynamicClientRegistrationResponse struct {
 	// dynamically registered
 	DynamicallyRegistered bool `json:"dynamically_registered,omitempty" yaml:"dynamically_registered,omitempty"`
 
+	// Enforce application membership for this application. When true, a user token is issued only if the
+	// user has membership/access to this application in the resolved organization. Defaults to false and,
+	// on creation, to the workspace-level default. Only meaningful while the applications_membership feature is enabled.
+	EnforceApplicationMembership bool `json:"enforce_application_membership,omitempty" yaml:"enforce_application_membership,omitempty"`
+
 	// An array of allowed OAuth client grant types.
 	//
 	// The `grantTypes` array stores OAuth flows that are allowed for a given client application.
@@ -314,6 +319,12 @@ type DynamicClientRegistrationResponse struct {
 	//
 	// [Read more](https://openid.net/specs/openid-connect-core-1_0.html)
 	SectorIdentifierURI string `json:"sector_identifier_uri,omitempty" yaml:"sector_identifier_uri,omitempty"`
+
+	// Skip device-based fingerprint (DBFP) collection for this client.
+	// If true, the interactive DBFP collection step is skipped during login, which lets
+	// non-interactive clients (e.g. backend HTTP clients that cannot execute the collection
+	// JavaScript) complete the authorization flow. Risk inference is unaffected.
+	SkipDbfp bool `json:"skip_dbfp,omitempty" yaml:"skip_dbfp,omitempty"`
 
 	// A unique identifier string (e.g., a Universally Unique Identifier
 	// (UUID)) assigned by the client developer or software publisher.

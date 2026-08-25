@@ -28,6 +28,15 @@ type GoogleWorkspaceSettings struct {
 	// Fetch user groups
 	FetchGroups bool `json:"fetch_groups,omitempty" yaml:"fetch_groups,omitempty"`
 
+	// Forward the original request's `id_token_hint` to the upstream IdP.
+	ForwardIDTokenHint bool `json:"forward_id_token_hint,omitempty" yaml:"forward_id_token_hint,omitempty"`
+
+	// Forward the original request's `max_age` to the upstream IdP.
+	ForwardMaxAge bool `json:"forward_max_age,omitempty" yaml:"forward_max_age,omitempty"`
+
+	// Forward the original request's `prompt` to the upstream IdP.
+	ForwardPrompt bool `json:"forward_prompt,omitempty" yaml:"forward_prompt,omitempty"`
+
 	// List of domains permitted for user authentication
 	HostedDomains []string `json:"hosted_domains" yaml:"hosted_domains"`
 

@@ -40,6 +40,15 @@ type OktaV2Settings struct {
 	// Example: dev-316761.okta.com
 	Domain string `json:"domain,omitempty" yaml:"domain,omitempty"`
 
+	// Forward the original request's `id_token_hint` to the upstream IdP.
+	ForwardIDTokenHint bool `json:"forward_id_token_hint,omitempty" yaml:"forward_id_token_hint,omitempty"`
+
+	// Forward the original request's `max_age` to the upstream IdP.
+	ForwardMaxAge bool `json:"forward_max_age,omitempty" yaml:"forward_max_age,omitempty"`
+
+	// Forward the original request's `prompt` to the upstream IdP.
+	ForwardPrompt bool `json:"forward_prompt,omitempty" yaml:"forward_prompt,omitempty"`
+
 	// If enabled, users' data is collected by calling the `userinfo` endpoint.
 	GetUserInfo bool `json:"get_user_info,omitempty" yaml:"get_user_info,omitempty"`
 

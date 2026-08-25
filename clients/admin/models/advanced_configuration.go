@@ -24,6 +24,10 @@ type AdvancedConfiguration struct {
 	// This option overrides all urls advertised by the well known endpoint with their mtls alias
 	AdvertiseOnlyMtlsAliasesInWellKnown bool `json:"advertise_only_mtls_aliases_in_well_known,omitempty" yaml:"advertise_only_mtls_aliases_in_well_known,omitempty"`
 
+	// Allow the user to select one of their organizations after authentication (application-membership
+	// org-selector login step). Disabled by default.
+	AllowOrganizationSelection bool `json:"allow_organization_selection,omitempty" yaml:"allow_organization_selection,omitempty"`
+
 	// auto request recovery
 	AutoRequestRecovery bool `json:"auto_request_recovery,omitempty" yaml:"auto_request_recovery,omitempty"`
 
@@ -32,6 +36,12 @@ type AdvancedConfiguration struct {
 
 	// cookies configuration
 	CookiesConfiguration *CookiesConfiguration `json:"cookies_configuration,omitempty" yaml:"cookies_configuration,omitempty"`
+
+	// Allow cross-organization application membership across this workspace's org tree — granting a
+	// user whose identity pool lives in one org access to an application in another org of the same
+	// tree, and honoring such grants at token time. Disabled by default. Set on the tree-root
+	// workspace; governs the whole tree. Role assignment is unaffected (that stays flag-gated).
+	CrossOrganizationApplicationMembership bool `json:"cross_organization_application_membership,omitempty" yaml:"cross_organization_application_membership,omitempty"`
 
 	// Disable certificate-bound access tokens for new DCR clients
 	//
@@ -64,6 +74,11 @@ type AdvancedConfiguration struct {
 
 	// Enforce acr values
 	EnforceAcrValues bool `json:"enforce_acr_values,omitempty" yaml:"enforce_acr_values,omitempty"`
+
+	// Default value stamped onto the enforce_application_membership toggle of applications created in
+	// this workspace. Applied at creation only — changing it later does not affect existing applications.
+	// Disabled by default. Only meaningful while the applications_membership feature is enabled.
+	EnforceApplicationMembershipDefault bool `json:"enforce_application_membership_default,omitempty" yaml:"enforce_application_membership_default,omitempty"`
 
 	// Ignore unknown scopes for DCR
 	//

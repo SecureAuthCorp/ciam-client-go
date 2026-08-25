@@ -6315,6 +6315,13 @@ definitions:
           If true, the authorization server will reject token requests from this client that do not contain the DPoP header.
         type: boolean
         x-nullable: false
+      enforce_application_membership:
+        description: |-
+          Enforce application membership for this application. When true, a user token is issued only if the
+          user has membership/access to this application in the resolved organization. Defaults to false and,
+          on creation, to the workspace-level default. Only meaningful while the applications_membership feature is enabled.
+        type: boolean
+        x-nullable: false
       exp:
         description: |-
           The time at which the request expires expressed as seconds since
@@ -6557,6 +6564,14 @@ definitions:
 
           [Read more](https://openid.net/specs/openid-connect-core-1_0.html)
         type: string
+        x-nullable: false
+      skip_dbfp:
+        description: |-
+          Skip device-based fingerprint (DBFP) collection for this client.
+          If true, the interactive DBFP collection step is skipped during login, which lets
+          non-interactive clients (e.g. backend HTTP clients that cannot execute the collection
+          JavaScript) complete the authorization flow. Risk inference is unaffected.
+        type: boolean
         x-nullable: false
       software_id:
         description: |-
@@ -6955,6 +6970,13 @@ definitions:
       dynamically_registered:
         type: boolean
         x-nullable: false
+      enforce_application_membership:
+        description: |-
+          Enforce application membership for this application. When true, a user token is issued only if the
+          user has membership/access to this application in the resolved organization. Defaults to false and,
+          on creation, to the workspace-level default. Only meaningful while the applications_membership feature is enabled.
+        type: boolean
+        x-nullable: false
       grant_types:
         default:
         - authorization_code
@@ -7168,6 +7190,14 @@ definitions:
 
           [Read more](https://openid.net/specs/openid-connect-core-1_0.html)
         type: string
+        x-nullable: false
+      skip_dbfp:
+        description: |-
+          Skip device-based fingerprint (DBFP) collection for this client.
+          If true, the interactive DBFP collection step is skipped during login, which lets
+          non-interactive clients (e.g. backend HTTP clients that cannot execute the collection
+          JavaScript) complete the authorization flow. Risk inference is unaffected.
+        type: boolean
         x-nullable: false
       software_id:
         description: |-
@@ -7529,6 +7559,16 @@ definitions:
     type: string
   Service:
     properties:
+      audience_mode:
+        description: Controls which audience is injected into access tokens for scopes
+          mapped to this service
+        enum:
+        - spiffe
+        - custom
+        - none
+        example: spiffe
+        type: string
+        x-nullable: false
       authorization_server_id:
         description: Authorization server identifier
         example: my-server

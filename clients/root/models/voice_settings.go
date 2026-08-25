@@ -22,15 +22,21 @@ type VoiceSettings struct {
 
 	// Custom voice call From phone number.
 	//
-	// If not set, the default is used.
+	// Deprecated: not used at runtime; the sender ID is configured per-tenant.
 	CustomSource string `json:"custom_source,omitempty" yaml:"custom_source,omitempty"`
 
 	// otp
 	Otp *OTPConfiguration `json:"otp,omitempty" yaml:"otp,omitempty"`
 
 	// Voice provider.
+	//
+	// Deprecated: kept for existing legacy configuration only; it no longer selects a
+	// messaging provider. Voice delivery routes through the tenant's phone provider
+	// configuration (phone_provider_config), which is where any new setup belongs.
+	// "embedded" is the only value still accepted here; the retired "twilio" value is
+	// tolerated on write so existing configuration keeps round-tripping.
 	// Example: embedded
-	// Enum: ["twilio","embedded"]
+	// Enum: ["embedded"]
 	Provider string `json:"provider,omitempty" yaml:"provider,omitempty"`
 }
 
@@ -75,7 +81,7 @@ var voiceSettingsTypeProviderPropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["twilio","embedded"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["embedded"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -84,9 +90,6 @@ func init() {
 }
 
 const (
-
-	// VoiceSettingsProviderTwilio captures enum value "twilio"
-	VoiceSettingsProviderTwilio string = "twilio"
 
 	// VoiceSettingsProviderEmbedded captures enum value "embedded"
 	VoiceSettingsProviderEmbedded string = "embedded"

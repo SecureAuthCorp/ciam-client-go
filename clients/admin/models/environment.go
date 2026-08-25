@@ -26,6 +26,9 @@ type Environment struct {
 	// reject bot user agents in activation handler
 	ActivationBotProtection bool `json:"activation_bot_protection,omitempty" yaml:"activation_bot_protection,omitempty"`
 
+	// require a captcha on the activation link before the activation code is consumed; supersedes two_step_activation and activation_bot_protection
+	ActivationCaptcha bool `json:"activation_captcha,omitempty" yaml:"activation_captcha,omitempty"`
+
 	// Active Directory IDP
 	ActiveDirectoryIdp bool `json:"active_directory_idp,omitempty" yaml:"active_directory_idp,omitempty"`
 
@@ -37,9 +40,6 @@ type Environment struct {
 
 	// admin workspace access
 	AdminWorkspaceAccess bool `json:"admin_workspace_access,omitempty" yaml:"admin_workspace_access,omitempty"`
-
-	// allow tenants to configure custom phone providers
-	AdvancedPhone bool `json:"advanced_phone,omitempty" yaml:"advanced_phone,omitempty"`
 
 	// show full system nav in agentic AI workspaces (default off - system nav is hidden)
 	AgenticAiSystemNav bool `json:"agentic_ai_system_nav,omitempty" yaml:"agentic_ai_system_nav,omitempty"`
@@ -60,8 +60,8 @@ type Environment struct {
 	// Format: duration
 	AnalyticsDuration strfmt.Duration `json:"analytics_duration,omitempty" yaml:"analytics_duration,omitempty"`
 
-	// application launch dashboard
-	ApplicationLaunchDashboard bool `json:"application_launch_dashboard,omitempty" yaml:"application_launch_dashboard,omitempty"`
+	// applications membership — assignment of applications to organizations / users / groups (in development)
+	ApplicationsMembership bool `json:"applications_membership,omitempty" yaml:"applications_membership,omitempty"`
 
 	// audit events duration
 	// Format: duration
@@ -76,7 +76,7 @@ type Environment struct {
 	// brute force limits
 	BruteForceLimits *DefaultBruteForceLimits `json:"brute_force_limits,omitempty" yaml:"brute_force_limits,omitempty"`
 
-	// send SMS using built-in advanced phone providers
+	// route SMS and voice sends through the platform-default phone provider chain
 	BuiltInAdvancedPhoneProviders bool `json:"built_in_advanced_phone_providers,omitempty" yaml:"built_in_advanced_phone_providers,omitempty"`
 
 	// cache access tokens
@@ -87,6 +87,9 @@ type Environment struct {
 
 	// disable unique software id for CDR
 	CdrDisableUniqueSoftwareID bool `json:"cdr_disable_unique_software_id,omitempty" yaml:"cdr_disable_unique_software_id,omitempty"`
+
+	// client ID metadata documents — accept an https client_id resolved by fetching the client's own metadata document (draft-ietf-oauth-client-id-metadata-document)
+	ClientIDMetadataDocument bool `json:"client_id_metadata_document,omitempty" yaml:"client_id_metadata_document,omitempty"`
 
 	// stores client secrets as one-way hashes
 	ClientSecretsStoredAsOneWayHash bool `json:"client_secrets_stored_as_one_way_hash,omitempty" yaml:"client_secrets_stored_as_one_way_hash,omitempty"`
@@ -121,12 +124,6 @@ type Environment struct {
 	// disable audit events
 	DisableAuditEvents bool `json:"disable_audit_events,omitempty" yaml:"disable_audit_events,omitempty"`
 
-	// disable embedded sms provider
-	DisableEmbeddedSmsProvider bool `json:"disable_embedded_sms_provider,omitempty" yaml:"disable_embedded_sms_provider,omitempty"`
-
-	// disable embedded voice provider
-	DisableEmbeddedVoiceProvider bool `json:"disable_embedded_voice_provider,omitempty" yaml:"disable_embedded_voice_provider,omitempty"`
-
 	// disable Identity Pool Self User APIs without scopes
 	DisableIdentityPoolSelfUserApisWithoutScopes bool `json:"disable_identity_pool_self_user_apis_without_scopes,omitempty" yaml:"disable_identity_pool_self_user_apis_without_scopes,omitempty"`
 
@@ -148,6 +145,9 @@ type Environment struct {
 	// drop tokens on password reset
 	DropTokensOnPasswordReset bool `json:"drop_tokens_on_password_reset,omitempty" yaml:"drop_tokens_on_password_reset,omitempty"`
 
+	// embeddable web components bundle served at /embed/v1
+	EmbeddableComponents bool `json:"embeddable_components,omitempty" yaml:"embeddable_components,omitempty"`
+
 	// embedded idps enabled
 	EmbeddedIdpsEnabled bool `json:"embedded_idps_enabled,omitempty" yaml:"embedded_idps_enabled,omitempty"`
 
@@ -166,11 +166,17 @@ type Environment struct {
 	// allow user tracking with hotjar, userpilot and other tracking tools
 	HotjarTracking bool `json:"hotjar_tracking,omitempty" yaml:"hotjar_tracking,omitempty"`
 
+	// ID-JAG — issue and redeem Identity Assertion JWT Authorization Grants for cross-app access (draft-ietf-oauth-identity-assertion-authz-grant)
+	IDJag bool `json:"id_jag,omitempty" yaml:"id_jag,omitempty"`
+
 	// identity assurance
 	IdentityAssurance bool `json:"identity_assurance,omitempty" yaml:"identity_assurance,omitempty"`
 
 	// image proxy url
 	ImageProxyURL string `json:"image_proxy_url,omitempty" yaml:"image_proxy_url,omitempty"`
+
+	// disables SSRF protection for webhook delivery
+	InsecureAllowInternalWebhookTargets bool `json:"insecure_allow_internal_webhook_targets,omitempty" yaml:"insecure_allow_internal_webhook_targets,omitempty"`
 
 	// disable csrf
 	InsecureDisableCsrf bool `json:"insecure_disable_csrf,omitempty" yaml:"insecure_disable_csrf,omitempty"`
@@ -187,7 +193,7 @@ type Environment struct {
 	// publish events to NATS
 	Nats bool `json:"nats,omitempty" yaml:"nats,omitempty"`
 
-	// drop outbound message events at publish time so no email/SMS/voice is dispatched; intended for perf-test tenants
+	// drop outbound message events at publish time so no email/SMS/voice is dispatched; intended for perf-test tenants; admin workspace is excluded
 	NoopMessageSending bool `json:"noop_message_sending,omitempty" yaml:"noop_message_sending,omitempty"`
 
 	// openbanking brasil
@@ -262,9 +268,6 @@ type Environment struct {
 	// Two-step activation flow to prevent email scanner auto-activation
 	TwoStepActivation bool `json:"two_step_activation,omitempty" yaml:"two_step_activation,omitempty"`
 
-	// Use new DN format
-	UseNewDnFormat bool `json:"use_new_dn_format,omitempty" yaml:"use_new_dn_format,omitempty"`
-
 	// User cross-organization role assignment
 	UserCrossOrganizationRoleAssignment bool `json:"user_cross_organization_role_assignment,omitempty" yaml:"user_cross_organization_role_assignment,omitempty"`
 
@@ -273,9 +276,6 @@ type Environment struct {
 
 	// version
 	Version string `json:"version,omitempty" yaml:"version,omitempty"`
-
-	// enable voice OTP authn method
-	VoiceOtp bool `json:"voice_otp,omitempty" yaml:"voice_otp,omitempty"`
 
 	// require that the wildcard tenant id matches the path param tenant id
 	WildcardTenantIDMustMatchPathTenantID bool `json:"wildcard_tenant_id_must_match_path_tenant_id,omitempty" yaml:"wildcard_tenant_id_must_match_path_tenant_id,omitempty"`

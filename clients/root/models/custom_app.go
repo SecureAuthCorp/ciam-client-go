@@ -28,7 +28,7 @@ type CustomApp struct {
 	ID string `json:"id" yaml:"id"`
 
 	// IdentityPoolID associated with the CustomApp.
-	// Required for type 'scim'. Not allowed for type 'post-authn'.
+	// Required for type 'scim'. Not allowed for types 'post-authn' and 'radius'.
 	IdentityPoolID string `json:"identity_pool_id,omitempty" yaml:"identity_pool_id,omitempty"`
 
 	// Name of the CustomApp
@@ -45,11 +45,11 @@ type CustomApp struct {
 
 	// Type of the custom app
 	// Example: post-authn
-	// Enum: ["post-authn","scim"]
+	// Enum: ["post-authn","scim","radius"]
 	Type string `json:"type,omitempty" yaml:"type,omitempty"`
 
 	// URL of the CustomApp.
-	// Required for type 'post-authn'. Not allowed for type 'scim'.
+	// Required for type 'post-authn'. Not allowed for types 'scim' and 'radius'.
 	URL string `json:"url,omitempty" yaml:"url,omitempty"`
 }
 
@@ -110,7 +110,7 @@ var customAppTypeTypePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["post-authn","scim"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["post-authn","scim","radius"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -125,6 +125,9 @@ const (
 
 	// CustomAppTypeScim captures enum value "scim"
 	CustomAppTypeScim string = "scim"
+
+	// CustomAppTypeRadius captures enum value "radius"
+	CustomAppTypeRadius string = "radius"
 )
 
 // prop value enum

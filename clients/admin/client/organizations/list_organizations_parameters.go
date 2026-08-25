@@ -84,6 +84,14 @@ type ListOrganizationsParams struct {
 	*/
 	IfMatch *string
 
+	/* InTreeOfWorkspaceID.
+
+	   optional: scope to organizations in the same top-level workspace tree as this workspace/org
+
+	   Format: serverID
+	*/
+	InTreeOfWorkspaceID *string
+
 	/* Limit.
 
 	     optional limit results
@@ -134,6 +142,14 @@ type ListOrganizationsParams struct {
 	   Count child organizations for each organization
 	*/
 	WithChildCount *bool
+
+	/* WithinWorkspaceID.
+
+	   optional: scope to organizations within this workspace/org subtree (all descendants, up to MaxOrganizationDepth levels)
+
+	   Format: serverID
+	*/
+	WithinWorkspaceID *string
 
 	/* XCorrelationID.
 
@@ -244,6 +260,17 @@ func (o *ListOrganizationsParams) SetIfMatch(ifMatch *string) {
 	o.IfMatch = ifMatch
 }
 
+// WithInTreeOfWorkspaceID adds the inTreeOfWorkspaceID to the list organizations params
+func (o *ListOrganizationsParams) WithInTreeOfWorkspaceID(inTreeOfWorkspaceID *string) *ListOrganizationsParams {
+	o.SetInTreeOfWorkspaceID(inTreeOfWorkspaceID)
+	return o
+}
+
+// SetInTreeOfWorkspaceID adds the inTreeOfWorkspaceId to the list organizations params
+func (o *ListOrganizationsParams) SetInTreeOfWorkspaceID(inTreeOfWorkspaceID *string) {
+	o.InTreeOfWorkspaceID = inTreeOfWorkspaceID
+}
+
 // WithLimit adds the limit to the list organizations params
 func (o *ListOrganizationsParams) WithLimit(limit *int64) *ListOrganizationsParams {
 	o.SetLimit(limit)
@@ -321,6 +348,17 @@ func (o *ListOrganizationsParams) SetWithChildCount(withChildCount *bool) {
 	o.WithChildCount = withChildCount
 }
 
+// WithWithinWorkspaceID adds the withinWorkspaceID to the list organizations params
+func (o *ListOrganizationsParams) WithWithinWorkspaceID(withinWorkspaceID *string) *ListOrganizationsParams {
+	o.SetWithinWorkspaceID(withinWorkspaceID)
+	return o
+}
+
+// SetWithinWorkspaceID adds the withinWorkspaceId to the list organizations params
+func (o *ListOrganizationsParams) SetWithinWorkspaceID(withinWorkspaceID *string) {
+	o.WithinWorkspaceID = withinWorkspaceID
+}
+
 // WithXCorrelationID adds the xCorrelationID to the list organizations params
 func (o *ListOrganizationsParams) WithXCorrelationID(xCorrelationID *string) *ListOrganizationsParams {
 	o.SetXCorrelationID(xCorrelationID)
@@ -390,6 +428,23 @@ func (o *ListOrganizationsParams) WriteToRequest(r runtime.ClientRequest, reg st
 		// header param if-match
 		if err := r.SetHeaderParam("if-match", *o.IfMatch); err != nil {
 			return err
+		}
+	}
+
+	if o.InTreeOfWorkspaceID != nil {
+
+		// query param in_tree_of_workspace_id
+		var qrInTreeOfWorkspaceID string
+
+		if o.InTreeOfWorkspaceID != nil {
+			qrInTreeOfWorkspaceID = *o.InTreeOfWorkspaceID
+		}
+		qInTreeOfWorkspaceID := qrInTreeOfWorkspaceID
+		if qInTreeOfWorkspaceID != "" {
+
+			if err := r.SetQueryParam("in_tree_of_workspace_id", qInTreeOfWorkspaceID); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -507,6 +562,23 @@ func (o *ListOrganizationsParams) WriteToRequest(r runtime.ClientRequest, reg st
 		if qWithChildCount != "" {
 
 			if err := r.SetQueryParam("with_child_count", qWithChildCount); err != nil {
+				return err
+			}
+		}
+	}
+
+	if o.WithinWorkspaceID != nil {
+
+		// query param within_workspace_id
+		var qrWithinWorkspaceID string
+
+		if o.WithinWorkspaceID != nil {
+			qrWithinWorkspaceID = *o.WithinWorkspaceID
+		}
+		qWithinWorkspaceID := qrWithinWorkspaceID
+		if qWithinWorkspaceID != "" {
+
+			if err := r.SetQueryParam("within_workspace_id", qWithinWorkspaceID); err != nil {
 				return err
 			}
 		}

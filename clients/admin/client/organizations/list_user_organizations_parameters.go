@@ -76,6 +76,14 @@ type ListUserOrganizationsParams struct {
 	*/
 	IfMatch *string
 
+	/* InTreeOfWorkspaceID.
+
+	   optional: scope to organizations in the same top-level workspace tree as this workspace/org
+
+	   Format: serverID
+	*/
+	InTreeOfWorkspaceID *string
+
 	/* Limit.
 
 	     optional limit results
@@ -184,6 +192,17 @@ func (o *ListUserOrganizationsParams) SetIfMatch(ifMatch *string) {
 	o.IfMatch = ifMatch
 }
 
+// WithInTreeOfWorkspaceID adds the inTreeOfWorkspaceID to the list user organizations params
+func (o *ListUserOrganizationsParams) WithInTreeOfWorkspaceID(inTreeOfWorkspaceID *string) *ListUserOrganizationsParams {
+	o.SetInTreeOfWorkspaceID(inTreeOfWorkspaceID)
+	return o
+}
+
+// SetInTreeOfWorkspaceID adds the inTreeOfWorkspaceId to the list user organizations params
+func (o *ListUserOrganizationsParams) SetInTreeOfWorkspaceID(inTreeOfWorkspaceID *string) {
+	o.InTreeOfWorkspaceID = inTreeOfWorkspaceID
+}
+
 // WithLimit adds the limit to the list user organizations params
 func (o *ListUserOrganizationsParams) WithLimit(limit *int64) *ListUserOrganizationsParams {
 	o.SetLimit(limit)
@@ -247,6 +266,23 @@ func (o *ListUserOrganizationsParams) WriteToRequest(r runtime.ClientRequest, re
 		// header param if-match
 		if err := r.SetHeaderParam("if-match", *o.IfMatch); err != nil {
 			return err
+		}
+	}
+
+	if o.InTreeOfWorkspaceID != nil {
+
+		// query param in_tree_of_workspace_id
+		var qrInTreeOfWorkspaceID string
+
+		if o.InTreeOfWorkspaceID != nil {
+			qrInTreeOfWorkspaceID = *o.InTreeOfWorkspaceID
+		}
+		qInTreeOfWorkspaceID := qrInTreeOfWorkspaceID
+		if qInTreeOfWorkspaceID != "" {
+
+			if err := r.SetQueryParam("in_tree_of_workspace_id", qInTreeOfWorkspaceID); err != nil {
+				return err
+			}
 		}
 	}
 

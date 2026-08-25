@@ -324,6 +324,16 @@ definitions:
     type: object
   Service:
     properties:
+      audience_mode:
+        description: Controls which audience is injected into access tokens for scopes
+          mapped to this service
+        enum:
+        - spiffe
+        - custom
+        - none
+        example: spiffe
+        type: string
+        x-nullable: false
       authorization_server_id:
         description: Authorization server identifier
         example: my-server

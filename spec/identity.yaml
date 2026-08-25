@@ -2133,6 +2133,14 @@ definitions:
     $ref: '#/definitions/Credential'
   WebAuthnSettings:
     properties:
+      require_user_interaction_before_prompt:
+        description: |-
+          RequireUserInteractionBeforePrompt, when true, stops the hosted web login UI
+          from auto-initiating the browser passkey prompt on page load; the user must
+          click Continue. Default false preserves auto-prompt behavior. API-driven
+          WebAuthn flows are unaffected.
+        type: boolean
+        x-nullable: false
       rp_id:
         type: string
         x-nullable: false

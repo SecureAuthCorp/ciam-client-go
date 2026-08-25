@@ -47,6 +47,12 @@ type WorkspacePermissionsResponse struct {
 	// manage apis
 	ManageApis bool `json:"manage_apis,omitempty" yaml:"manage_apis,omitempty"`
 
+	// manage application assignment
+	ManageApplicationAssignment bool `json:"manage_application_assignment,omitempty" yaml:"manage_application_assignment,omitempty"`
+
+	// manage application membership
+	ManageApplicationMembership bool `json:"manage_application_membership,omitempty" yaml:"manage_application_membership,omitempty"`
+
 	// manage auditor role
 	ManageAuditorRole bool `json:"manage_auditor_role,omitempty" yaml:"manage_auditor_role,omitempty"`
 
@@ -103,6 +109,12 @@ type WorkspacePermissionsResponse struct {
 
 	// read apis
 	ReadApis bool `json:"read_apis,omitempty" yaml:"read_apis,omitempty"`
+
+	// read application assignment
+	ReadApplicationAssignment bool `json:"read_application_assignment,omitempty" yaml:"read_application_assignment,omitempty"`
+
+	// read application membership
+	ReadApplicationMembership bool `json:"read_application_membership,omitempty" yaml:"read_application_membership,omitempty"`
 
 	// read audit events
 	ReadAuditEvents bool `json:"read_audit_events,omitempty" yaml:"read_audit_events,omitempty"`

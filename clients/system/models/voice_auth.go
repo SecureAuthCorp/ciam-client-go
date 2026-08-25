@@ -8,59 +8,28 @@ package models
 import (
 	"context"
 
-	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
 )
 
-// VoiceAuth voice auth
+// VoiceAuth Legacy Twilio voice credentials.
+//
+// Deprecated: kept for existing legacy configuration only and not used at runtime. Any new
+// setup, including Twilio, belongs in the tenant's phone provider configuration
+// (phone_provider_config).
 //
 // swagger:model VoiceAuth
 type VoiceAuth struct {
 
-	// The Twilio Auth Token.
-	// Required: true
-	AuthToken string `json:"auth_token" yaml:"auth_token"`
+	// auth token
+	AuthToken string `json:"auth_token,omitempty" yaml:"auth_token,omitempty"`
 
-	// The Twilio Account SID.
-	// Required: true
-	Sid string `json:"sid" yaml:"sid"`
+	// sid
+	Sid string `json:"sid,omitempty" yaml:"sid,omitempty"`
 }
 
 // Validate validates this voice auth
 func (m *VoiceAuth) Validate(formats strfmt.Registry) error {
-	var res []error
-
-	if err := m.validateAuthToken(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateSid(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-func (m *VoiceAuth) validateAuthToken(formats strfmt.Registry) error {
-
-	if err := validate.RequiredString("auth_token", "body", m.AuthToken); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *VoiceAuth) validateSid(formats strfmt.Registry) error {
-
-	if err := validate.RequiredString("sid", "body", m.Sid); err != nil {
-		return err
-	}
-
 	return nil
 }
 

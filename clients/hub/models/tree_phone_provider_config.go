@@ -7,11 +7,13 @@ package models
 
 import (
 	"context"
+	"encoding/json"
 	"strconv"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // TreePhoneProviderConfig tree phone provider config
@@ -22,6 +24,10 @@ type TreePhoneProviderConfig struct {
 	// active
 	Active bool `json:"active,omitempty" yaml:"active,omitempty"`
 
+	// mode
+	// Enum: ["built_in","custom"]
+	Mode string `json:"mode,omitempty" yaml:"mode,omitempty"`
+
 	// providers
 	Providers []*PhoneProvider `json:"providers" yaml:"providers"`
 }
@@ -30,6 +36,10 @@ type TreePhoneProviderConfig struct {
 func (m *TreePhoneProviderConfig) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateMode(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateProviders(formats); err != nil {
 		res = append(res, err)
 	}
@@ -37,6 +47,48 @@ func (m *TreePhoneProviderConfig) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+var treePhoneProviderConfigTypeModePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["built_in","custom"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		treePhoneProviderConfigTypeModePropEnum = append(treePhoneProviderConfigTypeModePropEnum, v)
+	}
+}
+
+const (
+
+	// TreePhoneProviderConfigModeBuiltIn captures enum value "built_in"
+	TreePhoneProviderConfigModeBuiltIn string = "built_in"
+
+	// TreePhoneProviderConfigModeCustom captures enum value "custom"
+	TreePhoneProviderConfigModeCustom string = "custom"
+)
+
+// prop value enum
+func (m *TreePhoneProviderConfig) validateModeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, treePhoneProviderConfigTypeModePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *TreePhoneProviderConfig) validateMode(formats strfmt.Registry) error {
+	if swag.IsZero(m.Mode) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateModeEnum("mode", "body", m.Mode); err != nil {
+		return err
+	}
+
 	return nil
 }
 

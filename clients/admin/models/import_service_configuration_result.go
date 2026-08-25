@@ -21,6 +21,11 @@ import (
 // swagger:model ImportServiceConfigurationResult
 type ImportServiceConfigurationResult struct {
 
+	// Controls which audience is injected into access tokens for scopes mapped to this service
+	// Example: spiffe
+	// Enum: ["spiffe","custom","none"]
+	AudienceMode string `json:"audience_mode,omitempty" yaml:"audience_mode,omitempty"`
+
 	// Authorization server identifier
 	// Example: my-server
 	AuthorizationServerID string `json:"authorization_server_id,omitempty" yaml:"authorization_server_id,omitempty"`
@@ -90,6 +95,10 @@ type ImportServiceConfigurationResult struct {
 func (m *ImportServiceConfigurationResult) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateAudienceMode(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateCapabilities(formats); err != nil {
 		res = append(res, err)
 	}
@@ -129,6 +138,51 @@ func (m *ImportServiceConfigurationResult) Validate(formats strfmt.Registry) err
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+var importServiceConfigurationResultTypeAudienceModePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["spiffe","custom","none"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		importServiceConfigurationResultTypeAudienceModePropEnum = append(importServiceConfigurationResultTypeAudienceModePropEnum, v)
+	}
+}
+
+const (
+
+	// ImportServiceConfigurationResultAudienceModeSpiffe captures enum value "spiffe"
+	ImportServiceConfigurationResultAudienceModeSpiffe string = "spiffe"
+
+	// ImportServiceConfigurationResultAudienceModeCustom captures enum value "custom"
+	ImportServiceConfigurationResultAudienceModeCustom string = "custom"
+
+	// ImportServiceConfigurationResultAudienceModeNone captures enum value "none"
+	ImportServiceConfigurationResultAudienceModeNone string = "none"
+)
+
+// prop value enum
+func (m *ImportServiceConfigurationResult) validateAudienceModeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, importServiceConfigurationResultTypeAudienceModePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *ImportServiceConfigurationResult) validateAudienceMode(formats strfmt.Registry) error {
+	if swag.IsZero(m.AudienceMode) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateAudienceModeEnum("audience_mode", "body", m.AudienceMode); err != nil {
+		return err
+	}
+
 	return nil
 }
 
