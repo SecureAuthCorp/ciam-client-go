@@ -2273,8 +2273,6 @@ definitions:
         x-nullable: false
       metadata:
         $ref: '#/definitions/Metadata'
-      obbr:
-        $ref: '#/definitions/OBBRMetadata'
       organisation_id:
         description: |-
           External organization identifier. It is a unique string assigned by the CDR Register to identify an Accredited
@@ -2677,6 +2675,25 @@ definitions:
     - authorization_server_id
     title: Defines a client application and its properties.
     type: object
+  ClientIDJAGTarget:
+    properties:
+      aud_tenant:
+        description: Sets the ID-JAG aud_tenant claim for this audience. Multi-tenant
+          resource servers require it.
+        type: string
+        x-nullable: false
+      audience:
+        description: Target authorization server issuer URL.
+        type: string
+        x-nullable: false
+      client_id:
+        description: Overrides the ID-JAG client_id claim for this audience. Empty
+          uses the requesting client's ID.
+        type: string
+        x-nullable: false
+    required:
+    - audience
+    type: object
   ClientInfo:
     properties:
       client_name:
@@ -2861,6 +2878,13 @@ definitions:
           Applies for the token exchange delegation flow only.
         items:
           type: string
+        type: array
+        x-nullable: false
+      id_jag_targets:
+        description: ID-JAG targets with optional client ID and audience tenant overrides.
+          Audiences must be unique.
+        items:
+          $ref: '#/definitions/ClientIDJAGTarget'
         type: array
         x-nullable: false
     type: object
@@ -3607,15 +3631,6 @@ definitions:
   NameIDFormat:
     description: NameIDFormat is the format of the id
     type: string
-  OBBRMetadata:
-    properties:
-      webhook_uris:
-        description: An array of hosts subscribed to Open Finance Webhook Notifications
-        items:
-          type: string
-        type: array
-        x-nullable: false
-    type: object
   Organization:
     description: See http://docs.oasis-open.org/security/saml/v2.0/saml-metadata-2.0-os.pdf
       §2.3.2.1
@@ -4374,6 +4389,9 @@ definitions:
         x-nullable: false
       Parent:
         $ref: '#/definitions/Element'
+      Remove:
+        type: boolean
+        x-nullable: false
     type: object
   TokenTTLs:
     properties:
@@ -4395,6 +4413,19 @@ definitions:
           After an authorization code reaches its time to live, it expires and it cannot be used to
           authorize the request to the `/token` endpoint.
         example: 10m0s
+        format: duration
+        type: string
+        x-nullable: false
+      id_jag_ttl:
+        default: 5m0s
+        description: |-
+          ID-JAG time to live
+
+          After an Identity Assertion JWT Authorization Grant reaches its time to live, it expires
+          and it cannot be redeemed at the resource authorization server. Kept short by default
+          because the grant is redeemed immediately, and its expiry bounds how long the resource
+          server must remember the grant identifier to reject replays.
+        example: 5m0s
         format: duration
         type: string
         x-nullable: false

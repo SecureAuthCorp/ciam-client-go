@@ -87,6 +87,15 @@ type ServerDump struct {
 	// Format: duration
 	CookieMaxAge strfmt.Duration `json:"cookie_max_age,omitempty" yaml:"cookie_max_age,omitempty"`
 
+	// Date the workspace or organization was created.
+	//
+	// Not set for workspaces and organizations that existed before this field was introduced,
+	// as there is no stored creation time to recover for them.
+	// Example: 2026-04-07T19:17:31.323187Z
+	// Read Only: true
+	// Format: date-time
+	CreatedAt strfmt.DateTime `json:"created_at,omitempty" yaml:"created_at,omitempty"`
+
 	// Defines a custom issuer URL that can be used as the value of the `iss` claim in an access
 	// token.
 	//
@@ -181,6 +190,16 @@ type ServerDump struct {
 	// Example: default
 	ID string `json:"id,omitempty" yaml:"id,omitempty"`
 
+	// ID-JAG time to live
+	//
+	// After an Identity Assertion JWT Authorization Grant reaches its time to live, it expires
+	// and it cannot be redeemed at the resource authorization server. Kept short by default
+	// because the grant is redeemed immediately, and its expiry bounds how long the resource
+	// server must remember the grant identifier to reject replays.
+	// Example: 5m0s
+	// Format: duration
+	IDJagTTL strfmt.Duration `json:"id_jag_ttl,omitempty" yaml:"id_jag_ttl,omitempty"`
+
 	// ID token time to live
 	//
 	// After an ID token reaches its time to live, it expires and it cannot be used to provide
@@ -231,7 +250,7 @@ type ServerDump struct {
 	Name string `json:"name,omitempty" yaml:"name,omitempty"`
 
 	// obbr
-	Obbr *OBBRConfiguration `json:"obbr,omitempty" yaml:"obbr,omitempty"`
+	Obbr *DeprecatedOBBRConfiguration `json:"obbr,omitempty" yaml:"obbr,omitempty"`
 
 	// organization
 	Organization *OrganizationConfiguration `json:"organization,omitempty" yaml:"organization,omitempty"`
@@ -371,6 +390,14 @@ type ServerDump struct {
 	// Enum: ["admin","developer","system","regular","organization"]
 	Type string `json:"type,omitempty" yaml:"type,omitempty"`
 
+	// Date the workspace or organization was last updated.
+	//
+	// Not set until the first write after this field was introduced.
+	// Example: 2026-05-08T01:11:51.126291Z
+	// Read Only: true
+	// Format: date-time
+	UpdatedAt strfmt.DateTime `json:"updated_at,omitempty" yaml:"updated_at,omitempty"`
+
 	// server version to track internal changes
 	// version that is currently the latest: 3
 	Version int64 `json:"version,omitempty" yaml:"version,omitempty"`
@@ -415,6 +442,10 @@ func (m *ServerDump) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateCreatedAt(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateDeviceAuthorization(formats); err != nil {
 		res = append(res, err)
 	}
@@ -428,6 +459,10 @@ func (m *ServerDump) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateGrantTypes(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateIDJagTTL(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -532,6 +567,10 @@ func (m *ServerDump) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateType(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateUpdatedAt(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -716,6 +755,18 @@ func (m *ServerDump) validateCookieMaxAge(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *ServerDump) validateCreatedAt(formats strfmt.Registry) error {
+	if swag.IsZero(m.CreatedAt) { // not required
+		return nil
+	}
+
+	if err := validate.FormatOf("created_at", "body", "date-time", m.CreatedAt.String(), formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (m *ServerDump) validateDeviceAuthorization(formats strfmt.Registry) error {
 	if swag.IsZero(m.DeviceAuthorization) { // not required
 		return nil
@@ -804,6 +855,18 @@ func (m *ServerDump) validateGrantTypes(formats strfmt.Registry) error {
 			return err
 		}
 
+	}
+
+	return nil
+}
+
+func (m *ServerDump) validateIDJagTTL(formats strfmt.Registry) error {
+	if swag.IsZero(m.IDJagTTL) { // not required
+		return nil
+	}
+
+	if err := validate.FormatOf("id_jag_ttl", "body", "duration", m.IDJagTTL.String(), formats); err != nil {
+		return err
 	}
 
 	return nil
@@ -1493,6 +1556,18 @@ func (m *ServerDump) validateType(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *ServerDump) validateUpdatedAt(formats strfmt.Registry) error {
+	if swag.IsZero(m.UpdatedAt) { // not required
+		return nil
+	}
+
+	if err := validate.FormatOf("updated_at", "body", "date-time", m.UpdatedAt.String(), formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (m *ServerDump) validateWorkforce(formats strfmt.Registry) error {
 	if swag.IsZero(m.Workforce) { // not required
 		return nil
@@ -1525,6 +1600,10 @@ func (m *ServerDump) ContextValidate(ctx context.Context, formats strfmt.Registr
 	}
 
 	if err := m.contextValidateCdr(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateCreatedAt(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -1600,6 +1679,10 @@ func (m *ServerDump) ContextValidate(ctx context.Context, formats strfmt.Registr
 		res = append(res, err)
 	}
 
+	if err := m.contextValidateUpdatedAt(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.contextValidateWorkforce(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -1668,6 +1751,15 @@ func (m *ServerDump) contextValidateCdr(ctx context.Context, formats strfmt.Regi
 			}
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (m *ServerDump) contextValidateCreatedAt(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := validate.ReadOnly(ctx, "created_at", "body", strfmt.DateTime(m.CreatedAt)); err != nil {
+		return err
 	}
 
 	return nil
@@ -2040,6 +2132,15 @@ func (m *ServerDump) contextValidateTrustAnchorConfiguration(ctx context.Context
 			}
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (m *ServerDump) contextValidateUpdatedAt(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := validate.ReadOnly(ctx, "updated_at", "body", strfmt.DateTime(m.UpdatedAt)); err != nil {
+		return err
 	}
 
 	return nil

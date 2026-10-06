@@ -7,6 +7,7 @@ package models
 
 import (
 	"context"
+	"encoding/json"
 	"strconv"
 
 	"github.com/go-openapi/errors"
@@ -23,11 +24,8 @@ type Environment struct {
 	// ACR support
 	Acr bool `json:"acr,omitempty" yaml:"acr,omitempty"`
 
-	// reject bot user agents in activation handler
-	ActivationBotProtection bool `json:"activation_bot_protection,omitempty" yaml:"activation_bot_protection,omitempty"`
-
-	// require a captcha on the activation link before the activation code is consumed; supersedes two_step_activation and activation_bot_protection
-	ActivationCaptcha bool `json:"activation_captcha,omitempty" yaml:"activation_captcha,omitempty"`
+	// offer (skippable) enrollment of the pool's preferred authentication method during activation
+	ActivationPreferredMethodSetup bool `json:"activation_preferred_method_setup,omitempty" yaml:"activation_preferred_method_setup,omitempty"`
 
 	// Active Directory IDP
 	ActiveDirectoryIdp bool `json:"active_directory_idp,omitempty" yaml:"active_directory_idp,omitempty"`
@@ -121,6 +119,9 @@ type Environment struct {
 	// hot reloading of templates
 	DevMode bool `json:"dev_mode,omitempty" yaml:"dev_mode,omitempty"`
 
+	// Offer opening the mobile app directly, both when pairing a device on the phone itself and when logging in with a QR code on it
+	DevicePairingTapToPair bool `json:"device_pairing_tap_to_pair,omitempty" yaml:"device_pairing_tap_to_pair,omitempty"`
+
 	// disable audit events
 	DisableAuditEvents bool `json:"disable_audit_events,omitempty" yaml:"disable_audit_events,omitempty"`
 
@@ -145,7 +146,7 @@ type Environment struct {
 	// drop tokens on password reset
 	DropTokensOnPasswordReset bool `json:"drop_tokens_on_password_reset,omitempty" yaml:"drop_tokens_on_password_reset,omitempty"`
 
-	// embeddable web components bundle served at /embed/v1
+	// render the tenant's User portal through the embeddable web components served at /embed/v1
 	EmbeddableComponents bool `json:"embeddable_components,omitempty" yaml:"embeddable_components,omitempty"`
 
 	// embedded idps enabled
@@ -196,11 +197,11 @@ type Environment struct {
 	// drop outbound message events at publish time so no email/SMS/voice is dispatched; intended for perf-test tenants; admin workspace is excluded
 	NoopMessageSending bool `json:"noop_message_sending,omitempty" yaml:"noop_message_sending,omitempty"`
 
-	// openbanking brasil
-	Obbr bool `json:"obbr,omitempty" yaml:"obbr,omitempty"`
+	// whether this tenant can currently deliver an SMS
+	PhoneDeliverySms bool `json:"phone_delivery_sms,omitempty" yaml:"phone_delivery_sms,omitempty"`
 
-	// openbanking ksa workspace and security profile
-	OpenbankingKsa bool `json:"openbanking_ksa,omitempty" yaml:"openbanking_ksa,omitempty"`
+	// whether this tenant can currently place a voice call
+	PhoneDeliveryVoice bool `json:"phone_delivery_voice,omitempty" yaml:"phone_delivery_voice,omitempty"`
 
 	// Push
 	Push bool `json:"push,omitempty" yaml:"push,omitempty"`
@@ -262,11 +263,12 @@ type Environment struct {
 	// tenant settings
 	TenantSettings *TenantSettings `json:"tenant_settings,omitempty" yaml:"tenant_settings,omitempty"`
 
+	// tenant source
+	// Enum: ["saidp","aws","internal_signup","marketing"]
+	TenantSource string `json:"tenant_source,omitempty" yaml:"tenant_source,omitempty"`
+
 	// hierarchical dumps tenant APIs
 	TreeDumpTenant bool `json:"tree_dump_tenant,omitempty" yaml:"tree_dump_tenant,omitempty"`
-
-	// Two-step activation flow to prevent email scanner auto-activation
-	TwoStepActivation bool `json:"two_step_activation,omitempty" yaml:"two_step_activation,omitempty"`
 
 	// User cross-organization role assignment
 	UserCrossOrganizationRoleAssignment bool `json:"user_cross_organization_role_assignment,omitempty" yaml:"user_cross_organization_role_assignment,omitempty"`
@@ -324,6 +326,10 @@ func (m *Environment) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateTenantSettings(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateTenantSource(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -442,6 +448,54 @@ func (m *Environment) validateTenantSettings(formats strfmt.Registry) error {
 			}
 			return err
 		}
+	}
+
+	return nil
+}
+
+var environmentTypeTenantSourcePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["saidp","aws","internal_signup","marketing"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		environmentTypeTenantSourcePropEnum = append(environmentTypeTenantSourcePropEnum, v)
+	}
+}
+
+const (
+
+	// EnvironmentTenantSourceSaidp captures enum value "saidp"
+	EnvironmentTenantSourceSaidp string = "saidp"
+
+	// EnvironmentTenantSourceAws captures enum value "aws"
+	EnvironmentTenantSourceAws string = "aws"
+
+	// EnvironmentTenantSourceInternalSignup captures enum value "internal_signup"
+	EnvironmentTenantSourceInternalSignup string = "internal_signup"
+
+	// EnvironmentTenantSourceMarketing captures enum value "marketing"
+	EnvironmentTenantSourceMarketing string = "marketing"
+)
+
+// prop value enum
+func (m *Environment) validateTenantSourceEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, environmentTypeTenantSourcePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *Environment) validateTenantSource(formats strfmt.Registry) error {
+	if swag.IsZero(m.TenantSource) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateTenantSourceEnum("tenant_source", "body", m.TenantSource); err != nil {
+		return err
 	}
 
 	return nil

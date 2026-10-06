@@ -8,23 +8,282 @@ package models
 import (
 	"context"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
 )
 
-// AuthenticationExtensionsClientOutputs AuthenticationExtensionsClientOutputs represents the IDL of the same name. It is a map of extension identifier
-// strings to their output values, returned by the client after a create() or get() call.
+// AuthenticationExtensionsClientOutputs AuthenticationExtensionsClientOutputs represents the AuthenticationExtensionsClientOutputs IDL, returned by the
+// client after a create() or get() call.
 //
-// Specification: §5.9. Authentication Extensions Client Outputs (https://www.w3.org/TR/webauthn/#iface-authentication-extensions-client-outputs)
+// Every modelled member is a pointer so an absent value is distinguishable from a false or empty one; the
+// unsolicited output check performed by [AuthenticationExtensionsClientOutputs.Verify] depends on that distinction.
+//
+// A JSON member whose key matches a modelled name only by case (e.g. "AppID" for "appid") is bound to that
+// modelled field, not collected into [AuthenticationExtensionsClientOutputs.Extra]: encoding/json resolves the
+// case-insensitive match during the first decoding pass, before UnmarshalJSON ever sees the untyped member map. If
+// such a member's value has the wrong type for the modelled field, unmarshalling fails outright rather than
+// falling back to Extra. encoding/json (v1, the only version this module may use) offers no way to defer that
+// binding.
+//
+// Specification: §5.9. Authentication Extensions Client Outputs (https://www.w3.org/TR/webauthn-3/#iface-authentication-extensions-client-outputs)
 //
 // swagger:model AuthenticationExtensionsClientOutputs
-type AuthenticationExtensionsClientOutputs map[string]interface{}
+type AuthenticationExtensionsClientOutputs struct {
+
+	// AppID indicates the FIDO AppID Extension was acted upon.
+	Appid bool `json:"appid,omitempty" yaml:"appid,omitempty"`
+
+	// AppIDExclude indicates the FIDO AppID Exclusion Extension was acted upon.
+	AppidExclude bool `json:"appidExclude,omitempty" yaml:"appidExclude,omitempty"`
+
+	// cred props
+	CredProps *CredentialPropertiesOutput `json:"credProps,omitempty" yaml:"credProps,omitempty"`
+
+	// HMACCreateSecret indicates the CTAP hmac-secret was provisioned at registration.
+	HmacCreateSecret bool `json:"hmacCreateSecret,omitempty" yaml:"hmacCreateSecret,omitempty"`
+
+	// hmac get secret
+	HmacGetSecret *HMACGetSecretOutputs `json:"hmacGetSecret,omitempty" yaml:"hmacGetSecret,omitempty"`
+
+	// large blob
+	LargeBlob *LargeBlobOutputs `json:"largeBlob,omitempty" yaml:"largeBlob,omitempty"`
+
+	// prf
+	Prf *PRFOutputs `json:"prf,omitempty" yaml:"prf,omitempty"`
+
+	// RemoteClientDataJSON indicates the Remote Client Data JSON Extension was acted upon, which means the local
+	// client delegated every Relying Party ID and origin check to a remote host. See
+	// [ExtensionRemoteClientDataJSON], which records that this extension is not yet ratified.
+	RemoteClientDataJSON bool `json:"remoteClientDataJSON,omitempty" yaml:"remoteClientDataJSON,omitempty"`
+}
 
 // Validate validates this authentication extensions client outputs
-func (m AuthenticationExtensionsClientOutputs) Validate(formats strfmt.Registry) error {
+func (m *AuthenticationExtensionsClientOutputs) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateCredProps(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateHmacGetSecret(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateLargeBlob(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validatePrf(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
 	return nil
 }
 
-// ContextValidate validates this authentication extensions client outputs based on context it is used
-func (m AuthenticationExtensionsClientOutputs) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+func (m *AuthenticationExtensionsClientOutputs) validateCredProps(formats strfmt.Registry) error {
+	if swag.IsZero(m.CredProps) { // not required
+		return nil
+	}
+
+	if m.CredProps != nil {
+		if err := m.CredProps.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("credProps")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("credProps")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *AuthenticationExtensionsClientOutputs) validateHmacGetSecret(formats strfmt.Registry) error {
+	if swag.IsZero(m.HmacGetSecret) { // not required
+		return nil
+	}
+
+	if m.HmacGetSecret != nil {
+		if err := m.HmacGetSecret.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("hmacGetSecret")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("hmacGetSecret")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *AuthenticationExtensionsClientOutputs) validateLargeBlob(formats strfmt.Registry) error {
+	if swag.IsZero(m.LargeBlob) { // not required
+		return nil
+	}
+
+	if m.LargeBlob != nil {
+		if err := m.LargeBlob.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("largeBlob")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("largeBlob")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *AuthenticationExtensionsClientOutputs) validatePrf(formats strfmt.Registry) error {
+	if swag.IsZero(m.Prf) { // not required
+		return nil
+	}
+
+	if m.Prf != nil {
+		if err := m.Prf.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("prf")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("prf")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ContextValidate validate this authentication extensions client outputs based on the context it is used
+func (m *AuthenticationExtensionsClientOutputs) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateCredProps(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateHmacGetSecret(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateLargeBlob(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidatePrf(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *AuthenticationExtensionsClientOutputs) contextValidateCredProps(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.CredProps != nil {
+
+		if swag.IsZero(m.CredProps) { // not required
+			return nil
+		}
+
+		if err := m.CredProps.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("credProps")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("credProps")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *AuthenticationExtensionsClientOutputs) contextValidateHmacGetSecret(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.HmacGetSecret != nil {
+
+		if swag.IsZero(m.HmacGetSecret) { // not required
+			return nil
+		}
+
+		if err := m.HmacGetSecret.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("hmacGetSecret")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("hmacGetSecret")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *AuthenticationExtensionsClientOutputs) contextValidateLargeBlob(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.LargeBlob != nil {
+
+		if swag.IsZero(m.LargeBlob) { // not required
+			return nil
+		}
+
+		if err := m.LargeBlob.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("largeBlob")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("largeBlob")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *AuthenticationExtensionsClientOutputs) contextValidatePrf(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Prf != nil {
+
+		if swag.IsZero(m.Prf) { // not required
+			return nil
+		}
+
+		if err := m.Prf.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("prf")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("prf")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (m *AuthenticationExtensionsClientOutputs) MarshalBinary() ([]byte, error) {
+	if m == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(m)
+}
+
+// UnmarshalBinary interface implementation
+func (m *AuthenticationExtensionsClientOutputs) UnmarshalBinary(b []byte) error {
+	var res AuthenticationExtensionsClientOutputs
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*m = res
 	return nil
 }

@@ -25,6 +25,9 @@ type Token struct {
 
 	// parent
 	Parent *Element `json:"Parent,omitempty" yaml:"Parent,omitempty"`
+
+	// remove
+	Remove bool `json:"Remove,omitempty" yaml:"Remove,omitempty"`
 }
 
 // Validate validates this token

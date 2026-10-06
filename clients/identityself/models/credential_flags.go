@@ -30,7 +30,10 @@ type CredentialFlags struct {
 	// Flag UP indicates the users presence.
 	UserPresent bool `json:"userPresent,omitempty" yaml:"userPresent,omitempty"`
 
-	// Flag UV indicates the user performed verification.
+	// Flag UV indicates the user performed verification. On a credential record this is the uvInitialized value
+	// of the specification, which is latched: once an assertion has verified the user it stays true, because
+	// [CredentialFlags.Update] only advances it. Read the UV flag of a ceremony's own authenticator data to
+	// determine whether that ceremony verified the user.
 	UserVerified bool `json:"userVerified,omitempty" yaml:"userVerified,omitempty"`
 }
 

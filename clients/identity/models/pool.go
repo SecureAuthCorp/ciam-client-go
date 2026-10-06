@@ -20,6 +20,9 @@ import (
 // swagger:model Pool
 type Pool struct {
 
+	// activation settings
+	ActivationSettings *ActivationSettings `json:"activation_settings,omitempty" yaml:"activation_settings,omitempty"`
+
 	// allow skip 2fa
 	AllowSkip2fa bool `json:"allow_skip_2fa,omitempty" yaml:"allow_skip_2fa,omitempty"`
 
@@ -120,6 +123,10 @@ type Pool struct {
 func (m *Pool) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateActivationSettings(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateAuthenticationMechanisms(formats); err != nil {
 		res = append(res, err)
 	}
@@ -183,6 +190,25 @@ func (m *Pool) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *Pool) validateActivationSettings(formats strfmt.Registry) error {
+	if swag.IsZero(m.ActivationSettings) { // not required
+		return nil
+	}
+
+	if m.ActivationSettings != nil {
+		if err := m.ActivationSettings.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("activation_settings")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("activation_settings")
+			}
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -544,6 +570,10 @@ func (m *Pool) validateWebauthnSettings(formats strfmt.Registry) error {
 func (m *Pool) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.contextValidateActivationSettings(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.contextValidateAuthenticationMechanisms(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -587,6 +617,27 @@ func (m *Pool) ContextValidate(ctx context.Context, formats strfmt.Registry) err
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *Pool) contextValidateActivationSettings(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.ActivationSettings != nil {
+
+		if swag.IsZero(m.ActivationSettings) { // not required
+			return nil
+		}
+
+		if err := m.ActivationSettings.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("activation_settings")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("activation_settings")
+			}
+			return err
+		}
+	}
+
 	return nil
 }
 

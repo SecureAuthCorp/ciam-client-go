@@ -20,6 +20,9 @@ import (
 // swagger:model TenantInternalSettings
 type TenantInternalSettings struct {
 
+	// captcha
+	Captcha *CaptchaSettings `json:"captcha,omitempty" yaml:"captcha,omitempty"`
+
 	// saidp
 	Saidp *SAIDPSettings `json:"saidp,omitempty" yaml:"saidp,omitempty"`
 
@@ -36,6 +39,10 @@ type TenantInternalSettings struct {
 func (m *TenantInternalSettings) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateCaptcha(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateSaidp(formats); err != nil {
 		res = append(res, err)
 	}
@@ -47,6 +54,25 @@ func (m *TenantInternalSettings) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *TenantInternalSettings) validateCaptcha(formats strfmt.Registry) error {
+	if swag.IsZero(m.Captcha) { // not required
+		return nil
+	}
+
+	if m.Captcha != nil {
+		if err := m.Captcha.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("captcha")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("captcha")
+			}
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -121,6 +147,10 @@ func (m *TenantInternalSettings) validateTenantSource(formats strfmt.Registry) e
 func (m *TenantInternalSettings) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.contextValidateCaptcha(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.contextValidateSaidp(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -128,6 +158,27 @@ func (m *TenantInternalSettings) ContextValidate(ctx context.Context, formats st
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *TenantInternalSettings) contextValidateCaptcha(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Captcha != nil {
+
+		if swag.IsZero(m.Captcha) { // not required
+			return nil
+		}
+
+		if err := m.Captcha.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("captcha")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("captcha")
+			}
+			return err
+		}
+	}
+
 	return nil
 }
 

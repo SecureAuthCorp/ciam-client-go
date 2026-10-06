@@ -76,7 +76,8 @@ type AccessRequestDataWithError struct {
 	// ID of the Group in Identity Pool
 	GroupID string `json:"group_id,omitempty" yaml:"group_id,omitempty"`
 
-	// ID of the Identity Pool
+	// ID of the Identity Pool the action targets: the pool being administered, or the pool
+	// owning the affected user or group. Not the acting principal's pool -- that is user_pool_id.
 	IdentityPoolID string `json:"identity_pool_id,omitempty" yaml:"identity_pool_id,omitempty"`
 
 	// IDP identifier
@@ -143,7 +144,7 @@ type AccessRequestDataWithError struct {
 	// ID of the User in Identity Pool
 	UserID string `json:"user_id,omitempty" yaml:"user_id,omitempty"`
 
-	// ID of the Identity Pool
+	// ID of the Identity Pool of the principal that performed the action.
 	UserPoolID string `json:"user_pool_id,omitempty" yaml:"user_pool_id,omitempty"`
 
 	// ID of the authorization server (workspace) to which a resource is tied.

@@ -42,7 +42,7 @@ type PublicKeyCredentialCreationOptions struct {
 	ExcludeCredentials []*CredentialDescriptor `json:"excludeCredentials" yaml:"excludeCredentials"`
 
 	// extensions
-	Extensions AuthenticationExtensions `json:"extensions,omitempty" yaml:"extensions,omitempty"`
+	Extensions *AuthenticationExtensions `json:"extensions,omitempty" yaml:"extensions,omitempty"`
 
 	// hints
 	Hints []PublicKeyCredentialHints `json:"hints" yaml:"hints"`
@@ -470,17 +470,20 @@ func (m *PublicKeyCredentialCreationOptions) contextValidateExcludeCredentials(c
 
 func (m *PublicKeyCredentialCreationOptions) contextValidateExtensions(ctx context.Context, formats strfmt.Registry) error {
 
-	if swag.IsZero(m.Extensions) { // not required
-		return nil
-	}
+	if m.Extensions != nil {
 
-	if err := m.Extensions.ContextValidate(ctx, formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("extensions")
-		} else if ce, ok := err.(*errors.CompositeError); ok {
-			return ce.ValidateName("extensions")
+		if swag.IsZero(m.Extensions) { // not required
+			return nil
 		}
-		return err
+
+		if err := m.Extensions.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("extensions")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("extensions")
+			}
+			return err
+		}
 	}
 
 	return nil

@@ -28,6 +28,15 @@ type Org struct {
 	// Example: #007FFF
 	Color string `json:"color,omitempty" yaml:"color,omitempty"`
 
+	// Date the workspace or organization was created.
+	//
+	// Not set for workspaces and organizations that existed before this field was introduced,
+	// as there is no stored creation time to recover for them.
+	// Example: 2026-04-07T19:17:31.323187Z
+	// Read Only: true
+	// Format: date-time
+	CreatedAt strfmt.DateTime `json:"created_at,omitempty" yaml:"created_at,omitempty"`
+
 	// deactivated
 	Deactivated bool `json:"deactivated,omitempty" yaml:"deactivated,omitempty"`
 
@@ -56,6 +65,14 @@ type Org struct {
 
 	// If true this organization can be used as a template when creating a new ones.
 	Template bool `json:"template,omitempty" yaml:"template,omitempty"`
+
+	// Date the workspace or organization was last updated.
+	//
+	// Not set until the first write after this field was introduced.
+	// Example: 2026-05-08T01:11:51.126291Z
+	// Read Only: true
+	// Format: date-time
+	UpdatedAt strfmt.DateTime `json:"updated_at,omitempty" yaml:"updated_at,omitempty"`
 }
 
 // Validate validates this org
@@ -66,7 +83,15 @@ func (m *Org) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateCreatedAt(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateMetadata(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateUpdatedAt(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -112,6 +137,18 @@ func (m *Org) validateAuthenticationMechanisms(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *Org) validateCreatedAt(formats strfmt.Registry) error {
+	if swag.IsZero(m.CreatedAt) { // not required
+		return nil
+	}
+
+	if err := validate.FormatOf("created_at", "body", "date-time", m.CreatedAt.String(), formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (m *Org) validateMetadata(formats strfmt.Registry) error {
 	if swag.IsZero(m.Metadata) { // not required
 		return nil
@@ -131,17 +168,46 @@ func (m *Org) validateMetadata(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *Org) validateUpdatedAt(formats strfmt.Registry) error {
+	if swag.IsZero(m.UpdatedAt) { // not required
+		return nil
+	}
+
+	if err := validate.FormatOf("updated_at", "body", "date-time", m.UpdatedAt.String(), formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // ContextValidate validate this org based on the context it is used
 func (m *Org) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.contextValidateCreatedAt(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.contextValidateMetadata(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateUpdatedAt(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *Org) contextValidateCreatedAt(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := validate.ReadOnly(ctx, "created_at", "body", strfmt.DateTime(m.CreatedAt)); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -161,6 +227,15 @@ func (m *Org) contextValidateMetadata(ctx context.Context, formats strfmt.Regist
 			}
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (m *Org) contextValidateUpdatedAt(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := validate.ReadOnly(ctx, "updated_at", "body", strfmt.DateTime(m.UpdatedAt)); err != nil {
+		return err
 	}
 
 	return nil

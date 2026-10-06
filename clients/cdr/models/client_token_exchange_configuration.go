@@ -7,7 +7,9 @@ package models
 
 import (
 	"context"
+	"strconv"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 )
@@ -23,15 +25,87 @@ type ClientTokenExchangeConfiguration struct {
 	//
 	// Applies for the token exchange delegation flow only.
 	ActorClaims []string `json:"actor_claims" yaml:"actor_claims"`
+
+	// ID-JAG targets with optional client ID and audience tenant overrides. Audiences must be unique.
+	IDJagTargets []*ClientIDJAGTarget `json:"id_jag_targets" yaml:"id_jag_targets"`
 }
 
 // Validate validates this client token exchange configuration
 func (m *ClientTokenExchangeConfiguration) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateIDJagTargets(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
 	return nil
 }
 
-// ContextValidate validates this client token exchange configuration based on context it is used
+func (m *ClientTokenExchangeConfiguration) validateIDJagTargets(formats strfmt.Registry) error {
+	if swag.IsZero(m.IDJagTargets) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(m.IDJagTargets); i++ {
+		if swag.IsZero(m.IDJagTargets[i]) { // not required
+			continue
+		}
+
+		if m.IDJagTargets[i] != nil {
+			if err := m.IDJagTargets[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("id_jag_targets" + "." + strconv.Itoa(i))
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("id_jag_targets" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// ContextValidate validate this client token exchange configuration based on the context it is used
 func (m *ClientTokenExchangeConfiguration) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateIDJagTargets(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *ClientTokenExchangeConfiguration) contextValidateIDJagTargets(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(m.IDJagTargets); i++ {
+
+		if m.IDJagTargets[i] != nil {
+
+			if swag.IsZero(m.IDJagTargets[i]) { // not required
+				return nil
+			}
+
+			if err := m.IDJagTargets[i].ContextValidate(ctx, formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("id_jag_targets" + "." + strconv.Itoa(i))
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("id_jag_targets" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
 	return nil
 }
 

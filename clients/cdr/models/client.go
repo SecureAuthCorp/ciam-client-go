@@ -261,9 +261,6 @@ type Client struct {
 	// metadata
 	Metadata Metadata `json:"metadata,omitempty" yaml:"metadata,omitempty"`
 
-	// obbr
-	Obbr *OBBRMetadata `json:"obbr,omitempty" yaml:"obbr,omitempty"`
-
 	// External organization identifier. It is a unique string assigned by the CDR Register to identify an Accredited
 	// Data Recipient Brand.
 	//
@@ -622,10 +619,6 @@ func (m *Client) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateMetadata(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateObbr(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -1379,25 +1372,6 @@ func (m *Client) validateMetadata(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *Client) validateObbr(formats strfmt.Registry) error {
-	if swag.IsZero(m.Obbr) { // not required
-		return nil
-	}
-
-	if m.Obbr != nil {
-		if err := m.Obbr.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("obbr")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("obbr")
-			}
-			return err
-		}
-	}
-
-	return nil
-}
-
 func (m *Client) validatePrivacy(formats strfmt.Registry) error {
 	if swag.IsZero(m.Privacy) { // not required
 		return nil
@@ -2134,10 +2108,6 @@ func (m *Client) ContextValidate(ctx context.Context, formats strfmt.Registry) e
 		res = append(res, err)
 	}
 
-	if err := m.contextValidateObbr(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
 	if err := m.contextValidatePrivacy(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -2327,27 +2297,6 @@ func (m *Client) contextValidateMetadata(ctx context.Context, formats strfmt.Reg
 			return ce.ValidateName("metadata")
 		}
 		return err
-	}
-
-	return nil
-}
-
-func (m *Client) contextValidateObbr(ctx context.Context, formats strfmt.Registry) error {
-
-	if m.Obbr != nil {
-
-		if swag.IsZero(m.Obbr) { // not required
-			return nil
-		}
-
-		if err := m.Obbr.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("obbr")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("obbr")
-			}
-			return err
-		}
 	}
 
 	return nil

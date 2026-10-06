@@ -677,6 +677,25 @@ definitions:
     - tenant_id
     - authorization_server_id
     type: object
+  ClientIDJAGTarget:
+    properties:
+      aud_tenant:
+        description: Sets the ID-JAG aud_tenant claim for this audience. Multi-tenant
+          resource servers require it.
+        type: string
+        x-nullable: false
+      audience:
+        description: Target authorization server issuer URL.
+        type: string
+        x-nullable: false
+      client_id:
+        description: Overrides the ID-JAG client_id claim for this audience. Empty
+          uses the requesting client's ID.
+        type: string
+        x-nullable: false
+    required:
+    - audience
+    type: object
   ClientJWK:
     properties:
       alg:
@@ -823,6 +842,13 @@ definitions:
           Applies for the token exchange delegation flow only.
         items:
           type: string
+        type: array
+        x-nullable: false
+      id_jag_targets:
+        description: ID-JAG targets with optional client ID and audience tenant overrides.
+          Audiences must be unique.
+        items:
+          $ref: '#/definitions/ClientIDJAGTarget'
         type: array
         x-nullable: false
     type: object

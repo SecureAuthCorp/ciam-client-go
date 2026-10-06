@@ -18,9 +18,6 @@ import (
 // swagger:model ConsentDetails
 type ConsentDetails struct {
 
-	// br
-	Br *BRConsentPayload `json:"br,omitempty" yaml:"br,omitempty"`
-
 	// cdr
 	Cdr *CDRArrangement `json:"cdr,omitempty" yaml:"cdr,omitempty"`
 
@@ -29,18 +26,11 @@ type ConsentDetails struct {
 
 	// fdx
 	Fdx *FDXConsent `json:"fdx,omitempty" yaml:"fdx,omitempty"`
-
-	// uk
-	Uk *UKConsentPayload `json:"uk,omitempty" yaml:"uk,omitempty"`
 }
 
 // Validate validates this consent details
 func (m *ConsentDetails) Validate(formats strfmt.Registry) error {
 	var res []error
-
-	if err := m.validateBr(formats); err != nil {
-		res = append(res, err)
-	}
 
 	if err := m.validateCdr(formats); err != nil {
 		res = append(res, err)
@@ -54,32 +44,9 @@ func (m *ConsentDetails) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateUk(formats); err != nil {
-		res = append(res, err)
-	}
-
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
-	return nil
-}
-
-func (m *ConsentDetails) validateBr(formats strfmt.Registry) error {
-	if swag.IsZero(m.Br) { // not required
-		return nil
-	}
-
-	if m.Br != nil {
-		if err := m.Br.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("br")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("br")
-			}
-			return err
-		}
-	}
-
 	return nil
 }
 
@@ -140,32 +107,9 @@ func (m *ConsentDetails) validateFdx(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ConsentDetails) validateUk(formats strfmt.Registry) error {
-	if swag.IsZero(m.Uk) { // not required
-		return nil
-	}
-
-	if m.Uk != nil {
-		if err := m.Uk.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("uk")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("uk")
-			}
-			return err
-		}
-	}
-
-	return nil
-}
-
 // ContextValidate validate this consent details based on the context it is used
 func (m *ConsentDetails) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
-
-	if err := m.contextValidateBr(ctx, formats); err != nil {
-		res = append(res, err)
-	}
 
 	if err := m.contextValidateCdr(ctx, formats); err != nil {
 		res = append(res, err)
@@ -179,34 +123,9 @@ func (m *ConsentDetails) ContextValidate(ctx context.Context, formats strfmt.Reg
 		res = append(res, err)
 	}
 
-	if err := m.contextValidateUk(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
-	return nil
-}
-
-func (m *ConsentDetails) contextValidateBr(ctx context.Context, formats strfmt.Registry) error {
-
-	if m.Br != nil {
-
-		if swag.IsZero(m.Br) { // not required
-			return nil
-		}
-
-		if err := m.Br.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("br")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("br")
-			}
-			return err
-		}
-	}
-
 	return nil
 }
 
@@ -265,27 +184,6 @@ func (m *ConsentDetails) contextValidateFdx(ctx context.Context, formats strfmt.
 				return ve.ValidateName("fdx")
 			} else if ce, ok := err.(*errors.CompositeError); ok {
 				return ce.ValidateName("fdx")
-			}
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (m *ConsentDetails) contextValidateUk(ctx context.Context, formats strfmt.Registry) error {
-
-	if m.Uk != nil {
-
-		if swag.IsZero(m.Uk) { // not required
-			return nil
-		}
-
-		if err := m.Uk.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("uk")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("uk")
 			}
 			return err
 		}

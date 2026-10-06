@@ -79,20 +79,8 @@ type Dump struct {
 	// mfa methods
 	MfaMethods []*MFAMethod `json:"mfa_methods" yaml:"mfa_methods"`
 
-	// openbanking br consents
-	OpenbankingBrConsents []*OBConsent `json:"openbanking_br_consents" yaml:"openbanking_br_consents"`
-
 	// openbanking fdx consents
 	OpenbankingFdxConsents []*FDXConsent `json:"openbanking_fdx_consents" yaml:"openbanking_fdx_consents"`
-
-	// openbanking file payment consent file resources
-	OpenbankingFilePaymentConsentFileResources []*FilePaymentConsentFileResource `json:"openbanking_file_payment_consent_file_resources" yaml:"openbanking_file_payment_consent_file_resources"`
-
-	// openbanking ksa consents
-	OpenbankingKsaConsents []*KSAConsent `json:"openbanking_ksa_consents" yaml:"openbanking_ksa_consents"`
-
-	// openbanking uk consents
-	OpenbankingUkConsents []*OBConsent `json:"openbanking_uk_consents" yaml:"openbanking_uk_consents"`
 
 	// phone provider configs
 	PhoneProviderConfigs []*PhoneProviderConfig `json:"phone_provider_configs" yaml:"phone_provider_configs"`
@@ -248,23 +236,7 @@ func (m *Dump) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateOpenbankingBrConsents(formats); err != nil {
-		res = append(res, err)
-	}
-
 	if err := m.validateOpenbankingFdxConsents(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateOpenbankingFilePaymentConsentFileResources(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateOpenbankingKsaConsents(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateOpenbankingUkConsents(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -877,32 +849,6 @@ func (m *Dump) validateMfaMethods(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *Dump) validateOpenbankingBrConsents(formats strfmt.Registry) error {
-	if swag.IsZero(m.OpenbankingBrConsents) { // not required
-		return nil
-	}
-
-	for i := 0; i < len(m.OpenbankingBrConsents); i++ {
-		if swag.IsZero(m.OpenbankingBrConsents[i]) { // not required
-			continue
-		}
-
-		if m.OpenbankingBrConsents[i] != nil {
-			if err := m.OpenbankingBrConsents[i].Validate(formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("openbanking_br_consents" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
-					return ce.ValidateName("openbanking_br_consents" + "." + strconv.Itoa(i))
-				}
-				return err
-			}
-		}
-
-	}
-
-	return nil
-}
-
 func (m *Dump) validateOpenbankingFdxConsents(formats strfmt.Registry) error {
 	if swag.IsZero(m.OpenbankingFdxConsents) { // not required
 		return nil
@@ -919,84 +865,6 @@ func (m *Dump) validateOpenbankingFdxConsents(formats strfmt.Registry) error {
 					return ve.ValidateName("openbanking_fdx_consents" + "." + strconv.Itoa(i))
 				} else if ce, ok := err.(*errors.CompositeError); ok {
 					return ce.ValidateName("openbanking_fdx_consents" + "." + strconv.Itoa(i))
-				}
-				return err
-			}
-		}
-
-	}
-
-	return nil
-}
-
-func (m *Dump) validateOpenbankingFilePaymentConsentFileResources(formats strfmt.Registry) error {
-	if swag.IsZero(m.OpenbankingFilePaymentConsentFileResources) { // not required
-		return nil
-	}
-
-	for i := 0; i < len(m.OpenbankingFilePaymentConsentFileResources); i++ {
-		if swag.IsZero(m.OpenbankingFilePaymentConsentFileResources[i]) { // not required
-			continue
-		}
-
-		if m.OpenbankingFilePaymentConsentFileResources[i] != nil {
-			if err := m.OpenbankingFilePaymentConsentFileResources[i].Validate(formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("openbanking_file_payment_consent_file_resources" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
-					return ce.ValidateName("openbanking_file_payment_consent_file_resources" + "." + strconv.Itoa(i))
-				}
-				return err
-			}
-		}
-
-	}
-
-	return nil
-}
-
-func (m *Dump) validateOpenbankingKsaConsents(formats strfmt.Registry) error {
-	if swag.IsZero(m.OpenbankingKsaConsents) { // not required
-		return nil
-	}
-
-	for i := 0; i < len(m.OpenbankingKsaConsents); i++ {
-		if swag.IsZero(m.OpenbankingKsaConsents[i]) { // not required
-			continue
-		}
-
-		if m.OpenbankingKsaConsents[i] != nil {
-			if err := m.OpenbankingKsaConsents[i].Validate(formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("openbanking_ksa_consents" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
-					return ce.ValidateName("openbanking_ksa_consents" + "." + strconv.Itoa(i))
-				}
-				return err
-			}
-		}
-
-	}
-
-	return nil
-}
-
-func (m *Dump) validateOpenbankingUkConsents(formats strfmt.Registry) error {
-	if swag.IsZero(m.OpenbankingUkConsents) { // not required
-		return nil
-	}
-
-	for i := 0; i < len(m.OpenbankingUkConsents); i++ {
-		if swag.IsZero(m.OpenbankingUkConsents[i]) { // not required
-			continue
-		}
-
-		if m.OpenbankingUkConsents[i] != nil {
-			if err := m.OpenbankingUkConsents[i].Validate(formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("openbanking_uk_consents" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
-					return ce.ValidateName("openbanking_uk_consents" + "." + strconv.Itoa(i))
 				}
 				return err
 			}
@@ -1689,23 +1557,7 @@ func (m *Dump) ContextValidate(ctx context.Context, formats strfmt.Registry) err
 		res = append(res, err)
 	}
 
-	if err := m.contextValidateOpenbankingBrConsents(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
 	if err := m.contextValidateOpenbankingFdxConsents(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.contextValidateOpenbankingFilePaymentConsentFileResources(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.contextValidateOpenbankingKsaConsents(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.contextValidateOpenbankingUkConsents(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -2296,31 +2148,6 @@ func (m *Dump) contextValidateMfaMethods(ctx context.Context, formats strfmt.Reg
 	return nil
 }
 
-func (m *Dump) contextValidateOpenbankingBrConsents(ctx context.Context, formats strfmt.Registry) error {
-
-	for i := 0; i < len(m.OpenbankingBrConsents); i++ {
-
-		if m.OpenbankingBrConsents[i] != nil {
-
-			if swag.IsZero(m.OpenbankingBrConsents[i]) { // not required
-				return nil
-			}
-
-			if err := m.OpenbankingBrConsents[i].ContextValidate(ctx, formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("openbanking_br_consents" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
-					return ce.ValidateName("openbanking_br_consents" + "." + strconv.Itoa(i))
-				}
-				return err
-			}
-		}
-
-	}
-
-	return nil
-}
-
 func (m *Dump) contextValidateOpenbankingFdxConsents(ctx context.Context, formats strfmt.Registry) error {
 
 	for i := 0; i < len(m.OpenbankingFdxConsents); i++ {
@@ -2336,81 +2163,6 @@ func (m *Dump) contextValidateOpenbankingFdxConsents(ctx context.Context, format
 					return ve.ValidateName("openbanking_fdx_consents" + "." + strconv.Itoa(i))
 				} else if ce, ok := err.(*errors.CompositeError); ok {
 					return ce.ValidateName("openbanking_fdx_consents" + "." + strconv.Itoa(i))
-				}
-				return err
-			}
-		}
-
-	}
-
-	return nil
-}
-
-func (m *Dump) contextValidateOpenbankingFilePaymentConsentFileResources(ctx context.Context, formats strfmt.Registry) error {
-
-	for i := 0; i < len(m.OpenbankingFilePaymentConsentFileResources); i++ {
-
-		if m.OpenbankingFilePaymentConsentFileResources[i] != nil {
-
-			if swag.IsZero(m.OpenbankingFilePaymentConsentFileResources[i]) { // not required
-				return nil
-			}
-
-			if err := m.OpenbankingFilePaymentConsentFileResources[i].ContextValidate(ctx, formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("openbanking_file_payment_consent_file_resources" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
-					return ce.ValidateName("openbanking_file_payment_consent_file_resources" + "." + strconv.Itoa(i))
-				}
-				return err
-			}
-		}
-
-	}
-
-	return nil
-}
-
-func (m *Dump) contextValidateOpenbankingKsaConsents(ctx context.Context, formats strfmt.Registry) error {
-
-	for i := 0; i < len(m.OpenbankingKsaConsents); i++ {
-
-		if m.OpenbankingKsaConsents[i] != nil {
-
-			if swag.IsZero(m.OpenbankingKsaConsents[i]) { // not required
-				return nil
-			}
-
-			if err := m.OpenbankingKsaConsents[i].ContextValidate(ctx, formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("openbanking_ksa_consents" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
-					return ce.ValidateName("openbanking_ksa_consents" + "." + strconv.Itoa(i))
-				}
-				return err
-			}
-		}
-
-	}
-
-	return nil
-}
-
-func (m *Dump) contextValidateOpenbankingUkConsents(ctx context.Context, formats strfmt.Registry) error {
-
-	for i := 0; i < len(m.OpenbankingUkConsents); i++ {
-
-		if m.OpenbankingUkConsents[i] != nil {
-
-			if swag.IsZero(m.OpenbankingUkConsents[i]) { // not required
-				return nil
-			}
-
-			if err := m.OpenbankingUkConsents[i].ContextValidate(ctx, formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("openbanking_uk_consents" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
-					return ce.ValidateName("openbanking_uk_consents" + "." + strconv.Itoa(i))
 				}
 				return err
 			}
