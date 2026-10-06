@@ -54,6 +54,9 @@ type Credential struct {
 	// authenticator
 	Authenticator *Authenticator `json:"authenticator,omitempty" yaml:"authenticator,omitempty"`
 
+	// extensions
+	Extensions *CredentialExtensions `json:"extensions,omitempty" yaml:"extensions,omitempty"`
+
 	// flags
 	Flags *CredentialFlags `json:"flags,omitempty" yaml:"flags,omitempty"`
 
@@ -77,6 +80,10 @@ func (m *Credential) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateAuthenticator(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateExtensions(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -124,6 +131,25 @@ func (m *Credential) validateAuthenticator(formats strfmt.Registry) error {
 				return ve.ValidateName("authenticator")
 			} else if ce, ok := err.(*errors.CompositeError); ok {
 				return ce.ValidateName("authenticator")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *Credential) validateExtensions(formats strfmt.Registry) error {
+	if swag.IsZero(m.Extensions) { // not required
+		return nil
+	}
+
+	if m.Extensions != nil {
+		if err := m.Extensions.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("extensions")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("extensions")
 			}
 			return err
 		}
@@ -184,6 +210,10 @@ func (m *Credential) ContextValidate(ctx context.Context, formats strfmt.Registr
 		res = append(res, err)
 	}
 
+	if err := m.contextValidateExtensions(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.contextValidateFlags(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -232,6 +262,27 @@ func (m *Credential) contextValidateAuthenticator(ctx context.Context, formats s
 				return ve.ValidateName("authenticator")
 			} else if ce, ok := err.(*errors.CompositeError); ok {
 				return ce.ValidateName("authenticator")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *Credential) contextValidateExtensions(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Extensions != nil {
+
+		if swag.IsZero(m.Extensions) { // not required
+			return nil
+		}
+
+		if err := m.Extensions.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("extensions")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("extensions")
 			}
 			return err
 		}

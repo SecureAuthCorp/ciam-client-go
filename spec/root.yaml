@@ -225,7 +225,9 @@ definitions:
         type: string
         x-nullable: false
       identity_pool_id:
-        description: ID of the Identity Pool
+        description: |-
+          ID of the Identity Pool the action targets: the pool being administered, or the pool
+          owning the affected user or group. Not the acting principal's pool -- that is user_pool_id.
         format: poolID
         type: string
         x-nullable: false
@@ -336,7 +338,7 @@ definitions:
         type: string
         x-nullable: false
       user_pool_id:
-        description: ID of the Identity Pool
+        description: ID of the Identity Pool of the principal that performed the action.
         format: poolID
         type: string
         x-nullable: false
@@ -455,7 +457,9 @@ definitions:
         type: string
         x-nullable: false
       identity_pool_id:
-        description: ID of the Identity Pool
+        description: |-
+          ID of the Identity Pool the action targets: the pool being administered, or the pool
+          owning the affected user or group. Not the acting principal's pool -- that is user_pool_id.
         format: poolID
         type: string
         x-nullable: false
@@ -566,7 +570,7 @@ definitions:
         type: string
         x-nullable: false
       user_pool_id:
-        description: ID of the Identity Pool
+        description: ID of the Identity Pool of the principal that performed the action.
         format: poolID
         type: string
         x-nullable: false
@@ -794,6 +798,119 @@ definitions:
         x-nullable: false
       team_id:
         description: team id
+        type: string
+        x-nullable: false
+    type: object
+  ApplicationAssignmentAuditPayload:
+    properties:
+      app_workspace_id:
+        format: serverID
+        type: string
+        x-nullable: false
+      cascaded_org_ids:
+        description: |-
+          Orgs whose delegated sub-assignments were removed by this unassign, as one summary rather
+          than an event per row.
+        items:
+          format: serverID
+          type: string
+        type: array
+        x-nullable: false
+      client_id:
+        format: clientID
+        type: string
+        x-nullable: false
+      delegated_from_org_id:
+        format: serverID
+        type: string
+        x-nullable: false
+      mode:
+        type: string
+        x-nullable: false
+      organization_id:
+        format: serverID
+        type: string
+        x-nullable: false
+    type: object
+  ApplicationMembershipAuditPayload:
+    properties:
+      app_workspace_id:
+        format: serverID
+        type: string
+        x-nullable: false
+      client_id:
+        format: clientID
+        type: string
+        x-nullable: false
+      grantee_type:
+        $ref: '#/definitions/GranteeType'
+      group_id:
+        format: groupID
+        type: string
+        x-nullable: false
+      home_workspace_id:
+        format: serverID
+        type: string
+        x-nullable: false
+      identity_pool_id:
+        format: poolID
+        type: string
+        x-nullable: false
+      organization_id:
+        format: serverID
+        type: string
+        x-nullable: false
+      user_id:
+        format: userID
+        type: string
+        x-nullable: false
+    type: object
+  ApplicationMembershipDeniedAuditPayload:
+    properties:
+      app_workspace_id:
+        format: serverID
+        type: string
+        x-nullable: false
+      client_id:
+        format: clientID
+        type: string
+        x-nullable: false
+      gate:
+        $ref: '#/definitions/EnforcementGate'
+      identity_pool_id:
+        description: Absent for pool-less subjects, which reach the gate legitimately.
+        format: poolID
+        type: string
+        x-nullable: false
+      organization_id:
+        format: serverID
+        type: string
+        x-nullable: false
+      reason:
+        $ref: '#/definitions/DenialReason'
+      user_id:
+        format: userID
+        type: string
+        x-nullable: false
+    type: object
+  ApplicationOpenAccessAuditPayload:
+    properties:
+      app_workspace_id:
+        format: serverID
+        type: string
+        x-nullable: false
+      cascade_to_suborgs:
+        type: boolean
+        x-nullable: false
+      client_id:
+        format: clientID
+        type: string
+        x-nullable: false
+      open_to_all:
+        type: boolean
+        x-nullable: false
+      organization_id:
+        format: serverID
         type: string
         x-nullable: false
     type: object
@@ -1045,6 +1162,8 @@ definitions:
         - webauthn
         - group
         - phone_delivery
+        - application_assignment
+        - application_membership
         example: client
         type: string
         x-nullable: false
@@ -1087,6 +1206,14 @@ definitions:
       affected_user_pool_id:
         description: ID of the Identity Pool of the User that is affected by an action
         format: poolID
+        type: string
+        x-nullable: false
+      application_id:
+        description: |-
+          ID of the application (OAuth client) an action targets.
+
+          Distinct from ClientID, which identifies the client of the access request itself.
+        format: clientID
         type: string
         x-nullable: false
       authorization_correlation_id:
@@ -1140,7 +1267,9 @@ definitions:
         type: boolean
         x-nullable: false
       identity_pool_id:
-        description: ID of the Identity Pool
+        description: |-
+          ID of the Identity Pool the action targets: the pool being administered, or the pool
+          owning the affected user or group. Not the acting principal's pool -- that is user_pool_id.
         format: poolID
         type: string
         x-nullable: false
@@ -1167,6 +1296,11 @@ definitions:
 
           It's first not empty value from: X-Forwaded-For, X-Real-IP or network socket IP address
         type: string
+        x-nullable: false
+      is_first_time_login:
+        description: True when the risk engine found no sign-in baseline for the user;
+          absent when not evaluated
+        type: boolean
         x-nullable: false
       latitude:
         description: Latitude
@@ -1252,7 +1386,7 @@ definitions:
         type: string
         x-nullable: false
       user_pool_id:
-        description: ID of the Identity Pool
+        description: ID of the Identity Pool of the principal that performed the action.
         format: poolID
         type: string
         x-nullable: false
@@ -1263,6 +1397,18 @@ definitions:
         $ref: '#/definitions/AccessRequestDataWithError'
       access_token_issued:
         $ref: '#/definitions/AccessRequestData'
+      application_assignment_created:
+        $ref: '#/definitions/ApplicationAssignmentAuditPayload'
+      application_assignment_deleted:
+        $ref: '#/definitions/ApplicationAssignmentAuditPayload'
+      application_membership_denied:
+        $ref: '#/definitions/ApplicationMembershipDeniedAuditPayload'
+      application_membership_granted:
+        $ref: '#/definitions/ApplicationMembershipAuditPayload'
+      application_membership_revoked:
+        $ref: '#/definitions/ApplicationMembershipAuditPayload'
+      application_membership_updated:
+        $ref: '#/definitions/ApplicationOpenAccessAuditPayload'
       authorization_code_denied:
         $ref: '#/definitions/AccessRequestDataWithError'
       authorization_code_issued:
@@ -1673,6 +1819,27 @@ definitions:
         type: array
         x-nullable: false
     type: object
+  AutomaticKeyRotation:
+    properties:
+      cron:
+        type: string
+        x-nullable: false
+      enabled:
+        type: boolean
+        x-nullable: false
+      scheduled_at:
+        format: date-time
+        readOnly: true
+        type: string
+        x-nullable: false
+      starting_from:
+        format: date-time
+        type: string
+        x-nullable: false
+    required:
+    - enabled
+    - cron
+    type: object
   AzureB2CCredentials:
     description: Azure IDP B2C specific credentials
     properties:
@@ -1864,56 +2031,6 @@ definitions:
         description: Directory ID from your Microsoft Azure application settings
         type: string
         x-nullable: false
-    type: object
-  BRConsentPayload:
-    properties:
-      account_ids:
-        items:
-          type: string
-        type: array
-        x-nullable: false
-      client_id:
-        description: Client application identifier.
-        example: '"cauqo9c9vpbs0aj2b2v0"'
-        format: clientID
-        type: string
-        x-nullable: false
-      consent_id:
-        format: consentID
-        type: string
-        x-nullable: false
-      created_at:
-        format: date-time
-        type: string
-        x-nullable: false
-      idempotency_key:
-        type: string
-        x-nullable: false
-      request_hash:
-        type: string
-        x-nullable: false
-      server_id:
-        description: Server / Workspace identifier.
-        example: '"server"'
-        format: serverID
-        type: string
-        x-nullable: false
-      spec:
-        type: string
-        x-nullable: false
-      spec_version:
-        $ref: '#/definitions/SpecVersion'
-      status:
-        type: string
-        x-nullable: false
-      tenant_id:
-        description: Tenant identifier.
-        example: '"tenant"'
-        format: tenantID
-        type: string
-        x-nullable: false
-      type:
-        $ref: '#/definitions/ConsentType'
     type: object
   BruteForceEventPayload:
     description: BruteForceEventPayload brute force event payload
@@ -2131,6 +2248,48 @@ definitions:
         format: cibaAuthenticationrServiceType
         type: string
         x-nullable: false
+    type: object
+  CaptchaDeployment:
+    properties:
+      enabled:
+        description: captcha is enforced in this deployment; when false, tenant whitelists
+          change nothing
+        type: boolean
+        x-nullable: false
+      threshold:
+        description: minimum reCAPTCHA v3 score accepted before falling back to v2
+        format: float
+        type: number
+        x-nullable: false
+      v2_configured:
+        description: a usable reCAPTCHA v2 site and secret key pair is configured
+        type: boolean
+        x-nullable: false
+      v3_configured:
+        description: a reCAPTCHA v3 site and secret key pair is configured
+        type: boolean
+        x-nullable: false
+      whitelist:
+        description: identifier suffixes exempt for the whole deployment; a tenant
+          whitelist replaces these
+        items:
+          type: string
+        type: array
+        x-nullable: false
+    title: CaptchaDeployment reports the deployment-wide captcha state without exposing
+      any key.
+    type: object
+  CaptchaSettings:
+    properties:
+      whitelist:
+        description: |-
+          Identifier suffixes exempt from captcha. Replaces the deployment-wide whitelist for
+          this tenant; leave empty to inherit it.
+        items:
+          type: string
+        type: array
+        x-nullable: false
+    title: CaptchaSettings is the per-tenant captcha override, managed by SecureAuth.
     type: object
   Claim:
     properties:
@@ -2671,8 +2830,6 @@ definitions:
         x-nullable: false
       metadata:
         $ref: '#/definitions/Metadata'
-      obbr:
-        $ref: '#/definitions/OBBRMetadata'
       organisation_id:
         description: |-
           External organization identifier. It is a unique string assigned by the CDR Register to identify an Accredited
@@ -3751,6 +3908,25 @@ definitions:
         type: integer
         x-nullable: false
     type: object
+  ClientIDJAGTarget:
+    properties:
+      aud_tenant:
+        description: Sets the ID-JAG aud_tenant claim for this audience. Multi-tenant
+          resource servers require it.
+        type: string
+        x-nullable: false
+      audience:
+        description: Target authorization server issuer URL.
+        type: string
+        x-nullable: false
+      client_id:
+        description: Overrides the ID-JAG client_id claim for this audience. Empty
+          uses the requesting client's ID.
+        type: string
+        x-nullable: false
+    required:
+    - audience
+    type: object
   ClientJWK:
     properties:
       alg:
@@ -3897,6 +4073,13 @@ definitions:
           Applies for the token exchange delegation flow only.
         items:
           type: string
+        type: array
+        x-nullable: false
+      id_jag_targets:
+        description: ID-JAG targets with optional client ID and audience tenant overrides.
+          Audiences must be unique.
+        items:
+          $ref: '#/definitions/ClientIDJAGTarget'
         type: array
         x-nullable: false
     type: object
@@ -4165,16 +4348,12 @@ definitions:
     type: object
   ConsentDetails:
     properties:
-      br:
-        $ref: '#/definitions/BRConsentPayload'
       cdr:
         $ref: '#/definitions/CDRArrangement'
       cdr_previous:
         $ref: '#/definitions/CDRArrangement'
       fdx:
         $ref: '#/definitions/FDXConsent'
-      uk:
-        $ref: '#/definitions/UKConsentPayload'
     type: object
   ConsentGrant:
     properties:
@@ -4420,8 +4599,6 @@ definitions:
         x-nullable: false
     type: object
   ConsentStatus:
-    type: string
-  ConsentType:
     type: string
   ContactPerson:
     description: See http://docs.oasis-open.org/security/saml/v2.0/saml-metadata-2.0-os.pdf
@@ -4848,6 +5025,15 @@ definitions:
         type: boolean
         x-nullable: false
     type: object
+  DenialReason:
+    type: string
+  DeprecatedOBBRConfiguration:
+    properties:
+      industry:
+        $ref: '#/definitions/DeprecatedOBBRIndustry'
+    type: object
+  DeprecatedOBBRIndustry:
+    type: string
   DeviceAuthorizationConfiguration:
     properties:
       request_ttl:
@@ -4966,29 +5152,9 @@ definitions:
           $ref: '#/definitions/MFAMethod'
         type: array
         x-nullable: false
-      openbanking_br_consents:
-        items:
-          $ref: '#/definitions/OBConsent'
-        type: array
-        x-nullable: false
       openbanking_fdx_consents:
         items:
           $ref: '#/definitions/FDXConsent'
-        type: array
-        x-nullable: false
-      openbanking_file_payment_consent_file_resources:
-        items:
-          $ref: '#/definitions/FilePaymentConsentFileResource'
-        type: array
-        x-nullable: false
-      openbanking_ksa_consents:
-        items:
-          $ref: '#/definitions/KSAConsent'
-        type: array
-        x-nullable: false
-      openbanking_uk_consents:
-        items:
-          $ref: '#/definitions/OBConsent'
         type: array
         x-nullable: false
       phone_provider_configs:
@@ -5123,6 +5289,14 @@ definitions:
           client
         type: boolean
         x-nullable: false
+      client_id_metadata_document:
+        default: false
+        description: |-
+          Accepts an https client_id that points at the client's own metadata document
+
+          Requires the `client_id_metadata_document` tenant feature.
+        type: boolean
+        x-nullable: false
       default_scopes:
         description: |-
           An optional list of scopes that are always included in client registrations, merged with any scopes requested by the client
@@ -5170,6 +5344,8 @@ definitions:
         format: duration
         type: string
         x-nullable: false
+      software_statement:
+        $ref: '#/definitions/SoftwareStatementSettings'
     type: object
   Element:
     properties:
@@ -5278,6 +5454,8 @@ definitions:
         x-nullable: false
     title: Endpoint represents the SAML EndpointType object.
     type: object
+  EnforcementGate:
+    type: string
   EntityDescriptor:
     description: See http://docs.oasis-open.org/security/saml/v2.0/saml-metadata-2.0-os.pdf
       §2.3.2
@@ -5751,34 +5929,6 @@ definitions:
         type: array
         x-nullable: false
     type: object
-  FilePaymentConsentFileResource:
-    properties:
-      client_id:
-        description: Client application identifier.
-        example: '"cauqo9c9vpbs0aj2b2v0"'
-        format: clientID
-        type: string
-        x-nullable: false
-      consent_id:
-        format: consentID
-        type: string
-        x-nullable: false
-      file:
-        type: string
-        x-nullable: false
-      server_id:
-        description: Server / Workspace identifier.
-        example: '"server"'
-        format: serverID
-        type: string
-        x-nullable: false
-      tenant_id:
-        description: Tenant identifier.
-        example: '"tenant"'
-        format: tenantID
-        type: string
-        x-nullable: false
-    type: object
   FnEnvVersion:
     type: string
   Gateway:
@@ -6082,6 +6232,8 @@ definitions:
         type: boolean
         x-nullable: false
     type: object
+  GranteeType:
+    type: string
   GraphQLField:
     properties:
       can_have_policy:
@@ -7046,6 +7198,8 @@ definitions:
         - webauthn
         - group
         - phone_delivery
+        - application_assignment
+        - application_membership
         type: string
         x-nullable: false
       event_type:
@@ -7236,46 +7390,6 @@ definitions:
   JwtClaims:
     additionalProperties:
       type: object
-    type: object
-  KSAConsent:
-    properties:
-      client_id:
-        description: Client application identifier
-        example: bugkgm23g9kregtu051g
-        format: clientID
-        type: string
-        x-nullable: false
-      consent_id:
-        description: Consent identifier
-        example: cavbbioiagh6fla7koig
-        type: string
-        x-nullable: false
-      created_at:
-        description: Consent creation date
-        example: "2022-07-01T08:52:27.127932Z"
-        format: date-time
-        type: string
-        x-nullable: false
-      expiry:
-        description: Consent expiration date
-        example: "2023-03-01T09:02:27.127932Z"
-        format: date-time
-        type: string
-        x-nullable: false
-      server_id:
-        description: Workspace identifier
-        example: server
-        format: serverID
-        type: string
-        x-nullable: false
-      status:
-        $ref: '#/definitions/ConsentStatus'
-      tenant_id:
-        description: Tenant identifier
-        example: my-company
-        format: tenantID
-        type: string
-        x-nullable: false
     type: object
   KeyDescriptor:
     description: KeyDescriptor represents the XMLSEC object of the same name
@@ -7829,6 +7943,8 @@ definitions:
         - webauthn
         - group
         - phone_delivery
+        - application_assignment
+        - application_membership
         example: client
         type: string
         x-nullable: false
@@ -7888,74 +8004,6 @@ definitions:
         description: OAuth2 token endpoint
         type: string
         x-nullable: false
-    type: object
-  OBBRConfiguration:
-    properties:
-      industry:
-        $ref: '#/definitions/OBBRIndustry'
-    type: object
-  OBBRIndustry:
-    type: string
-  OBBRMetadata:
-    properties:
-      webhook_uris:
-        description: An array of hosts subscribed to Open Finance Webhook Notifications
-        items:
-          type: string
-        type: array
-        x-nullable: false
-    type: object
-  OBConsent:
-    description: OBConsent this type is only meant to be used for importing and exporting
-      consents for testing
-    properties:
-      account_ids:
-        items:
-          type: string
-        type: array
-        x-nullable: false
-      client_id:
-        description: Client application identifier.
-        example: '"cauqo9c9vpbs0aj2b2v0"'
-        format: clientID
-        type: string
-        x-nullable: false
-      consent_id:
-        format: consentID
-        type: string
-        x-nullable: false
-      created_at:
-        format: date-time
-        type: string
-        x-nullable: false
-      idempotency_key:
-        type: string
-        x-nullable: false
-      request_hash:
-        type: string
-        x-nullable: false
-      server_id:
-        description: Server / Workspace identifier.
-        example: '"server"'
-        format: serverID
-        type: string
-        x-nullable: false
-      spec:
-        type: string
-        x-nullable: false
-      spec_version:
-        $ref: '#/definitions/SpecVersion'
-      status:
-        type: string
-        x-nullable: false
-      tenant_id:
-        description: Tenant identifier.
-        example: '"tenant"'
-        format: tenantID
-        type: string
-        x-nullable: false
-      type:
-        $ref: '#/definitions/ConsentType'
     type: object
   OIDCCredentials:
     description: OIDC IDP specific credentials
@@ -8268,6 +8316,17 @@ definitions:
         example: '#007FFF'
         type: string
         x-nullable: false
+      created_at:
+        description: |-
+          Date the workspace or organization was created.
+
+          Not set for workspaces and organizations that existed before this field was introduced,
+          as there is no stored creation time to recover for them.
+        example: "2026-04-07T19:17:31.323187Z"
+        format: date-time
+        readOnly: true
+        type: string
+        x-nullable: false
       deactivated:
         type: boolean
         x-nullable: false
@@ -8308,6 +8367,16 @@ definitions:
         description: If true this organization can be used as a template when creating
           a new ones.
         type: boolean
+        x-nullable: false
+      updated_at:
+        description: |-
+          Date the workspace or organization was last updated.
+
+          Not set until the first write after this field was introduced.
+        example: "2026-05-08T01:11:51.126291Z"
+        format: date-time
+        readOnly: true
+        type: string
         x-nullable: false
     type: object
   Organization:
@@ -8375,6 +8444,17 @@ definitions:
         example: '#007FFF'
         type: string
         x-nullable: false
+      created_at:
+        description: |-
+          Date the workspace or organization was created.
+
+          Not set for workspaces and organizations that existed before this field was introduced,
+          as there is no stored creation time to recover for them.
+        example: "2026-04-07T19:17:31.323187Z"
+        format: date-time
+        readOnly: true
+        type: string
+        x-nullable: false
       deactivated:
         type: boolean
         x-nullable: false
@@ -8435,6 +8515,16 @@ definitions:
         x-nullable: false
       theme_id:
         format: themeID
+        type: string
+        x-nullable: false
+      updated_at:
+        description: |-
+          Date the workspace or organization was last updated.
+
+          Not set until the first write after this field was introduced.
+        example: "2026-05-08T01:11:51.126291Z"
+        format: date-time
+        readOnly: true
         type: string
         x-nullable: false
     type: object
@@ -9183,6 +9273,9 @@ definitions:
         x-nullable: false
       id:
         $ref: '#/definitions/RiskID'
+      is_first_time_login:
+        type: boolean
+        x-nullable: false
       loa:
         $ref: '#/definitions/RiskLOA'
       risks:
@@ -9438,7 +9531,9 @@ definitions:
         type: string
         x-nullable: false
       identity_pool_id:
-        description: ID of the Identity Pool
+        description: |-
+          ID of the Identity Pool the action targets: the pool being administered, or the pool
+          owning the affected user or group. Not the acting principal's pool -- that is user_pool_id.
         format: poolID
         type: string
         x-nullable: false
@@ -9559,7 +9654,7 @@ definitions:
         type: string
         x-nullable: false
       user_pool_id:
-        description: ID of the Identity Pool
+        description: ID of the Identity Pool of the principal that performed the action.
         format: poolID
         type: string
         x-nullable: false
@@ -9658,7 +9753,9 @@ definitions:
         type: string
         x-nullable: false
       identity_pool_id:
-        description: ID of the Identity Pool
+        description: |-
+          ID of the Identity Pool the action targets: the pool being administered, or the pool
+          owning the affected user or group. Not the acting principal's pool -- that is user_pool_id.
         format: poolID
         type: string
         x-nullable: false
@@ -9779,7 +9876,7 @@ definitions:
         type: string
         x-nullable: false
       user_pool_id:
-        description: ID of the Identity Pool
+        description: ID of the Identity Pool of the principal that performed the action.
         format: poolID
         type: string
         x-nullable: false
@@ -10784,6 +10881,17 @@ definitions:
         format: duration
         type: string
         x-nullable: false
+      created_at:
+        description: |-
+          Date the workspace or organization was created.
+
+          Not set for workspaces and organizations that existed before this field was introduced,
+          as there is no stored creation time to recover for them.
+        example: "2026-04-07T19:17:31.323187Z"
+        format: date-time
+        readOnly: true
+        type: string
+        x-nullable: false
       custom_issuer_url:
         description: |-
           Defines a custom issuer URL that can be used as the value of the `iss` claim in an access
@@ -10922,6 +11030,19 @@ definitions:
         format: serverID
         type: string
         x-nullable: false
+      id_jag_ttl:
+        default: 5m0s
+        description: |-
+          ID-JAG time to live
+
+          After an Identity Assertion JWT Authorization Grant reaches its time to live, it expires
+          and it cannot be redeemed at the resource authorization server. Kept short by default
+          because the grant is redeemed immediately, and its expiry bounds how long the resource
+          server must remember the grant identifier to reject replays.
+        example: 5m0s
+        format: duration
+        type: string
+        x-nullable: false
       id_token_ttl:
         description: |-
           ID token time to live
@@ -10977,7 +11098,7 @@ definitions:
         type: string
         x-nullable: false
       obbr:
-        $ref: '#/definitions/OBBRConfiguration'
+        $ref: '#/definitions/DeprecatedOBBRConfiguration'
       organization:
         $ref: '#/definitions/OrganizationConfiguration'
       parent_id:
@@ -11226,6 +11347,16 @@ definitions:
         - regular
         - organization
         example: regular
+        type: string
+        x-nullable: false
+      updated_at:
+        description: |-
+          Date the workspace or organization was last updated.
+
+          Not set until the first write after this field was introduced.
+        example: "2026-05-08T01:11:51.126291Z"
+        format: date-time
+        readOnly: true
         type: string
         x-nullable: false
       version:
@@ -11487,6 +11618,19 @@ definitions:
         format: serverID
         type: string
         x-nullable: false
+      id_jag_ttl:
+        default: 5m0s
+        description: |-
+          ID-JAG time to live
+
+          After an Identity Assertion JWT Authorization Grant reaches its time to live, it expires
+          and it cannot be redeemed at the resource authorization server. Kept short by default
+          because the grant is redeemed immediately, and its expiry bounds how long the resource
+          server must remember the grant identifier to reject replays.
+        example: 5m0s
+        format: duration
+        type: string
+        x-nullable: false
       id_token_ttl:
         description: |-
           ID token time to live
@@ -11540,7 +11684,7 @@ definitions:
         type: string
         x-nullable: false
       obbr:
-        $ref: '#/definitions/OBBRConfiguration'
+        $ref: '#/definitions/DeprecatedOBBRConfiguration'
       organization:
         $ref: '#/definitions/OrganizationConfiguration'
       parent_id:
@@ -11995,6 +12139,17 @@ definitions:
         format: duration
         type: string
         x-nullable: false
+      created_at:
+        description: |-
+          Date the workspace or organization was created.
+
+          Not set for workspaces and organizations that existed before this field was introduced,
+          as there is no stored creation time to recover for them.
+        example: "2026-04-07T19:17:31.323187Z"
+        format: date-time
+        readOnly: true
+        type: string
+        x-nullable: false
       custom_issuer_url:
         description: |-
           Defines a custom issuer URL that can be used as the value of the `iss` claim in an access
@@ -12138,6 +12293,19 @@ definitions:
         format: serverID
         type: string
         x-nullable: false
+      id_jag_ttl:
+        default: 5m0s
+        description: |-
+          ID-JAG time to live
+
+          After an Identity Assertion JWT Authorization Grant reaches its time to live, it expires
+          and it cannot be redeemed at the resource authorization server. Kept short by default
+          because the grant is redeemed immediately, and its expiry bounds how long the resource
+          server must remember the grant identifier to reject replays.
+        example: 5m0s
+        format: duration
+        type: string
+        x-nullable: false
       id_token_ttl:
         description: |-
           ID token time to live
@@ -12198,7 +12366,7 @@ definitions:
         type: string
         x-nullable: false
       obbr:
-        $ref: '#/definitions/OBBRConfiguration'
+        $ref: '#/definitions/DeprecatedOBBRConfiguration'
       organization:
         $ref: '#/definitions/OrganizationConfiguration'
       parent_id:
@@ -12447,6 +12615,16 @@ definitions:
         - regular
         - organization
         example: regular
+        type: string
+        x-nullable: false
+      updated_at:
+        description: |-
+          Date the workspace or organization was last updated.
+
+          Not set until the first write after this field was introduced.
+        example: "2026-05-08T01:11:51.126291Z"
+        format: date-time
+        readOnly: true
         type: string
         x-nullable: false
       version:
@@ -12849,6 +13027,17 @@ definitions:
         format: duration
         type: string
         x-nullable: false
+      created_at:
+        description: |-
+          Date the workspace or organization was created.
+
+          Not set for workspaces and organizations that existed before this field was introduced,
+          as there is no stored creation time to recover for them.
+        example: "2026-04-07T19:17:31.323187Z"
+        format: date-time
+        readOnly: true
+        type: string
+        x-nullable: false
       custom_issuer_url:
         description: |-
           Defines a custom issuer URL that can be used as the value of the `iss` claim in an access
@@ -12987,6 +13176,19 @@ definitions:
         format: serverID
         type: string
         x-nullable: false
+      id_jag_ttl:
+        default: 5m0s
+        description: |-
+          ID-JAG time to live
+
+          After an Identity Assertion JWT Authorization Grant reaches its time to live, it expires
+          and it cannot be redeemed at the resource authorization server. Kept short by default
+          because the grant is redeemed immediately, and its expiry bounds how long the resource
+          server must remember the grant identifier to reject replays.
+        example: 5m0s
+        format: duration
+        type: string
+        x-nullable: false
       id_token_ttl:
         description: |-
           ID token time to live
@@ -13048,7 +13250,7 @@ definitions:
         type: string
         x-nullable: false
       obbr:
-        $ref: '#/definitions/OBBRConfiguration'
+        $ref: '#/definitions/DeprecatedOBBRConfiguration'
       organization:
         $ref: '#/definitions/OrganizationConfiguration'
       parent_id:
@@ -13323,6 +13525,16 @@ definitions:
         - regular
         - organization
         example: regular
+        type: string
+        x-nullable: false
+      updated_at:
+        description: |-
+          Date the workspace or organization was last updated.
+
+          Not set until the first write after this field was introduced.
+        example: "2026-05-08T01:11:51.126291Z"
+        format: date-time
+        readOnly: true
         type: string
         x-nullable: false
       version:
@@ -13687,6 +13899,17 @@ definitions:
         type: integer
         x-nullable: false
     type: object
+  SetTenantCaptcha:
+    properties:
+      whitelist:
+        description: |-
+          Identifier suffixes exempt from captcha. Replaces the deployment-wide whitelist for
+          this tenant; leave empty to inherit it.
+        items:
+          type: string
+        type: array
+        x-nullable: false
+    type: object
   SetTenantFeature:
     properties:
       flag:
@@ -13696,8 +13919,22 @@ definitions:
         type: boolean
         x-nullable: false
     type: object
-  SpecVersion:
-    type: string
+  SoftwareStatementSettings:
+    properties:
+      optional:
+        default: false
+        description: |-
+          Accepts registrations without a software statement
+
+          If enabled, the registration endpoint no longer requires a software statement, but still
+          validates and applies one whenever a client presents it. Clients that register with a
+          software statement are distinguished by a non-empty `software_statement_payload`.
+
+          Requires `enable_trust_anchor` to be on, as the trust anchor keys verify a presented
+          software statement.
+        type: boolean
+        x-nullable: false
+    type: object
   StaticCredentials:
     description: Static IDP specific credentials
     properties:
@@ -14050,6 +14287,8 @@ definitions:
     type: object
   TenantInternalSettings:
     properties:
+      captcha:
+        $ref: '#/definitions/CaptchaSettings'
       saidp:
         $ref: '#/definitions/SAIDPSettings'
       tenant_id:
@@ -14177,6 +14416,9 @@ definitions:
         x-nullable: false
       Parent:
         $ref: '#/definitions/Element'
+      Remove:
+        type: boolean
+        x-nullable: false
     type: object
   TokenTTLs:
     properties:
@@ -14198,6 +14440,19 @@ definitions:
           After an authorization code reaches its time to live, it expires and it cannot be used to
           authorize the request to the `/token` endpoint.
         example: 10m0s
+        format: duration
+        type: string
+        x-nullable: false
+      id_jag_ttl:
+        default: 5m0s
+        description: |-
+          ID-JAG time to live
+
+          After an Identity Assertion JWT Authorization Grant reaches its time to live, it expires
+          and it cannot be redeemed at the resource authorization server. Kept short by default
+          because the grant is redeemed immediately, and its expiry bounds how long the resource
+          server must remember the grant identifier to reject replays.
+        example: 5m0s
         format: duration
         type: string
         x-nullable: false
@@ -14269,56 +14524,6 @@ definitions:
     - auth_token
     - from
     title: TwilioPhoneProvider holds Twilio-specific configuration.
-    type: object
-  UKConsentPayload:
-    properties:
-      account_ids:
-        items:
-          type: string
-        type: array
-        x-nullable: false
-      client_id:
-        description: Client application identifier.
-        example: '"cauqo9c9vpbs0aj2b2v0"'
-        format: clientID
-        type: string
-        x-nullable: false
-      consent_id:
-        format: consentID
-        type: string
-        x-nullable: false
-      created_at:
-        format: date-time
-        type: string
-        x-nullable: false
-      idempotency_key:
-        type: string
-        x-nullable: false
-      request_hash:
-        type: string
-        x-nullable: false
-      server_id:
-        description: Server / Workspace identifier.
-        example: '"server"'
-        format: serverID
-        type: string
-        x-nullable: false
-      spec:
-        type: string
-        x-nullable: false
-      spec_version:
-        $ref: '#/definitions/SpecVersion'
-      status:
-        type: string
-        x-nullable: false
-      tenant_id:
-        description: Tenant identifier.
-        example: '"tenant"'
-        format: tenantID
-        type: string
-        x-nullable: false
-      type:
-        $ref: '#/definitions/ConsentType'
     type: object
   UserAttributeMapping:
     properties:
@@ -15206,6 +15411,65 @@ paths:
       summary: List workspaces
       tags:
       - workspaces
+  /api/admin/tenants/{tid}/captcha:
+    get:
+      operationId: getTenantCaptcha
+      parameters:
+      - default: default
+        description: Tenant id
+        in: path
+        name: tid
+        required: true
+        type: string
+      responses:
+        "200":
+          $ref: '#/responses/TenantCaptchaResponse'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - adminSystem: []
+      summary: Get tenant captcha settings
+      tags:
+      - captcha
+    put:
+      operationId: setTenantCaptcha
+      parameters:
+      - default: default
+        description: Tenant id
+        in: path
+        name: tid
+        required: true
+        type: string
+      - in: body
+        name: SetTenantCaptcha
+        schema:
+          $ref: '#/definitions/SetTenantCaptcha'
+      responses:
+        "200":
+          $ref: '#/responses/TenantCaptchaResponse'
+        "400":
+          $ref: '#/responses/badRequestHTTPError'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "404":
+          $ref: '#/responses/notFoundHTTPError'
+        "422":
+          $ref: '#/responses/unprocessableEntityHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - adminSystem: []
+      summary: Set tenant captcha settings
+      tags:
+      - captcha
   /api/admin/tenants/{tid}/feature:
     post:
       description: |-
@@ -15510,6 +15774,23 @@ paths:
       summary: Set tenant workforce settings
       tags:
       - workforce
+  /api/admin/tenants/captcha:
+    get:
+      operationId: getCaptcha
+      responses:
+        "200":
+          $ref: '#/responses/GetCaptchaResponse'
+        "401":
+          $ref: '#/responses/unauthorizedHTTPError'
+        "403":
+          $ref: '#/responses/forbiddenHTTPError'
+        "429":
+          $ref: '#/responses/tooManyRequestsHTTPError'
+      security:
+      - adminSystem: []
+      summary: Get deployment captcha state
+      tags:
+      - captcha
   /api/admin/tenants/security:
     get:
       description: 'Returns default security configuration'
@@ -15997,6 +16278,34 @@ responses:
         type: string
     schema:
       $ref: '#/definitions/AuditEvents'
+  AutomaticKeyRotation:
+    description: Automation key rotation
+    headers:
+      etag:
+        description: |-
+          The ETag HTTP header is an identifier for a specific version of a resource
+
+          in:header
+        format: etag
+        type: string
+      x-external-error:
+        description: |-
+          Indicates that a 5xx error was caused by tenant-provided code
+
+          in:header
+        type: string
+      x-trace-id:
+        description: |-
+          OpenTelemetry trace identifier
+
+          in:header
+        type: string
+    schema:
+      $ref: '#/definitions/AutomaticKeyRotation'
+  GetCaptchaResponse:
+    description: Get captcha
+    schema:
+      $ref: '#/definitions/CaptchaDeployment'
   GetSecurityResponse:
     description: Get security
     schema:
@@ -16237,6 +16546,10 @@ responses:
         type: string
     schema:
       $ref: '#/definitions/ServersBindingsResponse'
+  TenantCaptchaResponse:
+    description: Tenant captcha settings
+    schema:
+      $ref: '#/definitions/CaptchaSettings'
   TenantCreated:
     description: Tenant created
     schema:

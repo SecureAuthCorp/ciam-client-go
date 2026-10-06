@@ -11,6 +11,7 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // CredentialCreationResponse CredentialCreationResponse is the raw response returned to the Relying Party from the client for a credential
@@ -26,23 +27,27 @@ type CredentialCreationResponse struct {
 	AuthenticatorAttachment string `json:"authenticatorAttachment,omitempty" yaml:"authenticatorAttachment,omitempty"`
 
 	// client extension results
-	ClientExtensionResults AuthenticationExtensionsClientOutputs `json:"clientExtensionResults,omitempty" yaml:"clientExtensionResults,omitempty"`
+	ClientExtensionResults *AuthenticationExtensionsClientOutputs `json:"clientExtensionResults,omitempty" yaml:"clientExtensionResults,omitempty"`
 
 	// ID is The credential’s identifier. The requirements for the
 	// identifier are distinct for each type of credential. It might
 	// represent a username for username/password tuples, for example.
-	ID string `json:"id,omitempty" yaml:"id,omitempty"`
+	// Required: true
+	ID string `json:"id" yaml:"id"`
 
 	// raw Id
-	RawID URLEncodedBase64 `json:"rawId,omitempty" yaml:"rawId,omitempty"`
+	// Required: true
+	RawID *URLEncodedBase64 `json:"rawId" yaml:"rawId"`
 
 	// response
-	Response *AuthenticatorAttestationResponse `json:"response,omitempty" yaml:"response,omitempty"`
+	// Required: true
+	Response *AuthenticatorAttestationResponse `json:"response" yaml:"response"`
 
 	// Type is the value of the object’s interface object's [[type]] slot,
 	// which specifies the credential type represented by this object.
 	// This should be type "public-key" for Webauthn credentials.
-	Type string `json:"type,omitempty" yaml:"type,omitempty"`
+	// Required: true
+	Type string `json:"type" yaml:"type"`
 }
 
 // Validate validates this credential creation response
@@ -53,11 +58,19 @@ func (m *CredentialCreationResponse) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateID(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateRawID(formats); err != nil {
 		res = append(res, err)
 	}
 
 	if err := m.validateResponse(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateType(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -86,26 +99,43 @@ func (m *CredentialCreationResponse) validateClientExtensionResults(formats strf
 	return nil
 }
 
-func (m *CredentialCreationResponse) validateRawID(formats strfmt.Registry) error {
-	if swag.IsZero(m.RawID) { // not required
-		return nil
-	}
+func (m *CredentialCreationResponse) validateID(formats strfmt.Registry) error {
 
-	if err := m.RawID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("rawId")
-		} else if ce, ok := err.(*errors.CompositeError); ok {
-			return ce.ValidateName("rawId")
-		}
+	if err := validate.RequiredString("id", "body", m.ID); err != nil {
 		return err
 	}
 
 	return nil
 }
 
+func (m *CredentialCreationResponse) validateRawID(formats strfmt.Registry) error {
+
+	if err := validate.Required("rawId", "body", m.RawID); err != nil {
+		return err
+	}
+
+	if err := validate.Required("rawId", "body", m.RawID); err != nil {
+		return err
+	}
+
+	if m.RawID != nil {
+		if err := m.RawID.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("rawId")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("rawId")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (m *CredentialCreationResponse) validateResponse(formats strfmt.Registry) error {
-	if swag.IsZero(m.Response) { // not required
-		return nil
+
+	if err := validate.Required("response", "body", m.Response); err != nil {
+		return err
 	}
 
 	if m.Response != nil {
@@ -117,6 +147,15 @@ func (m *CredentialCreationResponse) validateResponse(formats strfmt.Registry) e
 			}
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (m *CredentialCreationResponse) validateType(formats strfmt.Registry) error {
+
+	if err := validate.RequiredString("type", "body", m.Type); err != nil {
+		return err
 	}
 
 	return nil
@@ -146,17 +185,20 @@ func (m *CredentialCreationResponse) ContextValidate(ctx context.Context, format
 
 func (m *CredentialCreationResponse) contextValidateClientExtensionResults(ctx context.Context, formats strfmt.Registry) error {
 
-	if swag.IsZero(m.ClientExtensionResults) { // not required
-		return nil
-	}
+	if m.ClientExtensionResults != nil {
 
-	if err := m.ClientExtensionResults.ContextValidate(ctx, formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("clientExtensionResults")
-		} else if ce, ok := err.(*errors.CompositeError); ok {
-			return ce.ValidateName("clientExtensionResults")
+		if swag.IsZero(m.ClientExtensionResults) { // not required
+			return nil
 		}
-		return err
+
+		if err := m.ClientExtensionResults.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("clientExtensionResults")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("clientExtensionResults")
+			}
+			return err
+		}
 	}
 
 	return nil
@@ -164,17 +206,16 @@ func (m *CredentialCreationResponse) contextValidateClientExtensionResults(ctx c
 
 func (m *CredentialCreationResponse) contextValidateRawID(ctx context.Context, formats strfmt.Registry) error {
 
-	if swag.IsZero(m.RawID) { // not required
-		return nil
-	}
+	if m.RawID != nil {
 
-	if err := m.RawID.ContextValidate(ctx, formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("rawId")
-		} else if ce, ok := err.(*errors.CompositeError); ok {
-			return ce.ValidateName("rawId")
+		if err := m.RawID.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("rawId")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("rawId")
+			}
+			return err
 		}
-		return err
 	}
 
 	return nil
@@ -183,10 +224,6 @@ func (m *CredentialCreationResponse) contextValidateRawID(ctx context.Context, f
 func (m *CredentialCreationResponse) contextValidateResponse(ctx context.Context, formats strfmt.Registry) error {
 
 	if m.Response != nil {
-
-		if swag.IsZero(m.Response) { // not required
-			return nil
-		}
 
 		if err := m.Response.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {

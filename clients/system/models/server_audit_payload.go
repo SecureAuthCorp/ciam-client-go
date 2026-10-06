@@ -178,6 +178,16 @@ type ServerAuditPayload struct {
 	// Example: default
 	ID string `json:"id,omitempty" yaml:"id,omitempty"`
 
+	// ID-JAG time to live
+	//
+	// After an Identity Assertion JWT Authorization Grant reaches its time to live, it expires
+	// and it cannot be redeemed at the resource authorization server. Kept short by default
+	// because the grant is redeemed immediately, and its expiry bounds how long the resource
+	// server must remember the grant identifier to reject replays.
+	// Example: 5m0s
+	// Format: duration
+	IDJagTTL strfmt.Duration `json:"id_jag_ttl,omitempty" yaml:"id_jag_ttl,omitempty"`
+
 	// ID token time to live
 	//
 	// After an ID token reaches its time to live, it expires and it cannot be used to provide
@@ -222,7 +232,7 @@ type ServerAuditPayload struct {
 	Name string `json:"name,omitempty" yaml:"name,omitempty"`
 
 	// obbr
-	Obbr *OBBRConfiguration `json:"obbr,omitempty" yaml:"obbr,omitempty"`
+	Obbr *DeprecatedOBBRConfiguration `json:"obbr,omitempty" yaml:"obbr,omitempty"`
 
 	// organization
 	Organization *OrganizationConfiguration `json:"organization,omitempty" yaml:"organization,omitempty"`
@@ -390,6 +400,10 @@ func (m *ServerAuditPayload) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateGrantTypes(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateIDJagTTL(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -762,6 +776,18 @@ func (m *ServerAuditPayload) validateGrantTypes(formats strfmt.Registry) error {
 			return err
 		}
 
+	}
+
+	return nil
+}
+
+func (m *ServerAuditPayload) validateIDJagTTL(formats strfmt.Registry) error {
+	if swag.IsZero(m.IDJagTTL) { // not required
+		return nil
+	}
+
+	if err := validate.FormatOf("id_jag_ttl", "body", "duration", m.IDJagTTL.String(), formats); err != nil {
+		return err
 	}
 
 	return nil

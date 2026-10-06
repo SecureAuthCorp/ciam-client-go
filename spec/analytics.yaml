@@ -3529,6 +3529,10 @@ paths:
         in: query
         name: idp_id
         type: string
+      - description: Filter by identity pool id
+        in: query
+        name: pool_id
+        type: string
       - description: A server will only return requested resources if the resource
           matches one of the listed ETag value
         format: etag

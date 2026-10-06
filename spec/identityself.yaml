@@ -10,20 +10,125 @@ definitions:
       for registration.
     type: string
   AuthenticationExtensions:
-    additionalProperties:
-      type: object
-    description: 'Specification: §5.7.1. Authentication Extensions Client Inputs (https://www.w3.org/TR/webauthn/#iface-authentication-extensions-client-inputs)'
+    description: |-
+      Members are marshalled in the AuthenticationExtensionsClientInputsJSON form, i.e. buffer sources are base64url
+      encoded strings, which is the form consumed by PublicKeyCredential.parseCreationOptionsFromJSON().
+
+      A JSON member whose key matches a modelled name only by case (e.g. "CredProps" for "credProps") is bound to that
+      modelled field, not collected into [AuthenticationExtensions.Extra]: encoding/json resolves the case-insensitive
+      match during the first decoding pass, before UnmarshalJSON ever sees the untyped member map. If such a member's
+      value has the wrong type for the modelled field, unmarshalling fails outright rather than falling back to Extra.
+      encoding/json (v1, the only version this module may use) offers no way to defer that binding.
+
+      Specification: §5.7.1. Authentication Extensions Client Inputs (https://www.w3.org/TR/webauthn-3/#iface-authentication-extensions-client-inputs)
+
+      Specification: §10.1. Client Extensions (https://www.w3.org/TR/webauthn-3/#sctn-defined-client-extensions)
+    properties:
+      appid:
+        description: AppID is the FIDO AppID Extension input. Authentication only.
+        type: string
+        x-nullable: false
+      appidExclude:
+        description: AppIDExclude is the FIDO AppID Exclusion Extension input. Registration
+          only.
+        type: string
+        x-nullable: false
+      credBlob:
+        $ref: '#/definitions/URLEncodedBase64'
+      credProps:
+        description: CredProps requests the Credential Properties Extension. Registration
+          only.
+        type: boolean
+        x-nullable: false
+      credentialProtectionPolicy:
+        $ref: '#/definitions/CredentialProtectionPolicy'
+      enforceCredentialProtectionPolicy:
+        description: EnforceCredentialProtectionPolicy requires the credProtect policy
+          is honoured. Registration only.
+        type: boolean
+        x-nullable: false
+      getCredBlob:
+        description: GetCredBlob requests the blob stored with the credential. Authentication
+          only.
+        type: boolean
+        x-nullable: false
+      hmacCreateSecret:
+        description: HMACCreateSecret requests provisioning of the CTAP hmac-secret.
+          Registration only.
+        type: boolean
+        x-nullable: false
+      hmacGetSecret:
+        $ref: '#/definitions/HMACGetSecretInputs'
+      largeBlob:
+        $ref: '#/definitions/LargeBlobInputs'
+      minPinLength:
+        description: MinPinLength requests the authenticator minimum PIN length. Registration
+          only.
+        type: boolean
+        x-nullable: false
+      prf:
+        $ref: '#/definitions/PRFInputs'
+      remoteClientDataJSON:
+        description: |-
+          RemoteClientDataJSON is the Remote Client Data JSON Extension input. This member is set by a remote desktop
+          web client and a Relying Party should not normally set it. See [ExtensionRemoteClientDataJSON], which records
+          that this extension is not yet ratified.
+        type: string
+        x-nullable: false
+      uvm:
+        description: UVM requests the user verification methods used for the operation.
+        type: boolean
+        x-nullable: false
     title: |-
-      AuthenticationExtensions represents the AuthenticationExtensionsClientInputs IDL. This member contains additional
+      AuthenticationExtensions represents the AuthenticationExtensionsClientInputs IDL. It contains additional
       parameters requesting additional processing by the client and authenticator.
     type: object
   AuthenticationExtensionsClientOutputs:
-    additionalProperties:
-      type: object
-    description: 'Specification: §5.9. Authentication Extensions Client Outputs (https://www.w3.org/TR/webauthn/#iface-authentication-extensions-client-outputs)'
+    description: |-
+      Every modelled member is a pointer so an absent value is distinguishable from a false or empty one; the
+      unsolicited output check performed by [AuthenticationExtensionsClientOutputs.Verify] depends on that distinction.
+
+      A JSON member whose key matches a modelled name only by case (e.g. "AppID" for "appid") is bound to that
+      modelled field, not collected into [AuthenticationExtensionsClientOutputs.Extra]: encoding/json resolves the
+      case-insensitive match during the first decoding pass, before UnmarshalJSON ever sees the untyped member map. If
+      such a member's value has the wrong type for the modelled field, unmarshalling fails outright rather than
+      falling back to Extra. encoding/json (v1, the only version this module may use) offers no way to defer that
+      binding.
+
+      Specification: §5.9. Authentication Extensions Client Outputs (https://www.w3.org/TR/webauthn-3/#iface-authentication-extensions-client-outputs)
+    properties:
+      appid:
+        description: AppID indicates the FIDO AppID Extension was acted upon.
+        type: boolean
+        x-nullable: false
+      appidExclude:
+        description: AppIDExclude indicates the FIDO AppID Exclusion Extension was
+          acted upon.
+        type: boolean
+        x-nullable: false
+      credProps:
+        $ref: '#/definitions/CredentialPropertiesOutput'
+      hmacCreateSecret:
+        description: HMACCreateSecret indicates the CTAP hmac-secret was provisioned
+          at registration.
+        type: boolean
+        x-nullable: false
+      hmacGetSecret:
+        $ref: '#/definitions/HMACGetSecretOutputs'
+      largeBlob:
+        $ref: '#/definitions/LargeBlobOutputs'
+      prf:
+        $ref: '#/definitions/PRFOutputs'
+      remoteClientDataJSON:
+        description: |-
+          RemoteClientDataJSON indicates the Remote Client Data JSON Extension was acted upon, which means the local
+          client delegated every Relying Party ID and origin check to a remote host. See
+          [ExtensionRemoteClientDataJSON], which records that this extension is not yet ratified.
+        type: boolean
+        x-nullable: false
     title: |-
-      AuthenticationExtensionsClientOutputs represents the IDL of the same name. It is a map of extension identifier
-      strings to their output values, returned by the client after a create() or get() call.
+      AuthenticationExtensionsClientOutputs represents the AuthenticationExtensionsClientOutputs IDL, returned by the
+      client after a create() or get() call.
     type: object
   AuthenticationMechanisms:
     items:
@@ -238,6 +343,8 @@ definitions:
         x-nullable: false
       authenticator:
         $ref: '#/definitions/Authenticator'
+      extensions:
+        $ref: '#/definitions/CredentialExtensions'
       flags:
         $ref: '#/definitions/CredentialFlags'
       id:
@@ -345,6 +452,11 @@ definitions:
           This should be type "public-key" for Webauthn credentials.
         type: string
         x-nullable: false
+    required:
+    - id
+    - rawId
+    - response
+    - type
     title: |-
       CredentialCreationResponse is the raw response returned to the Relying Party from the client for a credential
       registration ceremony. It contains the [AuthenticatorAttestationResponse] which holds the attestation object
@@ -370,6 +482,58 @@ definitions:
         $ref: '#/definitions/CredentialType'
     title: CredentialDescriptor represents the PublicKeyCredentialDescriptor IDL.
     type: object
+  CredentialExtensions:
+    description: |-
+      CredentialExtensions holds the extension results recorded at registration which remain meaningful for the life
+      of the credential.
+    properties:
+      credBlobSet:
+        description: |-
+          CredBlobSet reports whether the blob submitted with [WithExtensionCredBlob] at registration was stored by
+          the authenticator, which is what determines whether requesting [WithExtensionGetCredBlob] at authentication
+          can return anything.
+        type: boolean
+        x-nullable: false
+      credProtect:
+        $ref: '#/definitions/CredentialProtectionPolicy'
+      hmacSecret:
+        description: |-
+          HMACSecret reports whether the authenticator provisioned a CTAP hmac-secret for this credential, which is
+          what determines whether requesting [WithExtensionHMACGetSecret] at authentication can succeed.
+
+          The value is taken from the authenticator extension outputs where present, because those are covered by the
+          attestation signature, and from the client's 'hmacCreateSecret' output otherwise. The two are the signed and
+          client-reported views of one capability rather than two separate properties, so they share a field.
+
+          This is a sibling of PRFEnabled rather than a duplicate of it: the pseudo-random function extension is the
+          WebAuthn level abstraction over the same authenticator capability, and a client may report either, both, or
+          neither depending on which extension the Relying Party requested.
+        type: boolean
+        x-nullable: false
+      largeBlobSupported:
+        description: LargeBlobSupported reports whether the credential supports large
+          blob storage.
+        type: boolean
+        x-nullable: false
+      minPinLength:
+        description: MinPinLength is the authenticator's minimum PIN length at the
+          time of registration.
+        format: uint64
+        type: integer
+        x-nullable: false
+      prfEnabled:
+        description: |-
+          PRFEnabled reports whether the pseudo-random function is available for this credential. It is populated when
+          the registration requested the extension, typically with [WithExtensionPRFSupport].
+        type: boolean
+        x-nullable: false
+      rk:
+        description: |-
+          RK reports whether the credential is client-side discoverable, from the credProps extension. A false value
+          is meaningful and distinct from the client not reporting the property.
+        type: boolean
+        x-nullable: false
+    type: object
   CredentialFlags:
     description: |-
       These flags indicate the state of user presence, user verification, and backup eligibility/state at the time
@@ -391,7 +555,11 @@ definitions:
         type: boolean
         x-nullable: false
       userVerified:
-        description: Flag UV indicates the user performed verification.
+        description: |-
+          Flag UV indicates the user performed verification. On a credential record this is the uvInitialized value
+          of the specification, which is latched: once an assertion has verified the user it stays true, because
+          [CredentialFlags.Update] only advances it. Read the UV flag of a ceremony's own authenticator data to
+          determine whether that ceremony verified the user.
         type: boolean
         x-nullable: false
     title: CredentialFlags contains the boolean flags derived from the authenticator
@@ -414,6 +582,24 @@ definitions:
       type:
         $ref: '#/definitions/CredentialType'
     type: object
+  CredentialPropertiesOutput:
+    description: 'Specification: §10.1.3. Credential Properties Extension (https://www.w3.org/TR/webauthn-3/#sctn-authenticator-credential-properties-extension)'
+    properties:
+      rk:
+        description: |-
+          RK reports whether the created credential is a client-side discoverable credential. A false value is
+          meaningful and distinct from the client not reporting the property at all.
+        type: boolean
+        x-nullable: false
+    title: |-
+      CredentialPropertiesOutput represents the CredentialPropertiesOutput IDL. The editor's draft defines no member
+      other than rk.
+    type: object
+  CredentialProtectionPolicy:
+    description: 'Registry: https://www.iana.org/assignments/webauthn/webauthn.xhtml'
+    title: CredentialProtectionPolicy represents the credential protection policy
+      values of the CTAP credProtect extension.
+    type: string
   CredentialType:
     description: |-
       This enumeration defines the valid credential types. It is an extension point; values can be added to it in the
@@ -467,6 +653,68 @@ definitions:
         type: string
         x-nullable: false
     type: object
+  HMACGetSecretInputs:
+    description: 'Registry: https://www.iana.org/assignments/webauthn/webauthn.xhtml'
+    properties:
+      salt1:
+        $ref: '#/definitions/URLEncodedBase64'
+      salt2:
+        $ref: '#/definitions/URLEncodedBase64'
+    title: HMACGetSecretInputs represents the inputs of the CTAP hmac-secret extension
+      during authentication.
+    type: object
+  HMACGetSecretOutputs:
+    description: 'Registry: https://www.iana.org/assignments/webauthn/webauthn.xhtml'
+    properties:
+      output1:
+        $ref: '#/definitions/URLEncodedBase64'
+      output2:
+        $ref: '#/definitions/URLEncodedBase64'
+    title: HMACGetSecretOutputs represents the outputs of the CTAP hmac-secret extension
+      during authentication.
+    type: object
+  LargeBlobInputs:
+    description: 'Specification: §10.1.5. Large blob storage extension (https://www.w3.org/TR/webauthn-3/#sctn-large-blob-extension)'
+    properties:
+      read:
+        type: boolean
+        x-nullable: false
+      support:
+        $ref: '#/definitions/LargeBlobSupport'
+      write:
+        $ref: '#/definitions/URLEncodedBase64'
+    title: |-
+      LargeBlobInputs represents the AuthenticationExtensionsLargeBlobInputsJSON IDL. Support is only valid during
+      registration; Read and Write are only valid during authentication and are mutually exclusive.
+    type: object
+  LargeBlobOutputs:
+    description: 'Specification: §10.1.5. Large blob storage extension (https://www.w3.org/TR/webauthn-3/#sctn-large-blob-extension)'
+    properties:
+      blob:
+        $ref: '#/definitions/URLEncodedBase64'
+      supported:
+        description: |-
+          Supported reports whether the created credential supports large blob storage. It is only present at
+          registration, in answer to the 'support' input. A false value is meaningful and distinct from the client
+          not reporting support at all; [AuthenticationExtensionsClientOutputs.Verify] rejects both when support was
+          requested as required.
+        type: boolean
+        x-nullable: false
+      written:
+        description: |-
+          Written reports whether the blob supplied by a 'write' input was stored. A false value is meaningful and
+          distinct from the client not reporting the outcome at all.
+        type: boolean
+        x-nullable: false
+    title: LargeBlobOutputs represents the AuthenticationExtensionsLargeBlobOutputsJSON
+      IDL.
+    type: object
+  LargeBlobSupport:
+    description: 'Specification: §10.1.5. Large blob storage extension (https://www.w3.org/TR/webauthn-3/#sctn-large-blob-extension)'
+    title: |-
+      LargeBlobSupport represents the LargeBlobSupport IDL enumeration used by the large blob storage extension during
+      registration.
+    type: string
   ListUserMFASessions:
     properties:
       sessions:
@@ -500,6 +748,53 @@ definitions:
         x-nullable: false
     required:
     - name
+    type: object
+  PRFInputs:
+    description: |-
+      Every member is optional. A zero value is the bare availability probe, i.e. the "prf":{} input a Relying Party
+      sends at registration to learn whether the pseudo-random function is available for the credential; the client
+      answers with the 'enabled' output. This is why [AuthenticationExtensions.PRF] is a pointer while its
+      [LargeBlobInputs] and [HMACGetSecretInputs] siblings are not.
+
+      EvalByCredential is only valid during authentication; the client throws a NotSupportedError when it is present
+      during registration. Its keys are base64url encoded credential IDs which MUST each match an entry of the
+      allowed credentials.
+
+      Specification: §10.1.4. Pseudo-random function extension (https://www.w3.org/TR/webauthn-3/#prf-extension)
+    properties:
+      eval:
+        $ref: '#/definitions/PRFValues'
+      evalByCredential:
+        additionalProperties:
+          $ref: '#/definitions/PRFValues'
+        type: object
+        x-nullable: false
+    title: PRFInputs represents the AuthenticationExtensionsPRFInputsJSON IDL.
+    type: object
+  PRFOutputs:
+    description: 'Specification: §10.1.4. Pseudo-random function extension (https://www.w3.org/TR/webauthn-3/#prf-extension)'
+    properties:
+      enabled:
+        description: |-
+          Enabled reports whether the pseudo-random function is available for the credential. It is the answer to the
+          bare "prf":{} input a Relying Party sends at registration. A false value is meaningful and distinct from
+          the client not reporting availability at all.
+        type: boolean
+        x-nullable: false
+      results:
+        $ref: '#/definitions/PRFValues'
+    title: PRFOutputs represents the AuthenticationExtensionsPRFOutputsJSON IDL.
+    type: object
+  PRFValues:
+    description: 'Specification: §10.1.4. Pseudo-random function extension (https://www.w3.org/TR/webauthn-3/#prf-extension)'
+    properties:
+      first:
+        $ref: '#/definitions/URLEncodedBase64'
+      second:
+        $ref: '#/definitions/URLEncodedBase64'
+    title: |-
+      PRFValues represents the AuthenticationExtensionsPRFValuesJSON IDL. The byte values are conveyed to the client
+      base64url encoded.
     type: object
   PublicKeyCredentialCreationOptions:
     description: |-
@@ -549,6 +844,23 @@ definitions:
     title: PublicKeyCredentialCreationOptions represents the IDL of the same name.
     type: object
   PublicKeyCredentialHints:
+    description: |-
+      The IDL types the hints member as a sequence of strings rather than as this enumeration, and requires clients to
+      ignore values they do not recognise, so values are deliberately not validated against the constants below: a
+      Relying Party may send a hint ratified after this release, or one a particular user agent understands. Clients
+      also ignore the second and later appearances of a repeated hint.
+
+      Hints may contradict the authenticator attachment and the transports of the allowed credentials. Where they do,
+      a client which implements hints gives the hints precedence; see
+      [PublicKeyCredentialHints.AuthenticatorAttachment] for how a registration ceremony pairs the two for the benefit
+      of clients which do not.
+
+      WebAuthn Level 3.
+
+      Specification: §5.8.7. User-agent Hints Enumeration (https://www.w3.org/TR/webauthn-3/#enum-hints)
+    title: |-
+      PublicKeyCredentialHints represents an entry of the hints member, which conveys the Relying Party's belief about
+      how the user will satisfy the request, in descending order of preference.
     type: string
   RelyingPartyEntity:
     description: 'Specification: §5.4.2. Relying Party Parameters for Credential Generation

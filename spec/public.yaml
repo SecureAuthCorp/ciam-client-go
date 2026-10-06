@@ -717,12 +717,21 @@ definitions:
         description: If b2b_orgs_client_side_search is enabled
         type: boolean
         x-nullable: false
+      embeddable_components:
+        description: If the User portal renders its self-service panes through the
+          embeddable components
+        type: boolean
+        x-nullable: false
       faye_url:
         type: string
         x-nullable: false
       image_proxy_url:
         description: Image proxy URL
         type: string
+        x-nullable: false
+      push:
+        description: If push is enabled
+        type: boolean
         x-nullable: false
       server_profile:
         enum:

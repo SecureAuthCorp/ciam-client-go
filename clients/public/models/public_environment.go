@@ -32,11 +32,17 @@ type PublicEnvironment struct {
 	// If b2b_orgs_client_side_search is enabled
 	B2bOrgsClientSideSearch bool `json:"b2b_orgs_client_side_search,omitempty" yaml:"b2b_orgs_client_side_search,omitempty"`
 
+	// If the User portal renders its self-service panes through the embeddable components
+	EmbeddableComponents bool `json:"embeddable_components,omitempty" yaml:"embeddable_components,omitempty"`
+
 	// faye url
 	FayeURL string `json:"faye_url,omitempty" yaml:"faye_url,omitempty"`
 
 	// Image proxy URL
 	ImageProxyURL string `json:"image_proxy_url,omitempty" yaml:"image_proxy_url,omitempty"`
+
+	// If push is enabled
+	Push bool `json:"push,omitempty" yaml:"push,omitempty"`
 
 	// server profile
 	// Enum: ["default","demo","workforce","workforce_v2","consumer","partners","third_party","fapi_advanced","fapi_rw","fapi_ro","openbanking_uk_fapi_advanced","openbanking_uk","openbanking_br","openbanking_br_unico","cdr_australia","cdr_australia_fapi_rw","fdx","openbanking_ksa","fapi_20_security","fapi_20_message_signing","connect_id","agentic_ai","saidp_legacy"]

@@ -29,6 +29,11 @@ type AuditEventMetadata struct {
 	// ID of the Identity Pool of the User that is affected by an action
 	AffectedUserPoolID string `json:"affected_user_pool_id,omitempty" yaml:"affected_user_pool_id,omitempty"`
 
+	// ID of the application (OAuth client) an action targets.
+	//
+	// Distinct from ClientID, which identifies the client of the access request itself.
+	ApplicationID string `json:"application_id,omitempty" yaml:"application_id,omitempty"`
+
 	// Authorization correlation ID
 	//
 	// Represents the correlation ID used for the OAuth2 authorization code grant flow.
@@ -63,7 +68,8 @@ type AuditEventMetadata struct {
 	// High risk
 	HighRisk bool `json:"high_risk,omitempty" yaml:"high_risk,omitempty"`
 
-	// ID of the Identity Pool
+	// ID of the Identity Pool the action targets: the pool being administered, or the pool
+	// owning the affected user or group. Not the acting principal's pool -- that is user_pool_id.
 	IdentityPoolID string `json:"identity_pool_id,omitempty" yaml:"identity_pool_id,omitempty"`
 
 	// IDP identifier
@@ -81,6 +87,9 @@ type AuditEventMetadata struct {
 	//
 	// It's first not empty value from: X-Forwaded-For, X-Real-IP or network socket IP address
 	IP string `json:"ip,omitempty" yaml:"ip,omitempty"`
+
+	// True when the risk engine found no sign-in baseline for the user; absent when not evaluated
+	IsFirstTimeLogin bool `json:"is_first_time_login,omitempty" yaml:"is_first_time_login,omitempty"`
 
 	// Latitude
 	Latitude float64 `json:"latitude,omitempty" yaml:"latitude,omitempty"`
@@ -138,7 +147,7 @@ type AuditEventMetadata struct {
 	// ID of the User in Identity Pool
 	UserID string `json:"user_id,omitempty" yaml:"user_id,omitempty"`
 
-	// ID of the Identity Pool
+	// ID of the Identity Pool of the principal that performed the action.
 	UserPoolID string `json:"user_pool_id,omitempty" yaml:"user_pool_id,omitempty"`
 }
 

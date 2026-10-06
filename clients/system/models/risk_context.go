@@ -30,6 +30,9 @@ type RiskContext struct {
 	// id
 	ID RiskID `json:"id,omitempty" yaml:"id,omitempty"`
 
+	// is first time login
+	IsFirstTimeLogin bool `json:"is_first_time_login,omitempty" yaml:"is_first_time_login,omitempty"`
+
 	// loa
 	Loa RiskLOA `json:"loa,omitempty" yaml:"loa,omitempty"`
 

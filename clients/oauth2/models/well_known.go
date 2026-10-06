@@ -46,6 +46,9 @@ type WellKnown struct {
 	// Required: true
 	AuthorizationEndpoint string `json:"authorization_endpoint" yaml:"authorization_endpoint"`
 
+	// JSON array containing a list of the authorization grant profiles that this OP supports.
+	AuthorizationGrantProfilesSupported []string `json:"authorization_grant_profiles_supported" yaml:"authorization_grant_profiles_supported"`
+
 	// authorization response iss parameter supported
 	AuthorizationResponseIssParameterSupported bool `json:"authorization_response_iss_parameter_supported,omitempty" yaml:"authorization_response_iss_parameter_supported,omitempty"`
 
@@ -143,6 +146,9 @@ type WellKnown struct {
 	// to encode the Claims in a JWT.
 	// Required: true
 	IDTokenSigningAlgValuesSupported []string `json:"id_token_signing_alg_values_supported" yaml:"id_token_signing_alg_values_supported"`
+
+	// JSON array containing a list of token type identifiers the authorization server can issue via token exchange for identity chaining
+	IdentityChainingRequestedTokenTypesSupported []string `json:"identity_chaining_requested_token_types_supported" yaml:"identity_chaining_requested_token_types_supported"`
 
 	// OAuth 2.0 Introspection Endpoint.
 	IntrospectionEndpoint string `json:"introspection_endpoint,omitempty" yaml:"introspection_endpoint,omitempty"`

@@ -83,6 +83,12 @@ type ListAuditEventsParams struct {
 	*/
 	AfterEventID *string
 
+	/* ApplicationID.
+
+	   optional list audit events for a given application (target OAuth client id)
+	*/
+	ApplicationID *string
+
 	/* AuthorizationCorrelationID.
 
 	   optional list audit events with a given authorization correlation id
@@ -130,6 +136,13 @@ type ListAuditEventsParams struct {
 	IP
 	*/
 	HighRisk *string
+
+	/* IdentityPoolID.
+
+	     optional list audit events targeting a given identity pool: the pool administered, or the
+	pool owning the affected user or group
+	*/
+	IdentityPoolID *string
 
 	/* IdpID.
 
@@ -247,7 +260,7 @@ type ListAuditEventsParams struct {
 
 	/* UserPoolID.
 
-	     optional list audit events with a given user identity pool id
+	     optional list audit events performed by a principal from a given identity pool
 	UserPoolID
 	*/
 	UserPoolID *string
@@ -372,6 +385,17 @@ func (o *ListAuditEventsParams) SetAfterEventID(afterEventID *string) {
 	o.AfterEventID = afterEventID
 }
 
+// WithApplicationID adds the applicationID to the list audit events params
+func (o *ListAuditEventsParams) WithApplicationID(applicationID *string) *ListAuditEventsParams {
+	o.SetApplicationID(applicationID)
+	return o
+}
+
+// SetApplicationID adds the applicationId to the list audit events params
+func (o *ListAuditEventsParams) SetApplicationID(applicationID *string) {
+	o.ApplicationID = applicationID
+}
+
 // WithAuthorizationCorrelationID adds the authorizationCorrelationID to the list audit events params
 func (o *ListAuditEventsParams) WithAuthorizationCorrelationID(authorizationCorrelationID *string) *ListAuditEventsParams {
 	o.SetAuthorizationCorrelationID(authorizationCorrelationID)
@@ -447,6 +471,17 @@ func (o *ListAuditEventsParams) WithHighRisk(highRisk *string) *ListAuditEventsP
 // SetHighRisk adds the highRisk to the list audit events params
 func (o *ListAuditEventsParams) SetHighRisk(highRisk *string) {
 	o.HighRisk = highRisk
+}
+
+// WithIdentityPoolID adds the identityPoolID to the list audit events params
+func (o *ListAuditEventsParams) WithIdentityPoolID(identityPoolID *string) *ListAuditEventsParams {
+	o.SetIdentityPoolID(identityPoolID)
+	return o
+}
+
+// SetIdentityPoolID adds the identityPoolId to the list audit events params
+func (o *ListAuditEventsParams) SetIdentityPoolID(identityPoolID *string) {
+	o.IdentityPoolID = identityPoolID
 }
 
 // WithIdpID adds the idpID to the list audit events params
@@ -717,6 +752,23 @@ func (o *ListAuditEventsParams) WriteToRequest(r runtime.ClientRequest, reg strf
 		}
 	}
 
+	if o.ApplicationID != nil {
+
+		// query param application_id
+		var qrApplicationID string
+
+		if o.ApplicationID != nil {
+			qrApplicationID = *o.ApplicationID
+		}
+		qApplicationID := qrApplicationID
+		if qApplicationID != "" {
+
+			if err := r.SetQueryParam("application_id", qApplicationID); err != nil {
+				return err
+			}
+		}
+	}
+
 	if o.AuthorizationCorrelationID != nil {
 
 		// query param authorization_correlation_id
@@ -819,6 +871,23 @@ func (o *ListAuditEventsParams) WriteToRequest(r runtime.ClientRequest, reg strf
 		if qHighRisk != "" {
 
 			if err := r.SetQueryParam("high_risk", qHighRisk); err != nil {
+				return err
+			}
+		}
+	}
+
+	if o.IdentityPoolID != nil {
+
+		// query param identity_pool_id
+		var qrIdentityPoolID string
+
+		if o.IdentityPoolID != nil {
+			qrIdentityPoolID = *o.IdentityPoolID
+		}
+		qIdentityPoolID := qrIdentityPoolID
+		if qIdentityPoolID != "" {
+
+			if err := r.SetQueryParam("identity_pool_id", qIdentityPoolID); err != nil {
 				return err
 			}
 		}

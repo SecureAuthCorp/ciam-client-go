@@ -773,6 +773,9 @@ definitions:
         x-nullable: false
       Parent:
         $ref: '#/definitions/Element'
+      Remove:
+        type: boolean
+        x-nullable: false
     type: object
   X509Certificate:
     description: X509Certificate represents the XMLSEC object of the same name

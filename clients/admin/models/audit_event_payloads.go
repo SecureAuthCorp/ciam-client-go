@@ -24,6 +24,24 @@ type AuditEventPayloads struct {
 	// access token issued
 	AccessTokenIssued *AccessRequestData `json:"access_token_issued,omitempty" yaml:"access_token_issued,omitempty"`
 
+	// application assignment created
+	ApplicationAssignmentCreated *ApplicationAssignmentAuditPayload `json:"application_assignment_created,omitempty" yaml:"application_assignment_created,omitempty"`
+
+	// application assignment deleted
+	ApplicationAssignmentDeleted *ApplicationAssignmentAuditPayload `json:"application_assignment_deleted,omitempty" yaml:"application_assignment_deleted,omitempty"`
+
+	// application membership denied
+	ApplicationMembershipDenied *ApplicationMembershipDeniedAuditPayload `json:"application_membership_denied,omitempty" yaml:"application_membership_denied,omitempty"`
+
+	// application membership granted
+	ApplicationMembershipGranted *ApplicationMembershipAuditPayload `json:"application_membership_granted,omitempty" yaml:"application_membership_granted,omitempty"`
+
+	// application membership revoked
+	ApplicationMembershipRevoked *ApplicationMembershipAuditPayload `json:"application_membership_revoked,omitempty" yaml:"application_membership_revoked,omitempty"`
+
+	// application membership updated
+	ApplicationMembershipUpdated *ApplicationOpenAccessAuditPayload `json:"application_membership_updated,omitempty" yaml:"application_membership_updated,omitempty"`
+
 	// authorization code denied
 	AuthorizationCodeDenied *AccessRequestDataWithError `json:"authorization_code_denied,omitempty" yaml:"authorization_code_denied,omitempty"`
 
@@ -313,6 +331,30 @@ func (m *AuditEventPayloads) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateAccessTokenIssued(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateApplicationAssignmentCreated(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateApplicationAssignmentDeleted(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateApplicationMembershipDenied(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateApplicationMembershipGranted(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateApplicationMembershipRevoked(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateApplicationMembershipUpdated(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -724,6 +766,120 @@ func (m *AuditEventPayloads) validateAccessTokenIssued(formats strfmt.Registry) 
 				return ve.ValidateName("access_token_issued")
 			} else if ce, ok := err.(*errors.CompositeError); ok {
 				return ce.ValidateName("access_token_issued")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *AuditEventPayloads) validateApplicationAssignmentCreated(formats strfmt.Registry) error {
+	if swag.IsZero(m.ApplicationAssignmentCreated) { // not required
+		return nil
+	}
+
+	if m.ApplicationAssignmentCreated != nil {
+		if err := m.ApplicationAssignmentCreated.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("application_assignment_created")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("application_assignment_created")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *AuditEventPayloads) validateApplicationAssignmentDeleted(formats strfmt.Registry) error {
+	if swag.IsZero(m.ApplicationAssignmentDeleted) { // not required
+		return nil
+	}
+
+	if m.ApplicationAssignmentDeleted != nil {
+		if err := m.ApplicationAssignmentDeleted.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("application_assignment_deleted")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("application_assignment_deleted")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *AuditEventPayloads) validateApplicationMembershipDenied(formats strfmt.Registry) error {
+	if swag.IsZero(m.ApplicationMembershipDenied) { // not required
+		return nil
+	}
+
+	if m.ApplicationMembershipDenied != nil {
+		if err := m.ApplicationMembershipDenied.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("application_membership_denied")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("application_membership_denied")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *AuditEventPayloads) validateApplicationMembershipGranted(formats strfmt.Registry) error {
+	if swag.IsZero(m.ApplicationMembershipGranted) { // not required
+		return nil
+	}
+
+	if m.ApplicationMembershipGranted != nil {
+		if err := m.ApplicationMembershipGranted.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("application_membership_granted")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("application_membership_granted")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *AuditEventPayloads) validateApplicationMembershipRevoked(formats strfmt.Registry) error {
+	if swag.IsZero(m.ApplicationMembershipRevoked) { // not required
+		return nil
+	}
+
+	if m.ApplicationMembershipRevoked != nil {
+		if err := m.ApplicationMembershipRevoked.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("application_membership_revoked")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("application_membership_revoked")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *AuditEventPayloads) validateApplicationMembershipUpdated(formats strfmt.Registry) error {
+	if swag.IsZero(m.ApplicationMembershipUpdated) { // not required
+		return nil
+	}
+
+	if m.ApplicationMembershipUpdated != nil {
+		if err := m.ApplicationMembershipUpdated.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("application_membership_updated")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("application_membership_updated")
 			}
 			return err
 		}
@@ -2511,6 +2667,30 @@ func (m *AuditEventPayloads) ContextValidate(ctx context.Context, formats strfmt
 		res = append(res, err)
 	}
 
+	if err := m.contextValidateApplicationAssignmentCreated(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateApplicationAssignmentDeleted(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateApplicationMembershipDenied(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateApplicationMembershipGranted(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateApplicationMembershipRevoked(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateApplicationMembershipUpdated(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.contextValidateAuthorizationCodeDenied(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -2923,6 +3103,132 @@ func (m *AuditEventPayloads) contextValidateAccessTokenIssued(ctx context.Contex
 				return ve.ValidateName("access_token_issued")
 			} else if ce, ok := err.(*errors.CompositeError); ok {
 				return ce.ValidateName("access_token_issued")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *AuditEventPayloads) contextValidateApplicationAssignmentCreated(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.ApplicationAssignmentCreated != nil {
+
+		if swag.IsZero(m.ApplicationAssignmentCreated) { // not required
+			return nil
+		}
+
+		if err := m.ApplicationAssignmentCreated.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("application_assignment_created")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("application_assignment_created")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *AuditEventPayloads) contextValidateApplicationAssignmentDeleted(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.ApplicationAssignmentDeleted != nil {
+
+		if swag.IsZero(m.ApplicationAssignmentDeleted) { // not required
+			return nil
+		}
+
+		if err := m.ApplicationAssignmentDeleted.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("application_assignment_deleted")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("application_assignment_deleted")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *AuditEventPayloads) contextValidateApplicationMembershipDenied(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.ApplicationMembershipDenied != nil {
+
+		if swag.IsZero(m.ApplicationMembershipDenied) { // not required
+			return nil
+		}
+
+		if err := m.ApplicationMembershipDenied.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("application_membership_denied")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("application_membership_denied")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *AuditEventPayloads) contextValidateApplicationMembershipGranted(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.ApplicationMembershipGranted != nil {
+
+		if swag.IsZero(m.ApplicationMembershipGranted) { // not required
+			return nil
+		}
+
+		if err := m.ApplicationMembershipGranted.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("application_membership_granted")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("application_membership_granted")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *AuditEventPayloads) contextValidateApplicationMembershipRevoked(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.ApplicationMembershipRevoked != nil {
+
+		if swag.IsZero(m.ApplicationMembershipRevoked) { // not required
+			return nil
+		}
+
+		if err := m.ApplicationMembershipRevoked.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("application_membership_revoked")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("application_membership_revoked")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *AuditEventPayloads) contextValidateApplicationMembershipUpdated(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.ApplicationMembershipUpdated != nil {
+
+		if swag.IsZero(m.ApplicationMembershipUpdated) { // not required
+			return nil
+		}
+
+		if err := m.ApplicationMembershipUpdated.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("application_membership_updated")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("application_membership_updated")
 			}
 			return err
 		}

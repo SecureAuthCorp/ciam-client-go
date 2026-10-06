@@ -190,6 +190,16 @@ type TreeServer struct {
 	// Example: ["authorization_code","implicit","refresh_token","client_credentials"]
 	GrantTypes []string `json:"grant_types" yaml:"grant_types"`
 
+	// ID-JAG time to live
+	//
+	// After an Identity Assertion JWT Authorization Grant reaches its time to live, it expires
+	// and it cannot be redeemed at the resource authorization server. Kept short by default
+	// because the grant is redeemed immediately, and its expiry bounds how long the resource
+	// server must remember the grant identifier to reject replays.
+	// Example: 5m0s
+	// Format: duration
+	IDJagTTL strfmt.Duration `json:"id_jag_ttl,omitempty" yaml:"id_jag_ttl,omitempty"`
+
 	// ID token time to live
 	//
 	// After an ID token reaches its time to live, it expires and it cannot be used to provide
@@ -243,7 +253,7 @@ type TreeServer struct {
 	Name string `json:"name,omitempty" yaml:"name,omitempty"`
 
 	// obbr
-	Obbr *OBBRConfiguration `json:"obbr,omitempty" yaml:"obbr,omitempty"`
+	Obbr *DeprecatedOBBRConfiguration `json:"obbr,omitempty" yaml:"obbr,omitempty"`
 
 	// organization
 	Organization *OrganizationConfiguration `json:"organization,omitempty" yaml:"organization,omitempty"`
@@ -488,6 +498,10 @@ func (m *TreeServer) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateGrantTypes(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateIDJagTTL(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -1003,6 +1017,18 @@ func (m *TreeServer) validateGrantTypes(formats strfmt.Registry) error {
 			return err
 		}
 
+	}
+
+	return nil
+}
+
+func (m *TreeServer) validateIDJagTTL(formats strfmt.Registry) error {
+	if swag.IsZero(m.IDJagTTL) { // not required
+		return nil
+	}
+
+	if err := validate.FormatOf("id_jag_ttl", "body", "duration", m.IDJagTTL.String(), formats); err != nil {
+		return err
 	}
 
 	return nil

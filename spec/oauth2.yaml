@@ -53,6 +53,25 @@ definitions:
         type: integer
         x-nullable: false
     type: object
+  ClientIDJAGTarget:
+    properties:
+      aud_tenant:
+        description: Sets the ID-JAG aud_tenant claim for this audience. Multi-tenant
+          resource servers require it.
+        type: string
+        x-nullable: false
+      audience:
+        description: Target authorization server issuer URL.
+        type: string
+        x-nullable: false
+      client_id:
+        description: Overrides the ID-JAG client_id claim for this audience. Empty
+          uses the requesting client's ID.
+        type: string
+        x-nullable: false
+    required:
+    - audience
+    type: object
   ClientJWK:
     properties:
       alg:
@@ -199,6 +218,13 @@ definitions:
           Applies for the token exchange delegation flow only.
         items:
           type: string
+        type: array
+        x-nullable: false
+      id_jag_targets:
+        description: ID-JAG targets with optional client ID and audience tenant overrides.
+          Audiences must be unique.
+        items:
+          $ref: '#/definitions/ClientIDJAGTarget'
         type: array
         x-nullable: false
     type: object
@@ -2088,6 +2114,13 @@ definitions:
         example: https://example.com/oauth2/auth
         type: string
         x-nullable: false
+      authorization_grant_profiles_supported:
+        description: JSON array containing a list of the authorization grant profiles
+          that this OP supports.
+        items:
+          type: string
+        type: array
+        x-nullable: false
       authorization_response_iss_parameter_supported:
         type: boolean
         x-nullable: false
@@ -2287,6 +2320,13 @@ definitions:
         description: |-
           JSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for the ID Token
           to encode the Claims in a JWT.
+        items:
+          type: string
+        type: array
+        x-nullable: false
+      identity_chaining_requested_token_types_supported:
+        description: JSON array containing a list of token type identifiers the authorization
+          server can issue via token exchange for identity chaining
         items:
           type: string
         type: array

@@ -35,6 +35,16 @@ type TokenTTLs struct {
 	// Format: duration
 	AuthorizationCodeTTL strfmt.Duration `json:"authorization_code_ttl,omitempty" yaml:"authorization_code_ttl,omitempty"`
 
+	// ID-JAG time to live
+	//
+	// After an Identity Assertion JWT Authorization Grant reaches its time to live, it expires
+	// and it cannot be redeemed at the resource authorization server. Kept short by default
+	// because the grant is redeemed immediately, and its expiry bounds how long the resource
+	// server must remember the grant identifier to reject replays.
+	// Example: 5m0s
+	// Format: duration
+	IDJagTTL strfmt.Duration `json:"id_jag_ttl,omitempty" yaml:"id_jag_ttl,omitempty"`
+
 	// ID token time to live
 	//
 	// After an ID token reaches its time to live, it expires and it cannot be used to provide
@@ -61,6 +71,10 @@ func (m *TokenTTLs) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateAuthorizationCodeTTL(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateIDJagTTL(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -96,6 +110,18 @@ func (m *TokenTTLs) validateAuthorizationCodeTTL(formats strfmt.Registry) error 
 	}
 
 	if err := validate.FormatOf("authorization_code_ttl", "body", "duration", m.AuthorizationCodeTTL.String(), formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *TokenTTLs) validateIDJagTTL(formats strfmt.Registry) error {
+	if swag.IsZero(m.IDJagTTL) { // not required
+		return nil
+	}
+
+	if err := validate.FormatOf("id_jag_ttl", "body", "duration", m.IDJagTTL.String(), formats); err != nil {
 		return err
 	}
 
